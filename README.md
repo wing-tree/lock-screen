@@ -31,3 +31,6 @@ private fun wallpaper(): Bitmap? {
 }
 ```
 ## [Palette](https://developer.android.com/reference/android/support/v7/graphics/Palette.html)
+```
+implementation 'androidx.palette:palette-ktx:1.0.0'
+```
