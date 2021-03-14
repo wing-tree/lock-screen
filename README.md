@@ -30,4 +30,4 @@ private fun wallpaper(): Bitmap? {
     return null
 }
 ```
-## [Selecting Colors with the Palette API](https://developer.android.com/training/material/palette-colors)
+## [Palette](https://developer.android.com/reference/android/support/v7/graphics/Palette.html)
