@@ -34,3 +34,4 @@ private fun wallpaper(): Bitmap? {
 ```
 implementation 'androidx.palette:palette-ktx:1.0.0'
 ```
+## [Selecting Colors with the Palette API](https://developer.android.com/training/material/palette-colors)
