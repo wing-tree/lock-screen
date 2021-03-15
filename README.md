@@ -10,7 +10,8 @@ val string = calendarDisplays.map { it.id }.joinToString(separator = ", ") { "\"
 ## [CalendarContract.EventsColumns](https://developer.android.com/reference/android/provider/CalendarContract.EventsColumns#ACCESS_CONFIDENTIAL)
 ## [How to decide font color in white or black depending on background color?](https://stackoverflow.com/questions/3942878/how-to-decide-font-color-in-white-or-black-depending-on-background-color)
 ```
-private fun setDateTimeTextColor(@ColorInt colorInt: Int) {
+@ColorInt
+private fun getDateTimeTextColor(@ColorInt colorInt: Int): Int {
     var red = Color.red(colorInt) / 255.0
     var green = Color.green(colorInt) / 255.0
     var blue = Color.blue(colorInt) / 255.0
@@ -32,13 +33,10 @@ private fun setDateTimeTextColor(@ColorInt colorInt: Int) {
 
     val y = 0.2126 * red + 0.7152 * green + 0.0722 * blue
 
-    val color = if (y > 0.179)
+    return if (y > 0.179)
         Color.BLACK
     else
         Color.WHITE
-
-    viewBinding?.textDate?.setTextColor(color)
-    viewBinding?.textTime?.setTextColor(color)
 }
 ```
 ## [How to get android lock screen wallpaper?](https://stackoverflow.com/questions/53881697/how-to-get-android-lock-screen-wallpaper)
