@@ -5,6 +5,7 @@
 ```
 val string = calendarDisplays.map { it.id }.joinToString(separator = ", ") { "\"$it\"" }
 ```
+## [Android Calendar Intent](https://itnext.io/android-calendar-intent-8536232ecb38)
 ## [Avoiding memory leaks when using Data Binding and View Binding](https://proandroiddev.com/avoiding-memory-leaks-when-using-data-binding-and-view-binding-3b91d571c150)
 ## [CalendarContract.Events](https://developer.android.com/reference/android/provider/CalendarContract.Events)
 ## [CalendarContract.EventsColumns](https://developer.android.com/reference/android/provider/CalendarContract.EventsColumns#ACCESS_CONFIDENTIAL)
