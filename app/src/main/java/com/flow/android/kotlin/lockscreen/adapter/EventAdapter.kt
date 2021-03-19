@@ -2,6 +2,7 @@ package com.flow.android.kotlin.lockscreen.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.AdapterView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -9,28 +10,43 @@ import androidx.viewbinding.ViewBinding
 import com.flow.android.kotlin.lockscreen.calendar.Event
 import com.flow.android.kotlin.lockscreen.databinding.ItemEventBinding
 
-class EventAdapter: ListAdapter<Event, EventAdapter.ViewHolder>(DiffCallback()) {
+class EventAdapter(private val onItemClickListener: OnItemClickListener): ListAdapter<Event, EventAdapter.ViewHolder>(DiffCallback()) {
 
-    class ViewHolder private constructor(val viewBinding: ViewBinding): RecyclerView.ViewHolder(viewBinding.root) {
+    interface OnItemClickListener {
+        fun onItemClick(item: Event)
+    }
+
+    fun add(item: Event) {
+        val list = currentList.toMutableList()
+        list.add(item)
+        submitList(list)
+    }
+
+    class ViewHolder private constructor(private val viewBinding: ViewBinding, private val onItemClickListener: OnItemClickListener):
+            RecyclerView.ViewHolder(viewBinding.root) {
 
         fun bind(item: Event) {
             viewBinding as ItemEventBinding
             viewBinding.textCalendarDisplayName.text = item.calendarDisplayName
             viewBinding.textTitle.text = item.title
+
+            viewBinding.root.setOnClickListener {
+                onItemClickListener.onItemClick(item)
+            }
         }
 
         companion object {
-            fun from(parent: ViewGroup): ViewHolder {
+            fun from(parent: ViewGroup, onItemClickListener: OnItemClickListener): ViewHolder {
                 val inflater = LayoutInflater.from(parent.context)
                 val viewBinding = ItemEventBinding.inflate(inflater, parent, false)
 
-                return ViewHolder(viewBinding)
+                return ViewHolder(viewBinding, onItemClickListener)
             }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder.from(parent)
+        return ViewHolder.from(parent, onItemClickListener)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {

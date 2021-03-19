@@ -14,22 +14,33 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/text_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Time"
+        <TextClock
+            android:id="@+id/text_clock_time"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:format12Hour="@string/format_time"
+            app:autoSizeTextType="uniform"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/text_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Date"
+            android:id="@+id/text_clock_date"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:format24Hour="@string/format_date"
+            app:autoSizeTextType="uniform"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_time" />
+            app:layout_constraintTop_toBottomOf="@+id/text_clock_time" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/app_compat_image_button"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraint_layout"
+        app:srcCompat="@drawable/ic_round_add_24"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
@@ -38,6 +49,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraint_layout" />
-
+        app:layout_constraintTop_toBottomOf="@+id/app_compat_image_button" />
 </androidx.constraintlayout.widget.ConstraintLayout>

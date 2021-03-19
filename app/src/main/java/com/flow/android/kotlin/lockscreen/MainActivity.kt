@@ -2,6 +2,7 @@ package com.flow.android.kotlin.lockscreen
 
 import android.Manifest
 import android.app.WallpaperManager
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -9,6 +10,7 @@ import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.os.Build
 import android.os.Bundle
+import android.provider.CalendarContract
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -17,6 +19,7 @@ import androidx.palette.graphics.Palette
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.flow.android.kotlin.lockscreen.adapter.EventAdapter
 import com.flow.android.kotlin.lockscreen.calendar.CalendarHelper
+import com.flow.android.kotlin.lockscreen.calendar.Event
 import com.flow.android.kotlin.lockscreen.databinding.ActivityMainBinding
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.PermissionToken
@@ -27,10 +30,11 @@ import com.karumi.dexter.listener.single.PermissionListener
 import java.io.IOException
 import kotlin.math.pow
 
+internal const val BLANK = ""
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), EventAdapter.OnItemClickListener {
 
-    private val eventAdapter = EventAdapter()
+    private val eventAdapter = EventAdapter(this)
     private var viewBinding: ActivityMainBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,6 +61,10 @@ class MainActivity : AppCompatActivity() {
                     }
                 }).check()
 
+        viewBinding?.appCompatImageButton?.setOnClickListener {
+            CalendarHelper.insertEvent(this)
+        }
+
         viewBinding?.recyclerView?.apply {
             adapter = eventAdapter
             layoutManager = LinearLayoutManager(this@MainActivity)
@@ -64,7 +72,26 @@ class MainActivity : AppCompatActivity() {
 
         val events = CalendarHelper.events(contentResolver, CalendarHelper.calendarDisplays(contentResolver))
         eventAdapter.submitList(events)
-        println("KKKKKK: $events")
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        println("INTHEEEEEEEEEE $resultCode,, $RESULT_OK,,, $RESULT_CANCELED")
+
+        if (resultCode == RESULT_OK) {
+            println("RESULT_OK OOOOOOOOO")
+            @Suppress("SpellCheckingInspection")
+            when(requestCode) {
+                CalendarHelper.RequestCode.InsertEvent -> {
+                    data?.let {
+                        CalendarHelper.events(contentResolver, CalendarHelper.calendarDisplays(contentResolver)).also { events ->
+                            eventAdapter.submitList(events)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun wallpaper(): Bitmap? {
@@ -144,5 +171,10 @@ class MainActivity : AppCompatActivity() {
             Color.BLACK
         else
             Color.WHITE
+    }
+
+    /** EventAdapter.OnItemClickListener */
+    override fun onItemClick(item: Event) {
+        CalendarHelper.editEvent(this, item)
     }
 }
