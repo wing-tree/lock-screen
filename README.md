@@ -73,3 +73,4 @@ private fun wallpaper(): Bitmap? {
 implementation 'androidx.palette:palette-ktx:1.0.0'
 ```
 ## [Selecting Colors with the Palette API](https://developer.android.com/training/material/palette-colors)
+## [Using Sync Adapter to transfer data in android](https://nyamebismark12-nb.medium.com/using-sync-adapter-to-transfer-data-ad1e6c3f2d64)
