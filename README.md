@@ -141,6 +141,13 @@ private fun getDateTimeTextColor(@ColorInt colorInt: Int): Int {
 ```
 ## [How to get android lock screen wallpaper?](https://stackoverflow.com/questions/53881697/how-to-get-android-lock-screen-wallpaper)
 ```
+private fun wallpaper(): Bitmap {
+    val wallpaperManager = WallpaperManager.getInstance(this)
+   
+    return wallpaperManager.drawable.toBitmap()
+}
+```
+```
 private fun wallpaper(): Bitmap? {
     if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
         val wallpaperManager = WallpaperManager.getInstance(this)
