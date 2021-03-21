@@ -9,6 +9,105 @@ val string = calendarDisplays.map { it.id }.joinToString(separator = ", ") { "\"
 ## [Avoiding memory leaks when using Data Binding and View Binding](https://proandroiddev.com/avoiding-memory-leaks-when-using-data-binding-and-view-binding-3b91d571c150)
 ## [CalendarContract.Events](https://developer.android.com/reference/android/provider/CalendarContract.Events)
 ## [CalendarContract.EventsColumns](https://developer.android.com/reference/android/provider/CalendarContract.EventsColumns#ACCESS_CONFIDENTIAL)
+## [Cannot read recurring events from android calendar programmatically](https://stackoverflow.com/questions/7130025/cannot-read-recurring-events-from-android-calendar-programmatically)
+### [Instances table](https://developer.android.com/guide/topics/providers/calendar-provider.html#instances)
+```
+@Suppress("SpellCheckingInspection")
+@SuppressLint("Recycle")
+fun instances(contentResolver: ContentResolver, eventId: String, DTSTART: Calendar, DTEND: Calendar): ArrayList<Event>? {
+
+    val events = arrayListOf<Event>()
+
+    val selection = "${CalendarContract.Instances.EVENT_ID} = ?"
+    val selectionArgs: Array<String> = arrayOf(eventId)
+
+    val builder: Uri.Builder = CalendarContract.Instances.CONTENT_URI.buildUpon()
+    ContentUris.appendId(builder, DTSTART.timeInMillis)
+    ContentUris.appendId(builder, DTEND.timeInMillis)
+
+    val cursor = contentResolver.query(
+            builder.build(),
+            Instances.projection,
+            selection,
+            selectionArgs,
+            null
+    ) ?: return null
+
+    while (cursor.moveToNext()) {
+        val begin = cursor.getLongOrNull(Instances.Index.BEGIN) ?: 0L
+        val calendarDisplayName = cursor.getStringOrNull(Instances.Index.CALENDAR_DISPLAY_NAME) ?: BLANK
+        val calendarId = cursor.getLongOrNull(Instances.Index.CALENDAR_ID) ?: continue
+        val end = cursor.getLongOrNull(Instances.Index.END) ?: 0L
+        val id = cursor.getLongOrNull(Instances.Index.EVENT_ID) ?: continue
+        val rrule = cursor.getStringOrNull(Instances.Index.RRULE) ?: BLANK
+        val title = cursor.getStringOrNull(Instances.Index.TITLE) ?: BLANK
+
+        events.add(Event(
+                begin = begin,
+                calendarDisplayName = calendarDisplayName,
+                calendarId = calendarId,
+                end = end,
+                id = id,
+                rrule = rrule,
+                title = title
+        ))
+    }
+
+    return events
+}
+
+@SuppressLint("Recycle")
+fun events(contentResolver: ContentResolver, calendarDisplays: List<CalendarDisplay>): ArrayList<Event>? {
+
+    val events = arrayListOf<Event>()
+
+    @Suppress("LocalVariableName", "SpellCheckingInspection")
+    val DTSTART = Calendar.getInstance()
+
+    @Suppress("LocalVariableName", "SpellCheckingInspection")
+    val DTEND = Calendar.getInstance()
+
+    DTSTART.set(Calendar.HOUR_OF_DAY, 0)
+    DTSTART.set(Calendar.MINUTE, 0)
+    DTSTART.set(Calendar.SECOND, 0)
+
+    DTEND.set(Calendar.HOUR_OF_DAY, 0)
+    DTEND.set(Calendar.MINUTE, 0)
+    DTEND.set(Calendar.SECOND, 0)
+    DTEND.add(Calendar.DATE, 1)
+
+    val string = calendarDisplays.map { it.id }.joinToString(separator = ", ") { "\"$it\"" }
+    val selection = "(${CalendarContract.Events.CALENDAR_ID} IN ($string)) AND " +
+            "(${CalendarContract.Events.DELETED} = 0)"
+
+    val cursor = contentResolver.query(
+            CalendarContract.Events.CONTENT_URI,
+            Events.projection,
+            selection,
+            null,
+            null
+    ) ?: return null
+
+    cursor.moveToFirst()
+
+    @Suppress("SpellCheckingInspection")
+    while (cursor.moveToNext()) {
+        @Suppress("LocalVariableName")
+        val _id = cursor.getLongOrNull(Events.Index._ID) ?: continue
+        val title = cursor.getStringOrNull(Events.Index.TITLE) ?: BLANK
+
+        Timber.d("events")
+        Timber.d("_id: $_id")
+        Timber.d("title: $title")
+
+        instances(contentResolver, _id.toString(), DTSTART, DTEND)?.let { instances ->
+            events.addAll(instances)
+        }
+    }
+
+    return events
+}
+```
 ## [How to decide font color in white or black depending on background color?](https://stackoverflow.com/questions/3942878/how-to-decide-font-color-in-white-or-black-depending-on-background-color)
 ```
 @ColorInt
