@@ -3,12 +3,14 @@ package com.flow.android.kotlin.lockscreen.calendar
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ContentResolver
+import android.content.ContentUris
 import android.content.Intent
-import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.net.Uri
 import android.provider.CalendarContract
+import androidx.core.database.getLongOrNull
+import androidx.core.database.getStringOrNull
+import com.flow.android.kotlin.lockscreen.util.BLANK
 import timber.log.Timber
-import java.text.SimpleDateFormat
 import java.util.*
 
 object CalendarHelper {
@@ -39,22 +41,34 @@ object CalendarHelper {
     private object Events {
         val projection: Array<String> = arrayOf(
                 CalendarContract.Events._ID,
-                CalendarContract.Events.CALENDAR_DISPLAY_NAME,
-                CalendarContract.Events.CALENDAR_ID,
-                CalendarContract.Events.DTEND,
-                CalendarContract.Events.DTSTART,
-                CalendarContract.Events.RRULE,
                 CalendarContract.Events.TITLE
         )
 
-        @Suppress("SpellCheckingInspection")
         object Index {
             @Suppress("ObjectPropertyName")
             const val _ID = 0
+            const val TITLE = 1
+        }
+    }
+
+    private object Instances {
+        val projection: Array<String> = arrayOf(
+                CalendarContract.Instances.BEGIN,
+                CalendarContract.Instances.CALENDAR_DISPLAY_NAME,
+                CalendarContract.Instances.CALENDAR_ID,
+                CalendarContract.Instances.END,
+                CalendarContract.Instances.EVENT_ID,
+                CalendarContract.Instances.RRULE,
+                CalendarContract.Instances.TITLE
+        )
+
+        object Index {
+            const val BEGIN = 0
             const val CALENDAR_DISPLAY_NAME = 1
             const val CALENDAR_ID = 2
-            const val DTEND = 3
-            const val DTSTART = 4
+            const val END = 3
+            const val EVENT_ID = 4
+            @Suppress("SpellCheckingInspection")
             const val RRULE = 5
             const val TITLE = 6
         }
@@ -84,11 +98,8 @@ object CalendarHelper {
                 val _id = cursor.getLong(Calendars.Index._ID)
                 val calendarDisplayName = cursor.getString(Calendars.Index.CALENDAR_DISPLAY_NAME)
                 val isPrimary = cursor.getString(Calendars.Index.IS_PRIMARY)
-                val ownerAccount = cursor.getString(Calendars.Index.OWNER_ACCOUNT)
 
                 if (isPrimary == "1")
-                    calendarDisplays.add(CalendarDisplay(_id, calendarDisplayName))
-                else if (ownerAccount == "1")
                     calendarDisplays.add(CalendarDisplay(_id, calendarDisplayName))
             }
         }
@@ -98,6 +109,50 @@ object CalendarHelper {
         return calendarDisplays
     }
 
+    @Suppress("SpellCheckingInspection")
+    @SuppressLint("Recycle")
+    fun instances(contentResolver: ContentResolver, eventId: String, DTSTART: Calendar, DTEND: Calendar): ArrayList<Event>? {
+
+        val events = arrayListOf<Event>()
+
+        val selection = "${CalendarContract.Instances.EVENT_ID} = ?"
+        val selectionArgs: Array<String> = arrayOf(eventId)
+
+        val builder: Uri.Builder = CalendarContract.Instances.CONTENT_URI.buildUpon()
+        ContentUris.appendId(builder, DTSTART.timeInMillis)
+        ContentUris.appendId(builder, DTEND.timeInMillis)
+
+        val cursor = contentResolver.query(
+                builder.build(),
+                Instances.projection,
+                selection,
+                selectionArgs,
+                null
+        ) ?: return null
+
+        while (cursor.moveToNext()) {
+            val begin = cursor.getLongOrNull(Instances.Index.BEGIN) ?: 0L
+            val calendarDisplayName = cursor.getStringOrNull(Instances.Index.CALENDAR_DISPLAY_NAME) ?: BLANK
+            val calendarId = cursor.getLongOrNull(Instances.Index.CALENDAR_ID) ?: continue
+            val end = cursor.getLongOrNull(Instances.Index.END) ?: 0L
+            val id = cursor.getLongOrNull(Instances.Index.EVENT_ID) ?: continue
+            val rrule = cursor.getStringOrNull(Instances.Index.RRULE) ?: BLANK
+            val title = cursor.getStringOrNull(Instances.Index.TITLE) ?: BLANK
+
+            events.add(Event(
+                    begin = begin,
+                    calendarDisplayName = calendarDisplayName,
+                    calendarId = calendarId,
+                    end = end,
+                    id = id,
+                    rrule = rrule,
+                    title = title
+            ))
+        }
+
+        return events
+    }
+
     @SuppressLint("Recycle")
     fun events(contentResolver: ContentResolver, calendarDisplays: List<CalendarDisplay>): ArrayList<Event>? {
 
@@ -105,6 +160,7 @@ object CalendarHelper {
 
         @Suppress("LocalVariableName", "SpellCheckingInspection")
         val DTSTART = Calendar.getInstance()
+
         @Suppress("LocalVariableName", "SpellCheckingInspection")
         val DTEND = Calendar.getInstance()
 
@@ -118,13 +174,9 @@ object CalendarHelper {
         DTEND.add(Calendar.DATE, 1)
 
         val string = calendarDisplays.map { it.id }.joinToString(separator = ", ") { "\"$it\"" }
-        val selection = "${CalendarContract.Events.CALENDAR_ID} IN ($string) AND " +
-                //"${CalendarContract.Events.DELETED} != 1) AND " +
-                "(((${CalendarContract.Events.DTSTART} >= ${DTSTART.timeInMillis}) AND " +
-                "(${CalendarContract.Events.DTSTART} <=  ${DTEND.timeInMillis})) OR " +
-                "((${CalendarContract.Events.DTSTART} <= ${DTSTART.timeInMillis}) AND " +
-                "(${CalendarContract.Events.DTEND} >= ${DTSTART.timeInMillis})) OR " +
-                "(${CalendarContract.Events.RRULE} != \"\"))"
+        val selection = "(${CalendarContract.Events.CALENDAR_ID} IN ($string)) AND " +
+                "(${CalendarContract.Events.DELETED} = 0)"
+
         val cursor = contentResolver.query(
                 CalendarContract.Events.CONTENT_URI,
                 Events.projection,
@@ -138,49 +190,15 @@ object CalendarHelper {
         @Suppress("SpellCheckingInspection")
         while (cursor.moveToNext()) {
             @Suppress("LocalVariableName")
-            val _id = cursor.getLong(Events.Index._ID)
-            val calendarDisplayName = cursor.getString(Events.Index.CALENDAR_DISPLAY_NAME)
-            val calendarId = cursor.getLong(Events.Index.CALENDAR_ID)
-            val dtend = cursor.getLong(Events.Index.DTEND)
-            val dtstart = cursor.getLong(Events.Index.DTSTART)
-            val rrule = cursor.getString(Events.Index.RRULE)
-            val title = cursor.getString(Events.Index.TITLE)
-            // todo exrule 확인.. 보로요인으로 테스트.
+            val _id = cursor.getLongOrNull(Events.Index._ID) ?: continue
+            val title = cursor.getStringOrNull(Events.Index.TITLE) ?: BLANK
 
-            if (rrule.isNullOrBlank()) {
-                events.add(
-                        Event(
-                                id = _id,
-                                calendarDisplayName = calendarDisplayName,
-                                calendarId = calendarId,
-                                dtend = dtend,
-                                dtstart = dtstart,
-                                title = title
-                        )
-                )
-            } else {
-                val calendar = Calendar.getInstance().apply {
-                    timeInMillis = dtstart
-                }
+            Timber.d("events")
+            Timber.d("_id: $_id")
+            Timber.d("title: $title")
 
-                val dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
-                val month = calendar.get(Calendar.MONTH)
-                val year = calendar.get(Calendar.YEAR)
-
-                if (DTSTART.get(Calendar.DAY_OF_MONTH) == dayOfMonth &&
-                        DTSTART.get(Calendar.MONTH) == month &&
-                        DTSTART.get(Calendar.YEAR) == year) {
-                    events.add(
-                            Event(
-                                    id = _id,
-                                    calendarDisplayName = calendarDisplayName,
-                                    calendarId = calendarId,
-                                    dtend = dtend,
-                                    dtstart = dtstart,
-                                    title = title
-                            )
-                    )
-                }
+            instances(contentResolver, _id.toString(), DTSTART, DTEND)?.let { instances ->
+                events.addAll(instances)
             }
         }
 
@@ -188,6 +206,8 @@ object CalendarHelper {
     }
 
     fun editEvent(activity: Activity, event: Event) {
+        val uriString = CalendarContract.Events.CONTENT_URI.toString()
+        println("UUUUUUUUUU: $uriString")
         val intent = Intent(Intent.ACTION_EDIT)
                 .setData(Uri.parse("content://com.android.calendar/events/${event.id}"))
         // todo. set flag action..
@@ -200,10 +220,6 @@ object CalendarHelper {
         // todo. set flag action..
         activity.startActivityForResult(intent, RequestCode.InsertEvent)
     }
-
-    fun Long.toDateString(): String {
-        return SimpleDateFormat("yyyy-MM-dd:HH:mm:ss").format(Date(this))
-    }
 }
 
 data class CalendarDisplay(
@@ -211,12 +227,12 @@ data class CalendarDisplay(
         val name: String
 )
 
-@Suppress("SpellCheckingInspection")
 data class Event(
-        val id: Long,
+        val begin: Long,
         val calendarDisplayName: String,
         val calendarId: Long,
-        val dtend: Long,
-        val dtstart: Long,
+        val end: Long,
+        val id: Long,
+        val rrule: String,
         val title: String
 )

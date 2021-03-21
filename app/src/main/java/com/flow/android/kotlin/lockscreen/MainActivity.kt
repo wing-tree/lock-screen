@@ -8,19 +8,22 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
-import android.provider.CalendarContract
+import android.widget.Toast
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.graphics.drawable.toBitmap
+import androidx.lifecycle.ViewModelProvider
 import androidx.palette.graphics.Palette
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.flow.android.kotlin.lockscreen.adapter.EventAdapter
 import com.flow.android.kotlin.lockscreen.calendar.CalendarHelper
 import com.flow.android.kotlin.lockscreen.calendar.Event
 import com.flow.android.kotlin.lockscreen.databinding.ActivityMainBinding
+import com.flow.android.kotlin.lockscreen.view_model.MainViewModel
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionDeniedResponse
@@ -30,11 +33,12 @@ import com.karumi.dexter.listener.single.PermissionListener
 import java.io.IOException
 import kotlin.math.pow
 
-internal const val BLANK = ""
-
 class MainActivity : AppCompatActivity(), EventAdapter.OnItemClickListener {
 
     private val eventAdapter = EventAdapter(this)
+    private val viewModel: MainViewModel by lazy {
+        ViewModelProvider(this).get(MainViewModel::class.java)
+    }
     private var viewBinding: ActivityMainBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,45 +46,44 @@ class MainActivity : AppCompatActivity(), EventAdapter.OnItemClickListener {
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding?.root)
 
-        Dexter.withContext(this)
-                .withPermission(Manifest.permission.GET_ACCOUNTS)
+        val wallpaper = wallpaper()
+        viewBinding?.root?.background = wallpaper
+
+        /**
+        Dexter.withContext(this) // not called?? what the...
+                .withPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
                 .withListener(object : PermissionListener {
                     override fun onPermissionGranted(response: PermissionGrantedResponse) {
                         val wallpaper = wallpaper()
-                        test(wallpaper!!)
-                        val bitmapDrawable = BitmapDrawable(resources, wallpaper)
-                        viewBinding?.root?.background = bitmapDrawable
+                       // test(wallpaper!!)
+                      //  val bitmapDrawable = BitmapDrawable(resources, wallpaper)
+                       // viewBinding?.root?.background = bitmapDrawable
                     }
 
                     override fun onPermissionDenied(response: PermissionDeniedResponse) {
 
                     }
 
-                    override fun onPermissionRationaleShouldBeShown(permission: PermissionRequest?, token: PermissionToken?) {
-
-                    }
+                    override fun onPermissionRationaleShouldBeShown(permission: PermissionRequest?, token: PermissionToken?) {}
                 }).check()
 
         viewBinding?.appCompatImageButton?.setOnClickListener {
             CalendarHelper.insertEvent(this)
         }
+        */
 
         viewBinding?.recyclerView?.apply {
             adapter = eventAdapter
             layoutManager = LinearLayoutManager(this@MainActivity)
         }
 
-        val events = CalendarHelper.events(contentResolver, CalendarHelper.calendarDisplays(contentResolver))
-        eventAdapter.submitList(events)
+        initializeLiveData()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        println("INTHEEEEEEEEEE $resultCode,, $RESULT_OK,,, $RESULT_CANCELED")
-
         if (resultCode == RESULT_OK) {
-            println("RESULT_OK OOOOOOOOO")
             @Suppress("SpellCheckingInspection")
             when(requestCode) {
                 CalendarHelper.RequestCode.InsertEvent -> {
@@ -94,30 +97,18 @@ class MainActivity : AppCompatActivity(), EventAdapter.OnItemClickListener {
         }
     }
 
-    private fun wallpaper(): Bitmap? {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-            val wallpaperManager = WallpaperManager.getInstance(this)
+    private fun initializeLiveData() {
+        viewModel.events(contentResolver)
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                val wallpaperFile = wallpaperManager.getWallpaperFile(WallpaperManager.FLAG_LOCK) ?: wallpaperManager.getWallpaperFile(WallpaperManager.FLAG_SYSTEM)
+        viewModel.events.observe(this, { events ->
+            eventAdapter.submitList(events)
+        })
+    }
 
-                wallpaperFile?.let {
-                    val bitmap = BitmapFactory.decodeFileDescriptor(wallpaperFile.fileDescriptor)
+    private fun wallpaper(): Drawable {
+        val wallpaperManager = WallpaperManager.getInstance(this)
 
-                    try {
-                        wallpaperFile.close()
-                    } catch (e: IOException) {
-                        e.printStackTrace()
-                    }
-
-                    return bitmap
-                }
-            }
-
-            return wallpaperManager.drawable.toBitmap()
-        }
-
-        return null
+        return wallpaperManager.drawable
     }
 
     private fun test(bitmap: Bitmap) {
@@ -125,8 +116,9 @@ class MainActivity : AppCompatActivity(), EventAdapter.OnItemClickListener {
 
         viewBinding?.constraintLayout?.post {
 
-            val width = viewBinding?.constraintLayout?.width!!
-            val height = viewBinding?.constraintLayout?.height!!
+            /*
+            val width = viewBinding?.constraintLayout?.width ?: 100
+            val height = viewBinding?.constraintLayout?.height ?: 100
 
             println("WIDTH: $width")
             println("HEIGHT: $width")
@@ -141,6 +133,8 @@ class MainActivity : AppCompatActivity(), EventAdapter.OnItemClickListener {
                 val domin = palette?.getDominantColor(Color.WHITE)
                 println("domin2: $domin")
             }
+
+             */
         }
     }
 
