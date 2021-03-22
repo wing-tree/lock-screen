@@ -187,4 +187,4 @@ As is stated in the `View` class docs:
 
 > The `ViewGroup` subclass is the base class for layouts, which are invisible containers that hold other `View`s (or other `ViewGroup`s) and define their layout properties.
 
-Therefore a View is a base class for UI elements and a Widget is loosely defined as any ready to use View.
+Therefore a `View` is a base class for UI elements and a `Widget` is *loosely defined as* **any ready to use** `View`.
