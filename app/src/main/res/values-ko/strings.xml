@@ -3,5 +3,4 @@
     <string name="app_name">잠금 화면</string>
 
     <string name="format_date">M월 d일 EEEE</string>
-    <string name="format_time">h:m</string>
 </resources>

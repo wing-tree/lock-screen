@@ -2,5 +2,5 @@
     <string name="app_name" translatable="false">LockScreen</string>
 
     <string name="format_date">EEE, MMMM d</string>
-    <string name="format_time">h:m</string>
+    <string name="format_time" translatable="false">h:mm</string>
 </resources>

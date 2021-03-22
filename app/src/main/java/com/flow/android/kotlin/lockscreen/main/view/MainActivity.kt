@@ -1,41 +1,33 @@
-package com.flow.android.kotlin.lockscreen
+package com.flow.android.kotlin.lockscreen.main.view
 
-import android.Manifest
 import android.app.WallpaperManager
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.os.Bundle
-import android.widget.Toast
+import android.view.View.GONE
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.ViewModelProvider
 import androidx.palette.graphics.Palette
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.adapter.EventAdapter
 import com.flow.android.kotlin.lockscreen.calendar.CalendarHelper
 import com.flow.android.kotlin.lockscreen.calendar.Event
 import com.flow.android.kotlin.lockscreen.databinding.ActivityMainBinding
-import com.flow.android.kotlin.lockscreen.view_model.MainViewModel
-import com.karumi.dexter.Dexter
-import com.karumi.dexter.PermissionToken
-import com.karumi.dexter.listener.PermissionDeniedResponse
-import com.karumi.dexter.listener.PermissionGrantedResponse
-import com.karumi.dexter.listener.PermissionRequest
-import com.karumi.dexter.listener.single.PermissionListener
-import java.io.IOException
+import com.flow.android.kotlin.lockscreen.main.torch.Torch
+import com.flow.android.kotlin.lockscreen.main.view_model.MainViewModel
 import kotlin.math.pow
 
 class MainActivity : AppCompatActivity(), EventAdapter.OnItemClickListener {
 
     private val eventAdapter = EventAdapter(this)
+    private val torch: Torch by lazy {
+        Torch(this)
+    }
     private val viewModel: MainViewModel by lazy {
         ViewModelProvider(this).get(MainViewModel::class.java)
     }
@@ -47,37 +39,13 @@ class MainActivity : AppCompatActivity(), EventAdapter.OnItemClickListener {
         setContentView(viewBinding?.root)
 
         val wallpaper = wallpaper()
-        viewBinding?.root?.background = wallpaper
 
-        /**
-        Dexter.withContext(this) // not called?? what the...
-                .withPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-                .withListener(object : PermissionListener {
-                    override fun onPermissionGranted(response: PermissionGrantedResponse) {
-                        val wallpaper = wallpaper()
-                       // test(wallpaper!!)
-                      //  val bitmapDrawable = BitmapDrawable(resources, wallpaper)
-                       // viewBinding?.root?.background = bitmapDrawable
-                    }
+        setWallpaper(wallpaper)
+        setTextColor(wallpaper.toBitmap())
 
-                    override fun onPermissionDenied(response: PermissionDeniedResponse) {
-
-                    }
-
-                    override fun onPermissionRationaleShouldBeShown(permission: PermissionRequest?, token: PermissionToken?) {}
-                }).check()
-
-        viewBinding?.appCompatImageButton?.setOnClickListener {
-            CalendarHelper.insertEvent(this)
-        }
-        */
-
-        viewBinding?.recyclerView?.apply {
-            adapter = eventAdapter
-            layoutManager = LinearLayoutManager(this@MainActivity)
-        }
-
+        initializeAdapter()
         initializeLiveData()
+        initializeView()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -86,6 +54,13 @@ class MainActivity : AppCompatActivity(), EventAdapter.OnItemClickListener {
         if (resultCode == RESULT_OK) {
             @Suppress("SpellCheckingInspection")
             when(requestCode) {
+                CalendarHelper.RequestCode.EditEvent -> {
+                    data?.let {
+                        CalendarHelper.events(contentResolver, CalendarHelper.calendarDisplays(contentResolver)).also { events ->
+                            eventAdapter.submitList(events)
+                        }
+                    }
+                }
                 CalendarHelper.RequestCode.InsertEvent -> {
                     data?.let {
                         CalendarHelper.events(contentResolver, CalendarHelper.calendarDisplays(contentResolver)).also { events ->
@@ -97,6 +72,13 @@ class MainActivity : AppCompatActivity(), EventAdapter.OnItemClickListener {
         }
     }
 
+    private fun initializeAdapter() {
+        viewBinding?.recyclerView?.apply {
+            adapter = eventAdapter
+            layoutManager = LinearLayoutManager(this@MainActivity)
+        }
+    }
+
     private fun initializeLiveData() {
         viewModel.events(contentResolver)
 
@@ -105,36 +87,47 @@ class MainActivity : AppCompatActivity(), EventAdapter.OnItemClickListener {
         })
     }
 
+    private fun initializeView() {
+        viewBinding?.let { viewBinding ->
+            viewBinding.appCompatImageView.setOnClickListener {
+                CalendarHelper.insertEvent(this)
+            }
+
+            viewBinding.imageViewCamera.setOnClickListener {
+
+            }
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                viewBinding.imageViewHighlight.setOnClickListener {
+                    torch.toggle()
+                }
+            } else
+                viewBinding.imageViewHighlight.visibility = GONE
+        }
+    }
+
+    private fun setWallpaper(wallpaper: Drawable) {
+        viewBinding?.root?.background = wallpaper
+    }
+
     private fun wallpaper(): Drawable {
         val wallpaperManager = WallpaperManager.getInstance(this)
 
         return wallpaperManager.drawable
     }
 
-    private fun test(bitmap: Bitmap) {
-        val p: Palette = Palette.from(bitmap).generate()
+    private fun setTextColor(bitmap: Bitmap) {
+        val width = resources.getDimensionPixelSize(R.dimen.constraint_layout_date_time_width)
+        val height = resources.getDimensionPixelSize(R.dimen.constraint_layout_date_time_height)
 
-        viewBinding?.constraintLayout?.post {
+        Palette.Builder(bitmap).setRegion(0, 0, width, height).generate { palette ->
+            val dominantColor = palette?.getDominantColor(Color.WHITE)
+            val dateTimeTextColor = getDateTimeTextColor(dominantColor ?: Color.WHITE)
 
-            /*
-            val width = viewBinding?.constraintLayout?.width ?: 100
-            val height = viewBinding?.constraintLayout?.height ?: 100
-
-            println("WIDTH: $width")
-            println("HEIGHT: $width")
-
-            val bb = Palette.Builder(bitmap).setRegion(0, 0, width, height).generate { palette ->
-                val domin = palette?.getDominantColor(Color.WHITE)
-                println("domin1: $domin")
-                getDateTimeTextColor(domin ?: Color.WHITE)
+            viewBinding?.let {
+                it.textClockDate.setTextColor(dateTimeTextColor)
+                it.textClockTime.setTextColor(dateTimeTextColor)
             }
-
-            val cc = Palette.Builder(bitmap).generate { palette ->
-                val domin = palette?.getDominantColor(Color.WHITE)
-                println("domin2: $domin")
-            }
-
-             */
         }
     }
 

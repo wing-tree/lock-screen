@@ -75,6 +75,7 @@ object CalendarHelper {
     }
 
     object RequestCode {
+        const val EditEvent = 2056
         const val InsertEvent = 2057
     }
 
@@ -206,12 +207,12 @@ object CalendarHelper {
     }
 
     fun editEvent(activity: Activity, event: Event) {
-        val uriString = CalendarContract.Events.CONTENT_URI.toString()
-        println("UUUUUUUUUU: $uriString")
-        val intent = Intent(Intent.ACTION_EDIT)
-                .setData(Uri.parse("content://com.android.calendar/events/${event.id}"))
-        // todo. set flag action..
-        activity.startActivity(intent)
+        val uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, event.id)
+        val intent = Intent(Intent.ACTION_INSERT)
+                .setData(uri)
+
+        // todo. consider add some flag.
+        activity.startActivityForResult(intent, RequestCode.EditEvent)
     }
 
     fun insertEvent(activity: Activity) {
@@ -233,6 +234,7 @@ data class Event(
         val calendarId: Long,
         val end: Long,
         val id: Long,
+        @Suppress("SpellCheckingInspection")
         val rrule: String,
         val title: String
 )

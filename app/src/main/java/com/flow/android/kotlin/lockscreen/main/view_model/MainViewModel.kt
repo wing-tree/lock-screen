@@ -1,4 +1,4 @@
-package com.flow.android.kotlin.lockscreen.view_model
+package com.flow.android.kotlin.lockscreen.main.view_model
 
 import android.content.ContentResolver
 import androidx.lifecycle.LiveData
