@@ -2,11 +2,40 @@
 
 # Reference
 ## [[Android] AAC ViewModel 을 생성하는 6가지 방법 - ViewModelProvider](https://readystory.tistory.com/176)
+## [android.view.View.systemUiVisibility deprecated. What is the replacement?](https://stackoverflow.com/questions/62577645/android-view-view-systemuivisibility-deprecated-what-is-the-replacement)
+```
+private fun hideSystemUi() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        window.setDecorFitsSystemWindows(false)
+        window.insetsController?.let {
+            it.hide(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
+            it.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
+    } else {
+        @Suppress("DEPRECATION")
+        window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_FULLSCREEN
+                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION)
+    }
+}
+```
+
 ## [A simple use of joinToString() Kotlin function to get comma separated strings for SQLite](https://medium.com/@SindkarP/a-simple-use-of-jointostring-kotlin-function-to-get-comma-separated-strings-for-sqlite-cbece2bcb499)
 ```
 val string = calendarDisplays.map { it.id }.joinToString(separator = ", ") { "\"$it\"" }
 ```
 ## [Android Calendar Intent](https://itnext.io/android-calendar-intent-8536232ecb38)
+## [Android - Making activity full screen with status bar on top of it](https://stackoverflow.com/questions/43511326/android-making-activity-full-screen-with-status-bar-on-top-of-it)
+```
+window?.setFlags(
+        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+)
+```
+
 ## [Avoiding memory leaks when using Data Binding and View Binding](https://proandroiddev.com/avoiding-memory-leaks-when-using-data-binding-and-view-binding-3b91d571c150)
 ## [CalendarContract.Events](https://developer.android.com/reference/android/provider/CalendarContract.Events)
 ## [CalendarContract.EventsColumns](https://developer.android.com/reference/android/provider/CalendarContract.EventsColumns#ACCESS_CONFIDENTIAL)
@@ -188,3 +217,13 @@ As is stated in the `View` class docs:
 > The `ViewGroup` subclass is the base class for layouts, which are invisible containers that hold other `View`s (or other `ViewGroup`s) and define their layout properties.
 
 Therefore a `View` is a base class for UI elements and a `Widget` is *loosely defined as* **any ready to use** `View`.
+
+### View
+A `View` is a base class for all UI elements. It, therefore, covers many different classes and concepts, including widgets, `ViewGroup`s and layouts. There is a root `View` attached to a Window instance which forms the basis of the `View` hierarchy. In general, the word `View` is usually used to describe UI elements in general, or to refer to abstract or base UI classes such as `ViewGroup`s.
+
+### Widget
+There are various definitions for this term, but most refer to a "ready to use" UI element, be it a `Button`, `ImageView`, `EditText`, etc. Note that some people consider widgets to be UI elements that are complete (not abstract) and are not containers (such as `ViewGroup`s (layouts/`ListView`s)). It's also worth noting that "widget" is a package name (`android.widget`) where the docs mention the following:
+
+> The widget package contains (mostly visual) UI elements to use on your Application screen.
+
+Therefore, it is reasonable to consider non-visual UI elements to also be widgets, as well as any class defined under the widget package. See here for a full list of classes in the widget package: http://developer.android.com/reference/android/widget/package-summary.html
