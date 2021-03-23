@@ -188,3 +188,13 @@ As is stated in the `View` class docs:
 > The `ViewGroup` subclass is the base class for layouts, which are invisible containers that hold other `View`s (or other `ViewGroup`s) and define their layout properties.
 
 Therefore a `View` is a base class for UI elements and a `Widget` is *loosely defined as* **any ready to use** `View`.
+
+### View
+A `View` is a base class for all UI elements. It, therefore, covers many different classes and concepts, including widgets, `ViewGroup`s and layouts. There is a root `View` attached to a Window instance which forms the basis of the `View` hierarchy. In general, the word `View` is usually used to describe UI elements in general, or to refer to abstract or base UI classes such as `ViewGroup`s.
+
+### Widget
+There are various definitions for this term, but most refer to a "ready to use" UI element, be it a `Button`, `ImageView`, `EditText`, etc. Note that some people consider widgets to be UI elements that are complete (not abstract) and are not containers (such as `ViewGroup`s (layouts/`ListView`s)). It's also worth noting that "widget" is a package name (`android.widget`) where the docs mention the following:
+
+> The widget package contains (mostly visual) UI elements to use on your Application screen.
+
+Therefore, it is reasonable to consider non-visual UI elements to also be widgets, as well as any class defined under the widget package. See here for a full list of classes in the widget package: http://developer.android.com/reference/android/widget/package-summary.html
