@@ -1,14 +1,23 @@
 package com.flow.android.kotlin.lockscreen.main.view
 
+import android.Manifest
+import android.app.KeyguardManager
 import android.app.WallpaperManager
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.Drawable
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
+import android.provider.Settings
 import android.view.View.GONE
+import android.view.WindowManager
+import android.widget.ImageView
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.ViewModelProvider
 import androidx.palette.graphics.Palette
@@ -18,9 +27,18 @@ import com.flow.android.kotlin.lockscreen.adapter.EventAdapter
 import com.flow.android.kotlin.lockscreen.calendar.CalendarHelper
 import com.flow.android.kotlin.lockscreen.calendar.Event
 import com.flow.android.kotlin.lockscreen.databinding.ActivityMainBinding
+import com.flow.android.kotlin.lockscreen.lock_screen.LockScreenService
 import com.flow.android.kotlin.lockscreen.main.torch.Torch
 import com.flow.android.kotlin.lockscreen.main.view_model.MainViewModel
+import com.flow.android.kotlin.lockscreen.shared_preferences.SharedPreferencesHelper
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionDeniedResponse
+import com.karumi.dexter.listener.PermissionGrantedResponse
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.single.PermissionListener
 import kotlin.math.pow
+
 
 class MainActivity : AppCompatActivity(), EventAdapter.OnItemClickListener {
 
@@ -38,6 +56,13 @@ class MainActivity : AppCompatActivity(), EventAdapter.OnItemClickListener {
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding?.root)
 
+        window?.setFlags(
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+        )
+
+        setup()
+
         val wallpaper = wallpaper()
 
         setWallpaper(wallpaper)
@@ -46,6 +71,11 @@ class MainActivity : AppCompatActivity(), EventAdapter.OnItemClickListener {
         initializeAdapter()
         initializeLiveData()
         initializeView()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        checkPermission()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -93,16 +123,68 @@ class MainActivity : AppCompatActivity(), EventAdapter.OnItemClickListener {
                 CalendarHelper.insertEvent(this)
             }
 
-            viewBinding.imageViewCamera.setOnClickListener {
-
+            viewBinding.floatingActionButton.setOnClickListener {
+                finish()
             }
 
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            viewBinding.imageViewCamera.setOnClickListener {
+                Dexter.withContext(this)
+                        .withPermission(Manifest.permission.CAMERA)
+                        .withListener(object : PermissionListener {
+                            override fun onPermissionGranted(response: PermissionGrantedResponse) {
+                                Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { intent ->
+                                    startActivity(intent)
+                                }
+                            }
+
+                            override fun onPermissionDenied(response: PermissionDeniedResponse) {
+
+                            }
+
+                            override fun onPermissionRationaleShouldBeShown(permission: PermissionRequest?, token: PermissionToken?) {
+
+                            }
+                        }).check()
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 viewBinding.imageViewHighlight.setOnClickListener {
                     torch.toggle()
+
+                    val color = when(torch.mode) {
+                        Torch.Mode.On -> ContextCompat.getColor(this, R.color.yellow_A_200)
+                        Torch.Mode.Off -> ContextCompat.getColor(this, R.color.black)
+                        else -> throw IllegalArgumentException("Invalid mode.")
+                    }
+
+                    (it as ImageView).setColorFilter(
+                            color,
+                            android.graphics.PorterDuff.Mode.SRC_IN
+                    )
                 }
             } else
                 viewBinding.imageViewHighlight.visibility = GONE
+        }
+    }
+
+    private fun setup() {
+        val sharedPreferencesHelper = SharedPreferencesHelper()
+
+        if (sharedPreferencesHelper.getShowWhenLocked(this)) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                setShowWhenLocked(true)
+                setTurnScreenOn(true)
+
+                val keyguardManager = getSystemService(KEYGUARD_SERVICE) as KeyguardManager
+                keyguardManager.requestDismissKeyguard(this, null)
+            } else {
+                @Suppress("DEPRECATION")
+                window.addFlags(
+                        WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD or
+                                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
+                                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                )
+            }
         }
     }
 
@@ -158,6 +240,27 @@ class MainActivity : AppCompatActivity(), EventAdapter.OnItemClickListener {
             Color.BLACK
         else
             Color.WHITE
+    }
+
+    private fun checkPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!Settings.canDrawOverlays(this)) {
+                // todo show alert message for permission. rational
+                val uri = Uri.fromParts("package", packageName, null)
+                val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, uri)
+                startActivityForResult(intent, 0)
+            } else {
+                val intent = Intent(applicationContext, LockScreenService::class.java)
+                // startService(intent) ?? todo. check..
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    LockScreenService().enqueueWork(this, intent)
+                    startForegroundService(intent)
+                } else {
+                    LockScreenService().enqueueWork(this, intent)
+                    startService(intent)
+                }
+            }
+        }
     }
 
     /** EventAdapter.OnItemClickListener */

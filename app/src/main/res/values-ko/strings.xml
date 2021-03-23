@@ -3,4 +3,6 @@
     <string name="app_name">잠금 화면</string>
 
     <string name="format_date">M월 d일 EEEE</string>
+
+    <string name="notification_content_text">안정적인 실행을 위한 알림입니다.</string>
 </resources>

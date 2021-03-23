@@ -6,21 +6,23 @@ import android.hardware.camera2.CameraManager
 
 class Torch(context: Context) {
 
-    private object Mode {
+    object Mode {
         const val On = 0
         const val Off = 1
     }
 
     private val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
     private var cameraId: String? = null
-    private var mode = Mode.Off
+    private var _mode = Mode.Off
+    val mode: Int
+        get() = _mode
 
     init {
         cameraId = cameraId()
     }
 
     fun toggle() {
-        mode = if (mode == Mode.On) {
+        _mode = if (mode == Mode.On) {
             off()
             Mode.Off
         } else {
