@@ -13,6 +13,12 @@
 #### 첫번째 이유, 빠릅니다.
 Annotation Processor는 실제로 javac 컴파일러의 일부이므로 모든 처리가 런타임보다는 컴파일시간에 발생합니다. Annotation Processor가 정말 빠른 이유입니다. // 마무리할것.
 
+## [Android Why use executePendingBindings in RecyclerView](https://stackoverflow.com/questions/53043412/android-why-use-executependingbindings-in-recyclerview)
+https://stackoverflow.com/a/53043911
+Doing some changes on your binding does not mean that it will have an **immediate** effect on your `View`. Changing things in binding means that you're really scheduling those changes to be applied in the nearest future. This is for many reasons, performance being one of them.
+
+Calling `executePendingBindings` means that you're essentially forcing the framework to do everything it needs to do so far on the binding, right at the moment of calling it.
+
 ## [android.view.View.systemUiVisibility deprecated. What is the replacement?](https://stackoverflow.com/questions/62577645/android-view-view-systemuivisibility-deprecated-what-is-the-replacement)
 ```
 private fun hideSystemUi() {
