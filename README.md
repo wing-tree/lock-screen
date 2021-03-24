@@ -210,6 +210,7 @@ implementation 'androidx.palette:palette-ktx:1.0.0'
 ```
 ## [Selecting Colors with the Palette API](https://developer.android.com/training/material/palette-colors)
 ## [Using Sync Adapter to transfer data in android](https://nyamebismark12-nb.medium.com/using-sync-adapter-to-transfer-data-ad1e6c3f2d64)
+## [ViewBinding - how to get binding for included layouts?](https://stackoverflow.com/questions/58730127/viewbinding-how-to-get-binding-for-included-layouts)
 ## [What is the difference between a View and widget in Android?](https://stackoverflow.com/questions/5168549/what-is-the-difference-between-a-view-and-widget-in-android/21541275)
 As is stated in the `View` class docs:
 > This class represents the basic building block for user interface components. A `View` occupies a rectangular area on the screen and is responsible for drawing and event handling. `View` is the base class for widgets, which are used to create interactive UI components (buttons, text fields, etc.).  
