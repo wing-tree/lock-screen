@@ -2,6 +2,17 @@
 
 # Reference
 ## [[Android] AAC ViewModel 을 생성하는 6가지 방법 - ViewModelProvider](https://readystory.tistory.com/176)
+## [[Android] Annotation Processor 만들기](https://www.charlezz.com/?p=1167)
+### Annotation이란 ?
+애노테이션은 자바 소스 코드에 추가 할 수있는 메타 데이터의 한 형태입니다.
+
+### Annotation Processor란?
+애노테이션 프로세서는 java 컴파일러의 플러그인의 일종입니다.
+
+### Why Annotation?
+#### 첫번째 이유, 빠릅니다.
+Annotation Processor는 실제로 javac 컴파일러의 일부이므로 모든 처리가 런타임보다는 컴파일시간에 발생합니다. Annotation Processor가 정말 빠른 이유입니다. // 마무리할것.
+
 ## [android.view.View.systemUiVisibility deprecated. What is the replacement?](https://stackoverflow.com/questions/62577645/android-view-view-systemuivisibility-deprecated-what-is-the-replacement)
 ```
 private fun hideSystemUi() {
