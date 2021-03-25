@@ -23,7 +23,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.palette.graphics.Palette
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.flow.android.kotlin.lockscreen.R
-import com.flow.android.kotlin.lockscreen.adapter.EventAdapter
+import com.flow.android.kotlin.lockscreen.main.adapter.EventAdapter
 import com.flow.android.kotlin.lockscreen.calendar.CalendarHelper
 import com.flow.android.kotlin.lockscreen.calendar.Event
 import com.flow.android.kotlin.lockscreen.databinding.ActivityMainBinding
@@ -38,7 +38,6 @@ import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
 import kotlin.math.pow
-
 
 class MainActivity : AppCompatActivity(), EventAdapter.OnItemClickListener {
 

@@ -1,14 +1,13 @@
-package com.flow.android.kotlin.lockscreen.adapter
+package com.flow.android.kotlin.lockscreen.main.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.AdapterView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.flow.android.kotlin.lockscreen.calendar.Event
-import com.flow.android.kotlin.lockscreen.databinding.ItemEventBinding
+import com.flow.android.kotlin.lockscreen.databinding.EventItemBinding
 
 class EventAdapter(private val onItemClickListener: OnItemClickListener): ListAdapter<Event, EventAdapter.ViewHolder>(DiffCallback()) {
 
@@ -26,7 +25,7 @@ class EventAdapter(private val onItemClickListener: OnItemClickListener): ListAd
             RecyclerView.ViewHolder(viewBinding.root) {
 
         fun bind(item: Event) {
-            viewBinding as ItemEventBinding
+            viewBinding as EventItemBinding
             viewBinding.textCalendarDisplayName.text = item.calendarDisplayName
             viewBinding.textTitle.text = item.title
 
@@ -38,7 +37,7 @@ class EventAdapter(private val onItemClickListener: OnItemClickListener): ListAd
         companion object {
             fun from(parent: ViewGroup, onItemClickListener: OnItemClickListener): ViewHolder {
                 val inflater = LayoutInflater.from(parent.context)
-                val viewBinding = ItemEventBinding.inflate(inflater, parent, false)
+                val viewBinding = EventItemBinding.inflate(inflater, parent, false)
 
                 return ViewHolder(viewBinding, onItemClickListener)
             }

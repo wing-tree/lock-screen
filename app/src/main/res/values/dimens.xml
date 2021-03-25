@@ -25,4 +25,9 @@
 
     <dimen name="text_size_text_clock_date">@dimen/text_size_large</dimen>
     <dimen name="text_size_text_clock_time">@dimen/text_size_extra_large</dimen>
+
+    <dimen name="image_view_camera_margin_top">48dp</dimen>
+
+    <dimen name="text_description_margin_end">20dp</dimen>
+    <dimen name="text_title_margin_start">20dp</dimen>
 </resources>
