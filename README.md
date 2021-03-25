@@ -156,6 +156,10 @@ fun events(contentResolver: ContentResolver, calendarDisplays: List<CalendarDisp
     return events
 }
 ```
+## [How to catch navigation icon click on toolbar from fragment?](https://stackoverflow.com/questions/31311612/how-to-catch-navigation-icon-click-on-toolbar-from-fragment)
+https://stackoverflow.com/a/34249752  
+add code block `toolbar.setNavigationOnClickListener` after `setSupportActionBar(toolbar)`
+
 ## [How to decide font color in white or black depending on background color?](https://stackoverflow.com/questions/3942878/how-to-decide-font-color-in-white-or-black-depending-on-background-color)
 ```
 @ColorInt
