@@ -29,5 +29,6 @@
     <dimen name="image_view_camera_margin_top">48dp</dimen>
 
     <dimen name="text_description_margin_end">20dp</dimen>
+    <dimen name="text_title_margin_end">20dp</dimen>
     <dimen name="text_title_margin_start">20dp</dimen>
 </resources>

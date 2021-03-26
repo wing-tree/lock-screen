@@ -5,4 +5,7 @@
     <string name="format_date">M월 d일 EEEE</string>
 
     <string name="notification_content_text">안정적인 실행을 위한 알림입니다.</string>
+
+    <!-- Settings -->
+    <string name="calendar">캘린더</string>
 </resources>

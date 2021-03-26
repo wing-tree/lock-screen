@@ -19,6 +19,7 @@ import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.palette.graphics.Palette
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -30,6 +31,7 @@ import com.flow.android.kotlin.lockscreen.databinding.ActivityMainBinding
 import com.flow.android.kotlin.lockscreen.lock_screen.LockScreenService
 import com.flow.android.kotlin.lockscreen.main.torch.Torch
 import com.flow.android.kotlin.lockscreen.main.view_model.MainViewModel
+import com.flow.android.kotlin.lockscreen.settings.view.SettingsFragment
 import com.flow.android.kotlin.lockscreen.shared_preferences.SharedPreferencesHelper
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.PermissionToken
@@ -46,7 +48,12 @@ class MainActivity : AppCompatActivity(), EventAdapter.OnItemClickListener {
         Torch(this)
     }
     private val viewModel: MainViewModel by lazy {
-        ViewModelProvider(this).get(MainViewModel::class.java)
+        ViewModelProvider(this@MainActivity, object : ViewModelProvider.Factory {
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                @Suppress("UNCHECKED_CAST")
+                return MainViewModel(contentResolver) as T
+            }
+        }).get(MainViewModel::class.java)
     }
     private var viewBinding: ActivityMainBinding? = null
 
@@ -85,15 +92,19 @@ class MainActivity : AppCompatActivity(), EventAdapter.OnItemClickListener {
             when(requestCode) {
                 CalendarHelper.RequestCode.EditEvent -> {
                     data?.let {
-                        CalendarHelper.events(contentResolver, CalendarHelper.calendarDisplays(contentResolver)).also { events ->
-                            eventAdapter.submitList(events)
+                        viewModel.calendarDisplays()?.let { calendarDisplays ->
+                            CalendarHelper.events(contentResolver, calendarDisplays).also { events ->
+                                eventAdapter.submitList(events)
+                            }
                         }
                     }
                 }
                 CalendarHelper.RequestCode.InsertEvent -> {
                     data?.let {
-                        CalendarHelper.events(contentResolver, CalendarHelper.calendarDisplays(contentResolver)).also { events ->
-                            eventAdapter.submitList(events)
+                        viewModel.calendarDisplays()?.let { calendarDisplays ->
+                            CalendarHelper.events(contentResolver, calendarDisplays).also { events ->
+                                eventAdapter.submitList(events)
+                            }
                         }
                     }
                 }
@@ -109,10 +120,10 @@ class MainActivity : AppCompatActivity(), EventAdapter.OnItemClickListener {
     }
 
     private fun initializeLiveData() {
-        viewModel.events(contentResolver)
-
-        viewModel.events.observe(this, { events ->
-            eventAdapter.submitList(events)
+        viewModel.calendarDisplays.observe(this, { calendarDisplays ->
+            CalendarHelper.events(contentResolver, calendarDisplays).also { events ->
+                eventAdapter.submitList(events)
+            }
         })
     }
 
@@ -144,6 +155,15 @@ class MainActivity : AppCompatActivity(), EventAdapter.OnItemClickListener {
 
                             }
                         }).check()
+            }
+
+            viewBinding.imageViewSettings.setOnClickListener {
+                SettingsFragment().apply {
+                    supportFragmentManager.beginTransaction()
+                            .replace(R.id.frame_layout, this, tag)
+                            .addToBackStack(null)
+                            .commit()
+                }
             }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

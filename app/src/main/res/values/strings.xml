@@ -5,4 +5,7 @@
     <string name="format_time" translatable="false">h:mm</string>
 
     <string name="notification_content_text">This is a notification for stable execution.</string>
+
+    <!-- Settings -->
+    <string name="calendar">Calendar</string>
 </resources>
