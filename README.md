@@ -191,6 +191,7 @@ private fun getDateTimeTextColor(@ColorInt colorInt: Int): Int {
         Color.WHITE
 }
 ```
+## [Error inflating com.google.android.material.button.MaterialButton #298](https://github.com/material-components/material-components-android/issues/298)
 ## [How to get android lock screen wallpaper?](https://stackoverflow.com/questions/53881697/how-to-get-android-lock-screen-wallpaper)
 ```
 private fun wallpaper(): Bitmap {
