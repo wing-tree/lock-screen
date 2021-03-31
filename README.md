@@ -157,11 +157,13 @@ fun events(contentResolver: ContentResolver, calendarDisplays: List<CalendarDisp
 }
 ```
 ## [Finish all previous activities](https://stackoverflow.com/questions/6330260/finish-all-previous-activities)
+### https://stackoverflow.com/a/6330456
 ```
 val intent = Intent(applicationContext, HomeActivity::class.java)
 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
 startActivity(intent)
 ```
+### https://stackoverflow.com/a/25016158
 ```
 finishAffinity()
 ```
