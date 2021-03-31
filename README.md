@@ -156,6 +156,19 @@ fun events(contentResolver: ContentResolver, calendarDisplays: List<CalendarDisp
     return events
 }
 ```
+## [Finish all previous activities](https://stackoverflow.com/questions/6330260/finish-all-previous-activities)
+```
+Intent intent = new Intent(getApplicationContext(), Home.class);
+intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+startActivity(intent);
+```
+```
+finishAffinity();
+```
+```
+ActivityCompat.finishAffinity(this);
+```
+
 ## [How to catch navigation icon click on toolbar from fragment?](https://stackoverflow.com/questions/31311612/how-to-catch-navigation-icon-click-on-toolbar-from-fragment)
 https://stackoverflow.com/a/34249752  
 add code block `toolbar.setNavigationOnClickListener` after `setSupportActionBar(toolbar)`
