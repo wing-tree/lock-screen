@@ -163,10 +163,10 @@ intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 startActivity(intent);
 ```
 ```
-finishAffinity();
+finishAffinity()
 ```
 ```
-ActivityCompat.finishAffinity(this);
+ActivityCompat.finishAffinity(this)
 ```
 
 ## [How to catch navigation icon click on toolbar from fragment?](https://stackoverflow.com/questions/31311612/how-to-catch-navigation-icon-click-on-toolbar-from-fragment)
