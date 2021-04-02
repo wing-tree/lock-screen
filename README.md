@@ -171,6 +171,18 @@ finishAffinity()
 ActivityCompat.finishAffinity(this)
 ```
 
+## [Get icons of all installed apps in android](https://stackoverflow.com/questions/10696121/get-icons-of-all-installed-apps-in-android)
+### https://stackoverflow.com/a/10696164/15002852
+```
+try {
+    String pkg = "com.app.my";//your package name
+    Drawable icon = getContext().getPackageManager().getApplicationIcon(pkg);
+    imageView.setImageDrawable(icon);
+} catch (PackageManager.NameNotFoundException ne) {
+
+}
+```
+
 ## [How to catch navigation icon click on toolbar from fragment?](https://stackoverflow.com/questions/31311612/how-to-catch-navigation-icon-click-on-toolbar-from-fragment)
 https://stackoverflow.com/a/34249752  
 add code block `toolbar.setNavigationOnClickListener` after `setSupportActionBar(toolbar)`
