@@ -156,6 +156,33 @@ fun events(contentResolver: ContentResolver, calendarDisplays: List<CalendarDisp
     return events
 }
 ```
+## [Finish all previous activities](https://stackoverflow.com/questions/6330260/finish-all-previous-activities)
+### https://stackoverflow.com/a/6330456
+```
+val intent = Intent(applicationContext, HomeActivity::class.java)
+intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+startActivity(intent)
+```
+### https://stackoverflow.com/a/25016158
+```
+finishAffinity()
+```
+```
+ActivityCompat.finishAffinity(this)
+```
+
+## [Get icons of all installed apps in android](https://stackoverflow.com/questions/10696121/get-icons-of-all-installed-apps-in-android)
+### https://stackoverflow.com/a/10696164/15002852
+```
+try {
+    String pkg = "com.app.my";//your package name
+    Drawable icon = getContext().getPackageManager().getApplicationIcon(pkg);
+    imageView.setImageDrawable(icon);
+} catch (PackageManager.NameNotFoundException ne) {
+
+}
+```
+
 ## [How to catch navigation icon click on toolbar from fragment?](https://stackoverflow.com/questions/31311612/how-to-catch-navigation-icon-click-on-toolbar-from-fragment)
 https://stackoverflow.com/a/34249752  
 add code block `toolbar.setNavigationOnClickListener` after `setSupportActionBar(toolbar)`
@@ -191,6 +218,7 @@ private fun getDateTimeTextColor(@ColorInt colorInt: Int): Int {
         Color.WHITE
 }
 ```
+## [Error inflating com.google.android.material.button.MaterialButton #298](https://github.com/material-components/material-components-android/issues/298)
 ## [How to get android lock screen wallpaper?](https://stackoverflow.com/questions/53881697/how-to-get-android-lock-screen-wallpaper)
 ```
 private fun wallpaper(): Bitmap {
