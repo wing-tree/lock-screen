@@ -1,17 +1,15 @@
-package com.flow.android.kotlin.lockscreen.settings.adapter
+package com.flow.android.kotlin.lockscreen.configuration.adapter
 
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.flow.android.kotlin.lockscreen.databinding.*
-import com.flow.android.kotlin.lockscreen.util.rotate
 import java.security.InvalidParameterException
 
-class SettingAdapter(private val arrayList: ArrayList<AdapterItem>): RecyclerView.Adapter<SettingAdapter.ViewHolder>() {
+class ConfigurationAdapter(private val arrayList: ArrayList<AdapterItem>): RecyclerView.Adapter<ConfigurationAdapter.ViewHolder>() {
 
     class ViewHolder(private val viewBinding: ViewBinding): RecyclerView.ViewHolder(viewBinding.root) {
         fun bind(adapterItem: AdapterItem, viewType: Int) {
@@ -60,8 +58,8 @@ class SettingAdapter(private val arrayList: ArrayList<AdapterItem>): RecyclerVie
                     viewBinding.switchMaterial.isChecked = switchItem.isChecked
                     viewBinding.textTitle.text = switchItem.title
 
-                    viewBinding.root.setOnClickListener {
-                        switchItem.onClick.invoke(viewBinding, switchItem)
+                    viewBinding.switchMaterial.setOnCheckedChangeListener { _, isChecked ->
+                        switchItem.onCheckedChange(isChecked)
                     }
                 }
             }
@@ -116,11 +114,16 @@ object ViewType {
 
 sealed class AdapterItem {
     abstract val id: Long
+    abstract var isEnabled: Boolean
 
-    data class DividerItem(override val id: Long = 0L): AdapterItem()
+    data class DividerItem(
+        override val id: Long = 0L,
+        override var isEnabled: Boolean = true
+    ): AdapterItem()
 
     data class Item(
             override val id: Long = 0L,
+            override var isEnabled: Boolean = true,
             val description: String,
             val drawable: Drawable?,
             val onClick: (ItemBinding, Item) -> Unit,
@@ -129,6 +132,7 @@ sealed class AdapterItem {
 
     data class ListItem(
             override val id: Long = 0L,
+            override var isEnabled: Boolean = true,
             val adapter: RecyclerView.Adapter<*>,
             val drawable: Drawable?,
             val onClick: (ListItemBinding, ListItem) -> Unit,
@@ -137,14 +141,16 @@ sealed class AdapterItem {
 
     data class SubtitleItem(
             override val id: Long = 0L,
+            override var isEnabled: Boolean = true,
             val subtitle: String
     ): AdapterItem()
 
     data class SwitchItem(
             override val id: Long = 0L,
+            override var isEnabled: Boolean = true,
             val drawable: Drawable?,
             val isChecked: Boolean,
-            val onClick: (SwitchItemBinding, SwitchItem) -> Unit,
+            val onCheckedChange: (isChecked: Boolean) -> Unit,
             val title: String
     ): AdapterItem()
 }

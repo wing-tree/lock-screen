@@ -8,4 +8,11 @@
 
     <!-- Settings -->
     <string name="calendar">Calendar</string>
+    <string name="display_after_unlocking">Display after unlocking</string>
+    <string name="lock_screen">Lock Screen</string>
+    <string name="show_on_lock_screen">Show on lock screen</string>
+
+    <!-- MainActivity -->
+    <string name="main_activity_000">Calendar</string>
+    <string name="main_activity_001">Favorite Apps</string>
 </resources>

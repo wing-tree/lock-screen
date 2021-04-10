@@ -8,9 +8,10 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.flow.android.kotlin.lockscreen.calendar.Event
 import com.flow.android.kotlin.lockscreen.databinding.EventItemBinding
+import java.text.SimpleDateFormat
+import java.util.*
 
 class EventAdapter(private val onItemClickListener: OnItemClickListener): ListAdapter<Event, EventAdapter.ViewHolder>(DiffCallback()) {
-
     interface OnItemClickListener {
         fun onItemClick(item: Event)
     }
@@ -21,25 +22,37 @@ class EventAdapter(private val onItemClickListener: OnItemClickListener): ListAd
         submitList(list)
     }
 
-    class ViewHolder private constructor(private val viewBinding: ViewBinding, private val onItemClickListener: OnItemClickListener):
-            RecyclerView.ViewHolder(viewBinding.root) {
+    class ViewHolder private constructor(
+            private val viewBinding: ViewBinding,
+            private val onItemClickListener: OnItemClickListener,
+            private val simpleDateFormat: SimpleDateFormat
+    ): RecyclerView.ViewHolder(viewBinding.root) {
 
         fun bind(item: Event) {
             viewBinding as EventItemBinding
-            viewBinding.textCalendarDisplayName.text = item.calendarDisplayName
-            viewBinding.textTitle.text = item.title
+
+            val begin = "${item.begin.format()} - "
+            
+            viewBinding.textViewBegin.text = begin
+            viewBinding.viewCalendarColor.setBackgroundColor(item.calendarColor)
+            viewBinding.textViewCalendarDisplayName.text = item.calendarDisplayName
+            viewBinding.textViewTitle.text = item.title
+            viewBinding.textViewEnd.text = item.end.format()
 
             viewBinding.root.setOnClickListener {
                 onItemClickListener.onItemClick(item)
             }
         }
 
+        private fun Long.format() = simpleDateFormat.format(this)
+
         companion object {
             fun from(parent: ViewGroup, onItemClickListener: OnItemClickListener): ViewHolder {
                 val inflater = LayoutInflater.from(parent.context)
+                val simpleDateFormat = SimpleDateFormat("a hh:mm", Locale.getDefault())
                 val viewBinding = EventItemBinding.inflate(inflater, parent, false)
 
-                return ViewHolder(viewBinding, onItemClickListener)
+                return ViewHolder(viewBinding, onItemClickListener, simpleDateFormat)
             }
         }
     }

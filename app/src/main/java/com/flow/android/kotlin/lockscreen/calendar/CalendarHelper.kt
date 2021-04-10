@@ -5,8 +5,11 @@ import android.app.Activity
 import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.provider.CalendarContract
+import androidx.annotation.ColorInt
+import androidx.core.database.getIntOrNull
 import androidx.core.database.getLongOrNull
 import androidx.core.database.getStringOrNull
 import com.flow.android.kotlin.lockscreen.util.BLANK
@@ -54,6 +57,7 @@ object CalendarHelper {
     private object Instances {
         val projection: Array<String> = arrayOf(
                 CalendarContract.Instances.BEGIN,
+                CalendarContract.Instances.CALENDAR_COLOR,
                 CalendarContract.Instances.CALENDAR_DISPLAY_NAME,
                 CalendarContract.Instances.CALENDAR_ID,
                 CalendarContract.Instances.END,
@@ -64,13 +68,14 @@ object CalendarHelper {
 
         object Index {
             const val BEGIN = 0
-            const val CALENDAR_DISPLAY_NAME = 1
-            const val CALENDAR_ID = 2
-            const val END = 3
-            const val EVENT_ID = 4
+            const val CALENDAR_COLOR = 1
+            const val CALENDAR_DISPLAY_NAME = 2
+            const val CALENDAR_ID = 3
+            const val END = 4
+            const val EVENT_ID = 5
             @Suppress("SpellCheckingInspection")
-            const val RRULE = 5
-            const val TITLE = 6
+            const val RRULE = 6
+            const val TITLE = 7
         }
     }
 
@@ -133,6 +138,7 @@ object CalendarHelper {
 
         while (cursor.moveToNext()) {
             val begin = cursor.getLongOrNull(Instances.Index.BEGIN) ?: 0L
+            val calendarColor = cursor.getIntOrNull(Instances.Index.CALENDAR_COLOR) ?: Color.TRANSPARENT
             val calendarDisplayName = cursor.getStringOrNull(Instances.Index.CALENDAR_DISPLAY_NAME) ?: BLANK
             val calendarId = cursor.getLongOrNull(Instances.Index.CALENDAR_ID) ?: continue
             val end = cursor.getLongOrNull(Instances.Index.END) ?: 0L
@@ -142,6 +148,7 @@ object CalendarHelper {
 
             events.add(Event(
                     begin = begin,
+                    calendarColor = calendarColor,
                     calendarDisplayName = calendarDisplayName,
                     calendarId = calendarId,
                     end = end,
@@ -230,6 +237,8 @@ data class CalendarDisplay(
 
 data class Event(
         val begin: Long,
+        @ColorInt
+        val calendarColor: Int,
         val calendarDisplayName: String,
         val calendarId: Long,
         val end: Long,

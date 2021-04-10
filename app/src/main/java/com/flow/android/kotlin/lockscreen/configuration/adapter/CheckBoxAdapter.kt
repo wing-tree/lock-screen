@@ -1,4 +1,4 @@
-package com.flow.android.kotlin.lockscreen.settings.adapter
+package com.flow.android.kotlin.lockscreen.configuration.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -20,6 +20,10 @@ class CheckBoxAdapter(private val arrayList: ArrayList<CheckBoxItem>): RecyclerV
 
             viewBinding.checkBox.isChecked = item.isChecked
             viewBinding.checkBox.text = item.text
+
+            viewBinding.checkBox.setOnCheckedChangeListener { _, isChecked ->
+                item.onCheckedChange(isChecked)
+            }
         }
 
         companion object {
@@ -46,5 +50,6 @@ class CheckBoxAdapter(private val arrayList: ArrayList<CheckBoxItem>): RecyclerV
 
 data class CheckBoxItem(
         var isChecked: Boolean,
-        val text: String
+        val text: String,
+        val onCheckedChange: (isChecked: Boolean) -> Unit
 )

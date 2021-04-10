@@ -22,17 +22,18 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.palette.graphics.Palette
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.flow.android.kotlin.lockscreen.R
-import com.flow.android.kotlin.lockscreen.main.adapter.EventAdapter
 import com.flow.android.kotlin.lockscreen.calendar.CalendarHelper
-import com.flow.android.kotlin.lockscreen.calendar.Event
+import com.flow.android.kotlin.lockscreen.configuration.view.ConfigurationFragment
 import com.flow.android.kotlin.lockscreen.databinding.ActivityMainBinding
 import com.flow.android.kotlin.lockscreen.lock_screen.LockScreenService
+import com.flow.android.kotlin.lockscreen.main.adapter.FragmentStateAdapter
 import com.flow.android.kotlin.lockscreen.main.torch.Torch
 import com.flow.android.kotlin.lockscreen.main.view_model.MainViewModel
-import com.flow.android.kotlin.lockscreen.settings.view.SettingsFragment
-import com.flow.android.kotlin.lockscreen.shared_preferences.SharedPreferencesHelper
+import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
+import com.flow.android.kotlin.lockscreen.util.scale
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionDeniedResponse
@@ -41,9 +42,9 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
 import kotlin.math.pow
 
-class MainActivity : AppCompatActivity(), EventAdapter.OnItemClickListener {
 
-    private val eventAdapter = EventAdapter(this)
+class MainActivity : AppCompatActivity() {
+
     private val torch: Torch by lazy {
         Torch(this)
     }
@@ -51,7 +52,7 @@ class MainActivity : AppCompatActivity(), EventAdapter.OnItemClickListener {
         ViewModelProvider(this@MainActivity, object : ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                 @Suppress("UNCHECKED_CAST")
-                return MainViewModel(contentResolver) as T
+                return MainViewModel(application) as T
             }
         }).get(MainViewModel::class.java)
     }
@@ -71,17 +72,21 @@ class MainActivity : AppCompatActivity(), EventAdapter.OnItemClickListener {
 
         val wallpaper = wallpaper()
 
-        setWallpaper(wallpaper)
+        setWallpaper(wallpaper)  // todo check.
         setTextColor(wallpaper.toBitmap())
 
-        initializeAdapter()
-        initializeLiveData()
         initializeView()
     }
 
+    // todo 이거뭔데.
     override fun onPause() {
         super.onPause()
         checkPermission()
+    }
+
+    override fun finish() {
+        super.finish()
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -91,20 +96,20 @@ class MainActivity : AppCompatActivity(), EventAdapter.OnItemClickListener {
             @Suppress("SpellCheckingInspection")
             when(requestCode) {
                 CalendarHelper.RequestCode.EditEvent -> {
-                    data?.let {
-                        viewModel.calendarDisplays()?.let { calendarDisplays ->
-                            CalendarHelper.events(contentResolver, calendarDisplays).also { events ->
-                                eventAdapter.submitList(events)
-                            }
+                    data ?: return
+
+                    viewModel.calendarDisplays()?.let { calendarDisplays ->
+                        CalendarHelper.events(contentResolver, calendarDisplays).also { events ->
+                            events?.let { viewModel.submitEvents(it) }
                         }
                     }
                 }
                 CalendarHelper.RequestCode.InsertEvent -> {
-                    data?.let {
-                        viewModel.calendarDisplays()?.let { calendarDisplays ->
-                            CalendarHelper.events(contentResolver, calendarDisplays).also { events ->
-                                eventAdapter.submitList(events)
-                            }
+                    data ?: return
+
+                    viewModel.calendarDisplays()?.let { calendarDisplays ->
+                        CalendarHelper.events(contentResolver, calendarDisplays).also { events ->
+                            events?.let { viewModel.submitEvents(it) }
                         }
                     }
                 }
@@ -112,27 +117,8 @@ class MainActivity : AppCompatActivity(), EventAdapter.OnItemClickListener {
         }
     }
 
-    private fun initializeAdapter() {
-        viewBinding?.recyclerView?.apply {
-            adapter = eventAdapter
-            layoutManager = LinearLayoutManager(this@MainActivity)
-        }
-    }
-
-    private fun initializeLiveData() {
-        viewModel.calendarDisplays.observe(this, { calendarDisplays ->
-            CalendarHelper.events(contentResolver, calendarDisplays).also { events ->
-                eventAdapter.submitList(events)
-            }
-        })
-    }
-
     private fun initializeView() {
         viewBinding?.let { viewBinding ->
-            viewBinding.appCompatImageView.setOnClickListener {
-                CalendarHelper.insertEvent(this)
-            }
-
             viewBinding.floatingActionButton.setOnClickListener {
                 finish()
             }
@@ -158,9 +144,9 @@ class MainActivity : AppCompatActivity(), EventAdapter.OnItemClickListener {
             }
 
             viewBinding.imageViewSettings.setOnClickListener {
-                SettingsFragment().apply {
+                ConfigurationFragment().apply {
                     supportFragmentManager.beginTransaction()
-                            .replace(R.id.frame_layout, this, tag)
+                            .replace(R.id.fragment_container_view, this, tag)
                             .addToBackStack(null)
                             .commit()
                 }
@@ -183,13 +169,44 @@ class MainActivity : AppCompatActivity(), EventAdapter.OnItemClickListener {
                 }
             } else
                 viewBinding.imageViewHighlight.visibility = GONE
+
+            val tabTexts = arrayOf(
+                    getString(R.string.main_activity_000),
+                    getString(R.string.main_activity_001)
+            )
+
+            viewBinding.viewPager2.adapter = FragmentStateAdapter(this)
+            TabLayoutMediator(viewBinding.centerAlignedTabLayout, viewBinding.viewPager2) { tab, position ->
+                tab.tag = position
+                tab.text = tabTexts[position]
+            }.attach()
+
+            viewBinding.centerAlignedTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+                override fun onTabSelected(tab: TabLayout.Tab) {
+                    animateSelectedTab(tab)
+                }
+
+                override fun onTabUnselected(tab: TabLayout.Tab) {
+                    animateUnselectedTab(tab)
+                }
+
+                override fun onTabReselected(tab: TabLayout.Tab) {}
+            })
+
+            viewBinding.centerAlignedTabLayout.getTabAt(0)?.select()
         }
     }
 
-    private fun setup() {
-        val sharedPreferencesHelper = SharedPreferencesHelper()
+    private fun animateSelectedTab(tab: TabLayout.Tab) {
+        tab.view.scale(1.4F)
+    }
 
-        if (sharedPreferencesHelper.getShowWhenLocked(this)) {
+    private fun animateUnselectedTab(tab: TabLayout.Tab) {
+        tab.view.scale(1.0F)
+    }
+
+    private fun setup() {
+        if (ConfigurationPreferences.getShowOnLockScreen(this)) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
                 setShowWhenLocked(true)
                 setTurnScreenOn(true)
@@ -280,10 +297,5 @@ class MainActivity : AppCompatActivity(), EventAdapter.OnItemClickListener {
                 }
             }
         }
-    }
-
-    /** EventAdapter.OnItemClickListener */
-    override fun onItemClick(item: Event) {
-        CalendarHelper.editEvent(this, item)
     }
 }

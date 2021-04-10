@@ -12,3 +12,11 @@ fun View.rotate(
             .setListener(animationListenerAdapter)
             .start()
 }
+
+fun View.scale(scale: Float, duration: Number = 200) {
+    this.animate()
+            .scaleX(scale)
+            .scaleY(scale)
+            .setDuration(duration.toLong())
+            .start()
+}

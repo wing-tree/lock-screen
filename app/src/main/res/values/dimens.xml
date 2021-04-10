@@ -31,4 +31,11 @@
     <dimen name="text_description_margin_end">20dp</dimen>
     <dimen name="text_title_margin_end">20dp</dimen>
     <dimen name="text_title_margin_start">20dp</dimen>
+
+    <dimen name="app_icon_width">48dp</dimen>
+    <dimen name="app_icon_height">48dp</dimen>
+    <dimen name="app_item_width">80dp</dimen>
+    <dimen name="app_label_height">40dp</dimen>
+
+    <dimen name="floating_action_button_margin_bottom">112dp</dimen>
 </resources>

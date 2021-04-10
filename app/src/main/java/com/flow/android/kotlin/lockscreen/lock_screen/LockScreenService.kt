@@ -24,8 +24,7 @@ class LockScreenService : JobIntentService() {
                     newIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     startActivity(newIntent)
                 }
-                else -> {
-                }
+                else -> { }
             }
         }
     }
@@ -39,7 +38,7 @@ class LockScreenService : JobIntentService() {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val importance = NotificationManager.IMPORTANCE_MIN
             val notificationChannel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, importance)
             notificationChannel.description = CHANNEL_DESCRIPTION
             notificationManager.createNotificationChannel(notificationChannel)
@@ -57,7 +56,7 @@ class LockScreenService : JobIntentService() {
                 .setContentTitle(getString(R.string.app_name))
                 .setContentText(getString(R.string.notification_content_text))
                 .setContentIntent(pendingIntent)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setPriority(NotificationCompat.PRIORITY_MIN)
 
         val notification: Notification = builder.build()
 

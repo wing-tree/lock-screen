@@ -8,8 +8,8 @@
     android:layout_height="match_parent"
     tools:context=".main.view.MainActivity">
 
-    <FrameLayout
-        android:id="@+id/frame_layout"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragment_container_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:elevation="4dp"/>
@@ -48,24 +48,31 @@
             tools:text="Fri, January 1"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/app_compat_image_view"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:background="@null"
+
+    <com.flow.android.kotlin.lockscreen.widget.CenterAlignedTabLayout
+        android:id="@+id/center_aligned_tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@android:color/transparent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraint_layout_date_time"
-        app:srcCompat="@drawable/ic_round_add_24"/>
+        app:tabGravity="center"
+        app:tabIndicator="@null"
+        app:tabMode="scrollable"
+        app:tabPaddingStart="@dimen/spacing_large"
+        app:tabPaddingEnd="@dimen/spacing_large"
+        app:tabTextAppearance="@style/TextAppearance.Tab"/>
+    <!-- todo: check padding,, -->
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view"
-        android:layout_width="0dp"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/view_pager2"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/floating_action_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/app_compat_image_view" />
+        app:layout_constraintTop_toBottomOf="@+id/center_aligned_tab_layout" />
 
     <ImageView
         android:id="@+id/image_view_camera"
@@ -101,12 +108,11 @@
         app:srcCompat="@drawable/ic_round_settings_24"
         tools:ignore="ContentDescription" />
 
-
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floating_action_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/spacing_extra_large"
+        android:layout_marginBottom="@dimen/floating_action_button_margin_bottom"
         android:clickable="true"
         android:focusable="true"
         app:layout_constraintBottom_toBottomOf="parent"
