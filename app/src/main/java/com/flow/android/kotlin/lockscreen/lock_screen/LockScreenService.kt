@@ -13,29 +13,59 @@ import androidx.core.app.JobIntentService
 import androidx.core.app.NotificationCompat
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.main.view.MainActivity
+import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
 
 class LockScreenService : JobIntentService() {
+    object Action {
+        const val StopSelf = "com.flow.android.kotlin.lockscreen.lock_screen" +
+                ".lock_screen_service.action.stop_self"
+    }
 
     private val broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
+            val showOnLockScreen = ConfigurationPreferences.getShowOnLockScreen(context)
+            val displayAfterUnlocking = ConfigurationPreferences.getDisplayAfterUnlocking(context)
+
             when (intent.action) {
-                Intent.ACTION_SCREEN_ON, Intent.ACTION_USER_PRESENT -> {
-                    val newIntent = Intent(context, MainActivity::class.java)
-                    newIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    startActivity(newIntent)
+                Action.StopSelf -> {
+                    stopSelf()
+                    notificationManager.cancelAll()
                 }
-                else -> { }
+                Intent.ACTION_SCREEN_ON -> {
+                    if (showOnLockScreen.not() || displayAfterUnlocking)
+                        return
+
+                    Intent(context, MainActivity::class.java).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        startActivity(this)
+                    }
+                }
+                Intent.ACTION_USER_PRESENT -> {
+                    if (showOnLockScreen.not() || displayAfterUnlocking.not())
+                        return
+
+                    Intent(context, MainActivity::class.java).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        startActivity(this)
+                    }
+                }
+                else -> {
+
+                }
             }
         }
     }
 
+    private val notificationManager: NotificationManager by lazy {
+        getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    }
+
     override fun onHandleWork(intent: Intent) {
         val intentFilter = IntentFilter()
+        intentFilter.addAction(Action.StopSelf)
         intentFilter.addAction(Intent.ACTION_SCREEN_ON)
         intentFilter.addAction(Intent.ACTION_USER_PRESENT)
         registerReceiver(broadcastReceiver, intentFilter)
-
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val importance = NotificationManager.IMPORTANCE_MIN

@@ -20,7 +20,7 @@ object ConfigurationPreferences {
 
     fun getShowOnLockScreen(context: Context): Boolean {
         val sharedPreferences = context.getSharedPreferences(Name.ShowOnLockScreen, Context.MODE_PRIVATE)
-        return sharedPreferences.getBoolean(Key.ShowOnLockScreen, false)
+        return sharedPreferences.getBoolean(Key.ShowOnLockScreen, true)
     }
 
     fun putShowOnLockScreen(context: Context, showOnLockScreen: Boolean) {

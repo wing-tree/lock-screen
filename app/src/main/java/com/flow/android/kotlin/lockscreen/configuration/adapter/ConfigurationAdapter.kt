@@ -7,11 +7,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.flow.android.kotlin.lockscreen.databinding.*
+import com.flow.android.kotlin.lockscreen.util.collapse
+import com.flow.android.kotlin.lockscreen.util.expand
 import java.security.InvalidParameterException
 
 class ConfigurationAdapter(private val arrayList: ArrayList<AdapterItem>): RecyclerView.Adapter<ConfigurationAdapter.ViewHolder>() {
+    private var recyclerView: RecyclerView? = null
 
     class ViewHolder(private val viewBinding: ViewBinding): RecyclerView.ViewHolder(viewBinding.root) {
+        private val duration = 200
+
         fun bind(adapterItem: AdapterItem, viewType: Int) {
             when(viewType) {
                 ViewType.Divider -> {
@@ -65,6 +70,14 @@ class ConfigurationAdapter(private val arrayList: ArrayList<AdapterItem>): Recyc
             }
         }
 
+        fun hide() {
+            viewBinding.root.collapse(1, duration)
+        }
+
+        fun show() {
+            viewBinding.root.expand(200)
+        }
+
         companion object {
             fun from(layoutInflater: LayoutInflater, parent: ViewGroup, viewType: Int): ViewHolder {
                 val viewBinding = when(viewType) {
@@ -79,6 +92,11 @@ class ConfigurationAdapter(private val arrayList: ArrayList<AdapterItem>): Recyc
                 return ViewHolder(viewBinding)
             }
         }
+    }
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        this.recyclerView = recyclerView
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -100,6 +118,30 @@ class ConfigurationAdapter(private val arrayList: ArrayList<AdapterItem>): Recyc
             is AdapterItem.ListItem -> ViewType.List
             is AdapterItem.SubtitleItem -> ViewType.Subtitle
             is AdapterItem.SwitchItem -> ViewType.Switch
+        }
+    }
+
+    fun hideItem(id: Long) {
+        val item = arrayList.find { it.id == id } ?: return
+        val index = arrayList.indexOf(item)
+        val viewHolder = recyclerView?.findViewHolderForAdapterPosition(index)
+
+        viewHolder?.let {
+            if (it is ViewHolder) {
+                it.hide()
+            }
+        }
+    }
+
+    fun showItem(id: Long) {
+        val item = arrayList.find { it.id == id } ?: return
+        val index = arrayList.indexOf(item)
+        val viewHolder = recyclerView?.findViewHolderForAdapterPosition(index)
+
+        viewHolder?.let {
+            if (it is ViewHolder) {
+                it.show()
+            }
         }
     }
 }

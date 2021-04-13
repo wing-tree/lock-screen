@@ -34,8 +34,6 @@ class MainViewModel(private val application: Application): ViewModel() {
     private val _events = MutableLiveData<List<Event>>()
 
     init {
-        postCalendarDisplays(contentResolver)
-        postEvents(contentResolver)
         postFavoriteApps(application)
     }
 
@@ -43,7 +41,7 @@ class MainViewModel(private val application: Application): ViewModel() {
         _events.postValue(events)
     }
 
-    private fun postCalendarDisplays(contentResolver: ContentResolver) {
+    fun postCalendarDisplays() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 _calendarDisplays.postValue(CalendarHelper.calendarDisplays(contentResolver))
@@ -51,7 +49,7 @@ class MainViewModel(private val application: Application): ViewModel() {
         }
     }
 
-    private fun postEvents(contentResolver: ContentResolver) {
+    fun postEvents() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 _events.postValue(CalendarHelper.events(contentResolver, CalendarHelper.calendarDisplays(contentResolver)))

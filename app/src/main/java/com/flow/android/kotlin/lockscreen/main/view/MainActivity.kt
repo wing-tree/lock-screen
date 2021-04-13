@@ -4,8 +4,11 @@ import android.Manifest
 import android.app.KeyguardManager
 import android.app.WallpaperManager
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
@@ -15,10 +18,13 @@ import android.provider.Settings
 import android.view.View.GONE
 import android.view.WindowManager
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.palette.graphics.Palette
@@ -31,15 +37,19 @@ import com.flow.android.kotlin.lockscreen.main.adapter.FragmentStateAdapter
 import com.flow.android.kotlin.lockscreen.main.torch.Torch
 import com.flow.android.kotlin.lockscreen.main.view_model.MainViewModel
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
+import com.flow.android.kotlin.lockscreen.util.fadeIn
 import com.flow.android.kotlin.lockscreen.util.scale
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.karumi.dexter.Dexter
+import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionDeniedResponse
 import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.karumi.dexter.listener.single.PermissionListener
+import java.io.IOException
 import kotlin.math.pow
 
 
@@ -63,25 +73,32 @@ class MainActivity : AppCompatActivity() {
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding?.root)
 
+        if (ConfigurationPreferences.getShowOnLockScreen(this)) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                setShowWhenLocked(true)
+                setTurnScreenOn(true)
+
+                val keyguardManager = getSystemService(KEYGUARD_SERVICE) as KeyguardManager
+                keyguardManager.requestDismissKeyguard(this, null)
+            } else {
+                @Suppress("DEPRECATION")
+                window.addFlags(
+                    WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD or
+                            WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
+                            WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                )
+            }
+        }
+
         window?.setFlags(
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
         )
 
-        setup()
-
-        val wallpaper = wallpaper()
-
-        setWallpaper(wallpaper)  // todo check.
-        setTextColor(wallpaper.toBitmap())
+        checkManageOverlayPermission()
+        checkPermission()
 
         initializeView()
-    }
-
-    // todo 이거뭔데.
-    override fun onPause() {
-        super.onPause()
-        checkPermission()
     }
 
     override fun finish() {
@@ -205,33 +222,37 @@ class MainActivity : AppCompatActivity() {
         tab.view.scale(1.0F)
     }
 
-    private fun setup() {
-        if (ConfigurationPreferences.getShowOnLockScreen(this)) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-                setShowWhenLocked(true)
-                setTurnScreenOn(true)
-
-                val keyguardManager = getSystemService(KEYGUARD_SERVICE) as KeyguardManager
-                keyguardManager.requestDismissKeyguard(this, null)
-            } else {
-                @Suppress("DEPRECATION")
-                window.addFlags(
-                        WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD or
-                                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
-                                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
-                )
-            }
+    private fun setWallpaper() {
+        wallpaper()?.let {
+            viewBinding?.root?.background = it.toDrawable(resources)
+            setTextColor(it)
         }
     }
 
-    private fun setWallpaper(wallpaper: Drawable) {
-        viewBinding?.root?.background = wallpaper
-    }
+    private fun wallpaper(): Bitmap? {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            val wallpaperManager = WallpaperManager.getInstance(this)
 
-    private fun wallpaper(): Drawable {
-        val wallpaperManager = WallpaperManager.getInstance(this)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                val wallpaperFile = wallpaperManager.getWallpaperFile(WallpaperManager.FLAG_LOCK) ?: wallpaperManager.getWallpaperFile(WallpaperManager.FLAG_SYSTEM)
 
-        return wallpaperManager.drawable
+                wallpaperFile?.let {
+                    val bitmap = BitmapFactory.decodeFileDescriptor(wallpaperFile.fileDescriptor)
+
+                    try {
+                        wallpaperFile.close()
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
+
+                    return bitmap
+                }
+            }
+
+            return wallpaperManager.drawable.toBitmap()
+        }
+
+        return null
     }
 
     private fun setTextColor(bitmap: Bitmap) {
@@ -278,7 +299,7 @@ class MainActivity : AppCompatActivity() {
             Color.WHITE
     }
 
-    private fun checkPermission() {
+    private fun checkManageOverlayPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!Settings.canDrawOverlays(this)) {
                 // todo show alert message for permission. rational
@@ -287,7 +308,7 @@ class MainActivity : AppCompatActivity() {
                 startActivityForResult(intent, 0)
             } else {
                 val intent = Intent(applicationContext, LockScreenService::class.java)
-                // startService(intent) ?? todo. check..
+
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     LockScreenService().enqueueWork(this, intent)
                     startForegroundService(intent)
@@ -297,5 +318,31 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun checkPermission() {
+        Dexter.withContext(this)
+                .withPermissions(
+                        Manifest.permission.READ_CALENDAR,
+                        Manifest.permission.READ_EXTERNAL_STORAGE
+                ).withListener(object : MultiplePermissionsListener {
+                    override fun onPermissionsChecked(report: MultiplePermissionsReport) {
+                        for (grantedPermissionResponse in report.grantedPermissionResponses) {
+                            when (grantedPermissionResponse.permissionName) {
+                                Manifest.permission.READ_CALENDAR -> {
+                                    viewModel.postCalendarDisplays()
+                                    viewModel.postEvents()
+                                }
+                                Manifest.permission.READ_EXTERNAL_STORAGE -> {
+                                    setWallpaper()
+                                }
+                            }
+                        }
+                    }
+
+                    override fun onPermissionRationaleShouldBeShown(permissions: List<PermissionRequest>, token: PermissionToken) { /* ... */
+
+                    }
+                }).check()
     }
 }

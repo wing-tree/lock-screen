@@ -32,7 +32,7 @@ class EventAdapter(private val onItemClickListener: OnItemClickListener): ListAd
             viewBinding as EventItemBinding
 
             val begin = "${item.begin.format()} - "
-            
+
             viewBinding.textViewBegin.text = begin
             viewBinding.viewCalendarColor.setBackgroundColor(item.calendarColor)
             viewBinding.textViewCalendarDisplayName.text = item.calendarDisplayName
