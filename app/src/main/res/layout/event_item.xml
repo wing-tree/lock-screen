@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/spacing_small">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -12,46 +13,45 @@
 
         <View
             android:id="@+id/view_calendar_color"
-            android:layout_width="6dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="@+id/text_view_calendar_display_name"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_marginStart="@dimen/spacing_small"
+            android:background="@drawable/background_calendar_color"
+            app:layout_constraintBottom_toBottomOf="@+id/text_view_title"
+            app:layout_constraintEnd_toStartOf="@+id/text_view_title"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/text_view_calendar_display_name" />
-
-        <TextView
-            android:id="@+id/text_view_calendar_display_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/view_calendar_color"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/text_view_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_small"
+            android:layout_marginEnd="@dimen/spacing_small"
+            android:textSize="@dimen/text_size_medium"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_view_calendar_display_name" />
+            app:layout_constraintStart_toEndOf="@id/view_calendar_color"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Title" />
 
         <TextView
             android:id="@+id/text_view_begin"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="1dp"
-            app:layout_constraintEnd_toStartOf="@+id/text_view_end"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_view_title" />
+            android:layout_marginTop="@dimen/spacing_small"
+            app:layout_constraintStart_toEndOf="@+id/text_view_title"
+            app:layout_constraintStart_toStartOf="@+id/text_view_title"
+            app:layout_constraintTop_toBottomOf="@+id/text_view_title"
+            tools:text="오전 10:00 -" />
 
         <TextView
             android:id="@+id/text_view_end"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="1dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
+
             app:layout_constraintStart_toEndOf="@+id/text_view_begin"
-            app:layout_constraintTop_toBottomOf="@+id/text_view_title" />
+            app:layout_constraintTop_toTopOf="@+id/text_view_begin"
+            tools:text="오전 11:00" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

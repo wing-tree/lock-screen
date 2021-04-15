@@ -1,5 +1,6 @@
 package com.flow.android.kotlin.lockscreen.main.adapter
 
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -34,8 +35,7 @@ class EventAdapter(private val onItemClickListener: OnItemClickListener): ListAd
             val begin = "${item.begin.format()} - "
 
             viewBinding.textViewBegin.text = begin
-            viewBinding.viewCalendarColor.setBackgroundColor(item.calendarColor)
-            viewBinding.textViewCalendarDisplayName.text = item.calendarDisplayName
+            viewBinding.viewCalendarColor.backgroundTintList = ColorStateList.valueOf(item.calendarColor)
             viewBinding.textViewTitle.text = item.title
             viewBinding.textViewEnd.text = item.end.format()
 

@@ -101,6 +101,14 @@ class MainActivity : AppCompatActivity() {
         initializeView()
     }
 
+    override fun onPause() {
+        val index = viewBinding?.centerAlignedTabLayout?.selectedTabPosition ?: 0
+
+        ConfigurationPreferences.putSelectedTabIndex(this, index)
+
+        super.onPause()
+    }
+
     override fun finish() {
         super.finish()
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
