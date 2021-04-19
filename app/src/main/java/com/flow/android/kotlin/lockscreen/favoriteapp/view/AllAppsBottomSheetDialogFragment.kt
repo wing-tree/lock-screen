@@ -1,4 +1,4 @@
-package com.flow.android.kotlin.lockscreen.favorite_app.view
+package com.flow.android.kotlin.lockscreen.favoriteapp.view
 
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -7,12 +7,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.flow.android.kotlin.lockscreen.databinding.FragmentAllAppsBottomSheetDialogBinding
-import com.flow.android.kotlin.lockscreen.favorite_app.adapter.App
-import com.flow.android.kotlin.lockscreen.favorite_app.adapter.AppAdapter
-import com.flow.android.kotlin.lockscreen.preferences.PackageNamePreferences
+import com.flow.android.kotlin.lockscreen.favoriteapp.adapter.App
+import com.flow.android.kotlin.lockscreen.favoriteapp.adapter.AppAdapter
+import com.flow.android.kotlin.lockscreen.main.view_model.MainViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -21,9 +22,8 @@ import timber.log.Timber
 
 
 class AllAppsBottomSheetDialogFragment: BottomSheetDialogFragment() {
-    private val appAdapter = AppAdapter { packageName ->
-        PackageNamePreferences.addPackageName(requireContext(), packageName)
-    }
+    private val viewModel: MainViewModel by activityViewModels()
+    private val appAdapter = AppAdapter { viewModel.addFavoriteApp(it) }
     private val batchSize = 16
     private var viewBinding: FragmentAllAppsBottomSheetDialogBinding? = null
 

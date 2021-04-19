@@ -8,8 +8,6 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -18,7 +16,7 @@ import android.provider.Settings
 import android.view.View.GONE
 import android.view.WindowManager
 import android.widget.ImageView
-import android.widget.Toast
+import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -32,12 +30,11 @@ import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.calendar.CalendarHelper
 import com.flow.android.kotlin.lockscreen.configuration.view.ConfigurationFragment
 import com.flow.android.kotlin.lockscreen.databinding.ActivityMainBinding
-import com.flow.android.kotlin.lockscreen.lock_screen.LockScreenService
+import com.flow.android.kotlin.lockscreen.lockscreen.LockScreenService
 import com.flow.android.kotlin.lockscreen.main.adapter.FragmentStateAdapter
 import com.flow.android.kotlin.lockscreen.main.torch.Torch
 import com.flow.android.kotlin.lockscreen.main.view_model.MainViewModel
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
-import com.flow.android.kotlin.lockscreen.util.fadeIn
 import com.flow.android.kotlin.lockscreen.util.scale
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -124,18 +121,18 @@ class MainActivity : AppCompatActivity() {
                     data ?: return
 
                     viewModel.calendarDisplays()?.let { calendarDisplays ->
-                        CalendarHelper.events(contentResolver, calendarDisplays).also { events ->
-                            events?.let { viewModel.submitEvents(it) }
-                        }
+//                        CalendarHelper.events(contentResolver, calendarDisplays).also { events ->
+//                            events?.let { viewModel.submitEvents(it) }
+//                        }
                     }
                 }
                 CalendarHelper.RequestCode.InsertEvent -> {
                     data ?: return
 
                     viewModel.calendarDisplays()?.let { calendarDisplays ->
-                        CalendarHelper.events(contentResolver, calendarDisplays).also { events ->
-                            events?.let { viewModel.submitEvents(it) }
-                        }
+//                        CalendarHelper.events(contentResolver, calendarDisplays).also { events ->
+//                            events?.let { viewModel.submitEvents(it) }
+//                        }
                     }
                 }
             }
@@ -202,8 +199,8 @@ class MainActivity : AppCompatActivity() {
 
             viewBinding.viewPager2.adapter = FragmentStateAdapter(this)
             TabLayoutMediator(viewBinding.centerAlignedTabLayout, viewBinding.viewPager2) { tab, position ->
-                tab.tag = position
-                tab.text = tabTexts[position]
+                tab.customView = layoutInflater.inflate(R.layout.tab_custom_view, null)
+                tab.customView?.findViewById<TextView>(R.id.text_view)?.text = tabTexts[position]
             }.attach()
 
             viewBinding.centerAlignedTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
@@ -223,7 +220,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun animateSelectedTab(tab: TabLayout.Tab) {
-        tab.view.scale(1.4F)
+        tab.view.scale(1.5F)
     }
 
     private fun animateUnselectedTab(tab: TabLayout.Tab) {
@@ -339,7 +336,7 @@ class MainActivity : AppCompatActivity() {
                             when (grantedPermissionResponse.permissionName) {
                                 Manifest.permission.READ_CALENDAR -> {
                                     viewModel.postCalendarDisplays()
-                                    viewModel.postEvents()
+                                    // viewModel.postEvents()
                                 }
                                 Manifest.permission.READ_EXTERNAL_STORAGE -> {
                                     setWallpaper()

@@ -162,7 +162,7 @@ object CalendarHelper {
     }
 
     @SuppressLint("Recycle")
-    fun events(contentResolver: ContentResolver, calendarDisplays: List<CalendarDisplay>): ArrayList<Event>? {
+    fun events(contentResolver: ContentResolver, calendarDisplays: List<CalendarDisplay>, amount: Int): ArrayList<Event>? {
 
         val events = arrayListOf<Event>()
 
@@ -171,6 +171,9 @@ object CalendarHelper {
 
         @Suppress("LocalVariableName", "SpellCheckingInspection")
         val DTEND = Calendar.getInstance()
+
+        DTSTART.add(Calendar.DATE, amount)
+        DTEND.add(Calendar.DATE, amount)
 
         DTSTART.set(Calendar.HOUR_OF_DAY, 0)
         DTSTART.set(Calendar.MINUTE, 0)

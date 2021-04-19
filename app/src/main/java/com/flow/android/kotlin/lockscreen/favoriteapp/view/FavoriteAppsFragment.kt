@@ -1,24 +1,21 @@
-package com.flow.android.kotlin.lockscreen.favorite_app.view
+package com.flow.android.kotlin.lockscreen.favoriteapp.view
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.flow.android.kotlin.lockscreen.databinding.FragmentFavoriteAppsBinding
-import com.flow.android.kotlin.lockscreen.favorite_app.adapter.AppAdapter
+import com.flow.android.kotlin.lockscreen.favoriteapp.adapter.AppAdapter
 import com.flow.android.kotlin.lockscreen.main.view_model.MainViewModel
 
 class FavoriteAppsFragment: Fragment() {
-    private val appAdapter = AppAdapter { packageName ->
-        launchApplication(packageName)
+    private val appAdapter = AppAdapter { app ->
+        launchApplication(app.packageName)
     }
 
     private val viewModel: MainViewModel by lazy {

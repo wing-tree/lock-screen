@@ -10,7 +10,6 @@ import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.databinding.FragmentConfigurationBinding
@@ -20,7 +19,7 @@ import com.flow.android.kotlin.lockscreen.configuration.adapter.AdapterItem
 import com.flow.android.kotlin.lockscreen.configuration.adapter.CheckBoxAdapter
 import com.flow.android.kotlin.lockscreen.configuration.adapter.CheckBoxItem
 import com.flow.android.kotlin.lockscreen.configuration.adapter.ConfigurationAdapter
-import com.flow.android.kotlin.lockscreen.lock_screen.LockScreenService
+import com.flow.android.kotlin.lockscreen.lockscreen.LockScreenService
 
 class ConfigurationFragment: Fragment() {
     private var viewBinding: FragmentConfigurationBinding? = null

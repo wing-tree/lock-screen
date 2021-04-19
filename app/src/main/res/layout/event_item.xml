@@ -5,7 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/spacing_small">
+    android:layout_marginBottom="@dimen/spacing_small"
+    app:cardBackgroundColor="@color/event_item_background">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -49,7 +50,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="1dp"
-
             app:layout_constraintStart_toEndOf="@+id/text_view_begin"
             app:layout_constraintTop_toTopOf="@+id/text_view_begin"
             tools:text="오전 11:00" />

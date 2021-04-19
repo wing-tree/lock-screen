@@ -7,14 +7,19 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.lifecycle.lifecycleScope
 import com.flow.android.kotlin.lockscreen.databinding.FragmentCalendarBinding
-import com.flow.android.kotlin.lockscreen.main.adapter.EventAdapter
+import com.flow.android.kotlin.lockscreen.calendar.adapter.EventsAdapter
 import com.flow.android.kotlin.lockscreen.main.view_model.MainViewModel
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class CalendarFragment: Fragment(), EventAdapter.OnItemClickListener {
-    private val eventAdapter = EventAdapter(this)
+class CalendarFragment: Fragment() {
+    private val eventsAdapter = EventsAdapter(arrayListOf()) {
+        CalendarHelper.editEvent(requireActivity(), it)
+    }
     private val viewModel: MainViewModel by lazy {
         ViewModelProvider(requireActivity(), object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
@@ -33,28 +38,30 @@ class CalendarFragment: Fragment(), EventAdapter.OnItemClickListener {
         viewBinding = FragmentCalendarBinding.inflate(inflater, container, false)
 
         initializeView()
-        initializeAdapter()
         initializeLiveData()
 
         return viewBinding?.root
-    }
-
-    private fun initializeAdapter() {
-        viewBinding?.recyclerView?.apply {
-            adapter = eventAdapter
-            layoutManager = LinearLayoutManager(requireContext())
-        }
     }
 
     private fun initializeLiveData() {
         viewModel.calendarDisplays.observe(viewLifecycleOwner, { calendarDisplays ->
             val uncheckedCalendarIds = ConfigurationPreferences.getUncheckedCalendarIds(requireContext())
 
-            CalendarHelper.events(viewModel.contentResolver(), calendarDisplays.filter {
-                uncheckedCalendarIds.contains(it.id.toString()).not()
-            }).also { events ->
-                eventAdapter.submitList(events)
+            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                for (i in 0..7) {
+                    CalendarHelper.events(
+                            viewModel.contentResolver(),
+                            calendarDisplays.filter {
+                                uncheckedCalendarIds.contains(it.id.toString()).not()
+                            }, i
+                    ).also { events ->
+                        withContext(Dispatchers.Main) {
+                            events?.let { eventsAdapter.add(it) }
+                        }
+                    }
+                }
             }
+
         })
     }
 
@@ -62,10 +69,11 @@ class CalendarFragment: Fragment(), EventAdapter.OnItemClickListener {
         viewBinding?.appCompatImageView?.setOnClickListener {
             CalendarHelper.insertEvent(requireActivity())
         }
-    }
 
-    /** EventAdapter.OnItemClickListener */
-    override fun onItemClick(item: Event) {
-        CalendarHelper.editEvent(requireActivity(), item)
+        viewBinding?.viewPager2?.adapter = eventsAdapter
+
+        viewBinding?.imageViewForward?.setOnClickListener {
+            viewBinding?.viewPager2?.currentItem = 2
+        }
     }
 }

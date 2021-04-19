@@ -1,4 +1,4 @@
-package com.flow.android.kotlin.lockscreen.lock_screen
+package com.flow.android.kotlin.lockscreen.lockscreen
 
 import android.app.Notification
 import android.app.NotificationChannel

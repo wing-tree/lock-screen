@@ -1,4 +1,4 @@
-package com.flow.android.kotlin.lockscreen.favorite_app.adapter
+package com.flow.android.kotlin.lockscreen.favoriteapp.adapter
 
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
@@ -8,7 +8,7 @@ import com.bumptech.glide.Glide
 import com.flow.android.kotlin.lockscreen.databinding.AppItemBinding
 import com.flow.android.kotlin.lockscreen.util.diff
 
-class AppAdapter(private val onItemClick: (packageName: String) -> Unit): RecyclerView.Adapter<AppAdapter.ViewHolder>() {
+class AppAdapter(private val onItemClick: (app: App) -> Unit): RecyclerView.Adapter<AppAdapter.ViewHolder>() {
     private val apps = arrayListOf<App>()
     private var layoutInflater: LayoutInflater? = null
 
@@ -33,7 +33,7 @@ class AppAdapter(private val onItemClick: (packageName: String) -> Unit): Recycl
             binding.textView.text = item.label
 
             binding.root.setOnClickListener {
-                onItemClick(item.packageName)
+                onItemClick(item)
             }
         }
     }

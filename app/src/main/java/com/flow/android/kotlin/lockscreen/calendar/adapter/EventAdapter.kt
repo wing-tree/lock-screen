@@ -1,4 +1,4 @@
-package com.flow.android.kotlin.lockscreen.main.adapter
+package com.flow.android.kotlin.lockscreen.calendar.adapter
 
 import android.content.res.ColorStateList
 import android.view.LayoutInflater
@@ -12,10 +12,7 @@ import com.flow.android.kotlin.lockscreen.databinding.EventItemBinding
 import java.text.SimpleDateFormat
 import java.util.*
 
-class EventAdapter(private val onItemClickListener: OnItemClickListener): ListAdapter<Event, EventAdapter.ViewHolder>(DiffCallback()) {
-    interface OnItemClickListener {
-        fun onItemClick(item: Event)
-    }
+class EventAdapter(private val onItemClick: (item: Event) -> Unit): ListAdapter<Event, EventAdapter.ViewHolder>(DiffCallback()) {
 
     fun add(item: Event) {
         val list = currentList.toMutableList()
@@ -25,7 +22,7 @@ class EventAdapter(private val onItemClickListener: OnItemClickListener): ListAd
 
     class ViewHolder private constructor(
             private val viewBinding: ViewBinding,
-            private val onItemClickListener: OnItemClickListener,
+            private val onItemClick: (item: Event) -> Unit,
             private val simpleDateFormat: SimpleDateFormat
     ): RecyclerView.ViewHolder(viewBinding.root) {
 
@@ -40,25 +37,25 @@ class EventAdapter(private val onItemClickListener: OnItemClickListener): ListAd
             viewBinding.textViewEnd.text = item.end.format()
 
             viewBinding.root.setOnClickListener {
-                onItemClickListener.onItemClick(item)
+                onItemClick(item)
             }
         }
 
         private fun Long.format() = simpleDateFormat.format(this)
 
         companion object {
-            fun from(parent: ViewGroup, onItemClickListener: OnItemClickListener): ViewHolder {
+            fun from(parent: ViewGroup, onItemClick: (item: Event) -> Unit): ViewHolder {
                 val inflater = LayoutInflater.from(parent.context)
                 val simpleDateFormat = SimpleDateFormat("a hh:mm", Locale.getDefault())
                 val viewBinding = EventItemBinding.inflate(inflater, parent, false)
 
-                return ViewHolder(viewBinding, onItemClickListener, simpleDateFormat)
+                return ViewHolder(viewBinding, onItemClick, simpleDateFormat)
             }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder.from(parent, onItemClickListener)
+        return ViewHolder.from(parent, onItemClick)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {

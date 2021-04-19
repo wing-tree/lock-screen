@@ -16,9 +16,9 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraint_layout_date_time"
-        android:layout_width="@dimen/constraint_layout_date_time_width"
-        android:layout_height="@dimen/constraint_layout_date_time_height"
-        android:layout_marginTop="@dimen/spacing_large"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_extra_large"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -35,12 +35,12 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="12시 00분"/>
 
-        <TextView
+        <TextClock
             android:id="@+id/text_clock_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/spacing_medium"
-            android:format24Hour="@string/format_date"
+            android:format12Hour="@string/format_date"
             android:gravity="center_vertical"
             android:textSize="@dimen/text_size_text_clock_date"
             app:layout_constraintStart_toStartOf="parent"

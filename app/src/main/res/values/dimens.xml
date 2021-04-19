@@ -23,8 +23,8 @@
     <dimen name="constraint_layout_date_time_width">144dp</dimen>
     <dimen name="constraint_layout_date_time_height">96dp</dimen>
 
-    <dimen name="text_size_text_clock_date">@dimen/text_size_large</dimen>
-    <dimen name="text_size_text_clock_time">@dimen/text_size_extra_large</dimen>
+    <dimen name="text_size_text_clock_date">32sp</dimen>
+    <dimen name="text_size_text_clock_time">36sp</dimen>
 
     <dimen name="image_view_camera_margin_top">48dp</dimen>
 

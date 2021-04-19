@@ -1,7 +1,6 @@
 package com.flow.android.kotlin.lockscreen.main.view_model
 
 import android.app.Application
-import android.content.ContentResolver
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.flow.android.kotlin.lockscreen.calendar.CalendarDisplay
 import com.flow.android.kotlin.lockscreen.calendar.CalendarHelper
 import com.flow.android.kotlin.lockscreen.calendar.Event
-import com.flow.android.kotlin.lockscreen.favorite_app.adapter.App
+import com.flow.android.kotlin.lockscreen.favoriteapp.adapter.App
 import com.flow.android.kotlin.lockscreen.preferences.PackageNamePreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -52,7 +51,7 @@ class MainViewModel(private val application: Application): ViewModel() {
     fun postEvents() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                _events.postValue(CalendarHelper.events(contentResolver, CalendarHelper.calendarDisplays(contentResolver)))
+                _events.postValue(CalendarHelper.events(contentResolver, CalendarHelper.calendarDisplays(contentResolver), 0))
             }
         }
     }
@@ -74,5 +73,16 @@ class MainViewModel(private val application: Application): ViewModel() {
     fun refreshCalendarDisplays() {
         val value = calendarDisplays.value ?: return
         _calendarDisplays.value = value
+    }
+
+    fun addFavoriteApp(app: App) {
+        _favoriteApps.value?.let {
+            if (it.contains(app).not()) {
+                _favoriteApps.value = it.toMutableList().apply {
+                    PackageNamePreferences.addPackageName(application, app.packageName)
+                    add(app)
+                }
+            }
+        }
     }
 }
