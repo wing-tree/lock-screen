@@ -27,6 +27,16 @@ class AppAdapter(private val onItemClick: (app: App) -> Unit): RecyclerView.Adap
         notifyDataSetChanged()
     }
 
+    fun remove(app: App) {
+        val index = apps.indexOf(app)
+
+        if (index == -1)
+            return
+
+        apps.removeAt(index)
+        notifyItemRemoved(index)
+    }
+
     inner class ViewHolder(private val binding: AppItemBinding): RecyclerView.ViewHolder(binding.root) {
         fun bind(item: App) {
             Glide.with(binding.root.context).load(item.icon).into(binding.imageView)

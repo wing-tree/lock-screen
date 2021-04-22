@@ -14,6 +14,7 @@ import com.flow.android.kotlin.lockscreen.databinding.FragmentAllAppsBottomSheet
 import com.flow.android.kotlin.lockscreen.favoriteapp.adapter.App
 import com.flow.android.kotlin.lockscreen.favoriteapp.adapter.AppAdapter
 import com.flow.android.kotlin.lockscreen.main.view_model.MainViewModel
+import com.flow.android.kotlin.lockscreen.preferences.PackageNamePreferences
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,7 +24,9 @@ import timber.log.Timber
 
 class AllAppsBottomSheetDialogFragment: BottomSheetDialogFragment() {
     private val viewModel: MainViewModel by activityViewModels()
-    private val appAdapter = AppAdapter { viewModel.addFavoriteApp(it) }
+    private val appAdapter = AppAdapter { viewModel.addFavoriteApp(it) { app ->
+        removeApp(app)
+    } }
     private val batchSize = 16
     private var viewBinding: FragmentAllAppsBottomSheetDialogBinding? = null
 
@@ -53,6 +56,7 @@ class AllAppsBottomSheetDialogFragment: BottomSheetDialogFragment() {
 
     private suspend fun addApps() {
         withContext(Dispatchers.IO) {
+            val addedPackageNames = PackageNamePreferences.getPackageNames(requireContext())
             val apps = arrayListOf<App>()
             var count = 0
 
@@ -67,6 +71,9 @@ class AllAppsBottomSheetDialogFragment: BottomSheetDialogFragment() {
                     val icon = resolveInfo.activityInfo.loadIcon(packageManager)
                     val label = resolveInfo.loadLabel(packageManager).toString()
                     val packageName = resolveInfo.activityInfo.packageName
+
+                    if (addedPackageNames.contains(packageName))
+                        continue
 
                     apps.add(
                             App(
@@ -94,5 +101,9 @@ class AllAppsBottomSheetDialogFragment: BottomSheetDialogFragment() {
                 appAdapter.addAll(apps.toList())
             }
         }
+    }
+
+    private fun removeApp(app: App) {
+        appAdapter.remove(app)
     }
 }

@@ -40,7 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/spacing_medium"
-            android:format12Hour="@string/format_date"
+            android:format12Hour="@string/format_date_000"
             android:gravity="center_vertical"
             android:textSize="@dimen/text_size_text_clock_date"
             app:layout_constraintStart_toStartOf="parent"

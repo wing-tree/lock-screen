@@ -75,12 +75,13 @@ class MainViewModel(private val application: Application): ViewModel() {
         _calendarDisplays.value = value
     }
 
-    fun addFavoriteApp(app: App) {
+    fun addFavoriteApp(app: App, onComplete: (app: App) -> Unit) {
         _favoriteApps.value?.let {
             if (it.contains(app).not()) {
                 _favoriteApps.value = it.toMutableList().apply {
                     PackageNamePreferences.addPackageName(application, app.packageName)
                     add(app)
+                    onComplete.invoke(app)
                 }
             }
         }

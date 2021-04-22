@@ -2,7 +2,10 @@
 <resources>
     <string name="app_name">잠금 화면</string>
 
-    <string name="format_date">M월 d일 EEE</string>
+    <string name="today">오늘</string>
+
+    <string name="format_date_000">M월 d일 EEE</string>
+    <string name="format_date_001">M월 d일</string>
 
     <string name="notification_content_text">안정적인 실행을 위한 알림입니다.</string>
 
