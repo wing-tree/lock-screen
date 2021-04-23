@@ -25,7 +25,6 @@ class EventsAdapter(private val eventsList: ArrayList<List<Event>>, private val 
                 adapter = EventAdapter {
                     onItemClick(it)
                 }.apply {
-                    println("KKKKKK: $item")
                     submitList(item)
                 }
             }

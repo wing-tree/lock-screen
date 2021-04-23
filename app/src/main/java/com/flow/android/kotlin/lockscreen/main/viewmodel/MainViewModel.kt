@@ -1,22 +1,20 @@
-package com.flow.android.kotlin.lockscreen.main.view_model
+package com.flow.android.kotlin.lockscreen.main.viewmodel
 
 import android.app.Application
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.flow.android.kotlin.lockscreen.calendar.CalendarDisplay
 import com.flow.android.kotlin.lockscreen.calendar.CalendarHelper
 import com.flow.android.kotlin.lockscreen.calendar.Event
-import com.flow.android.kotlin.lockscreen.favoriteapp.adapter.App
+import com.flow.android.kotlin.lockscreen.favoriteapp.entity.App
 import com.flow.android.kotlin.lockscreen.preferences.PackageNamePreferences
+import com.flow.android.kotlin.lockscreen.repository.LocalRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-
-class MainViewModel(private val application: Application): ViewModel() {
+class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val contentResolver = application.contentResolver
+    private val localRepository = LocalRepository(application)
     private val packageManager = application.packageManager
 
     private val _calendarDisplays = MutableLiveData<List<CalendarDisplay>>()
@@ -26,6 +24,8 @@ class MainViewModel(private val application: Application): ViewModel() {
     private val _favoriteApps = MutableLiveData<List<App>>()
     val favoriteApps: LiveData<List<App>>
         get() = _favoriteApps
+
+    val memos = localRepository.getAllMemos()
 
     fun calendarDisplays() = calendarDisplays.value
     fun contentResolver() = contentResolver
@@ -79,7 +79,7 @@ class MainViewModel(private val application: Application): ViewModel() {
         _favoriteApps.value?.let {
             if (it.contains(app).not()) {
                 _favoriteApps.value = it.toMutableList().apply {
-                    PackageNamePreferences.addPackageName(application, app.packageName)
+                    PackageNamePreferences.addPackageName(getApplication(), app.packageName)
                     add(app)
                     onComplete.invoke(app)
                 }

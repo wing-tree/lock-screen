@@ -3,7 +3,7 @@ package com.flow.android.kotlin.lockscreen.main.adapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.flow.android.kotlin.lockscreen.calendar.CalendarFragment
+import com.flow.android.kotlin.lockscreen.calendar.view.CalendarFragment
 import com.flow.android.kotlin.lockscreen.favoriteapp.view.FavoriteAppsFragment
 
 class FragmentStateAdapter(fragmentActivity: FragmentActivity): FragmentStateAdapter(fragmentActivity) {

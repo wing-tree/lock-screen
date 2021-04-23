@@ -11,7 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.flow.android.kotlin.lockscreen.databinding.FragmentFavoriteAppsBinding
 import com.flow.android.kotlin.lockscreen.favoriteapp.adapter.AppAdapter
-import com.flow.android.kotlin.lockscreen.main.view_model.MainViewModel
+import com.flow.android.kotlin.lockscreen.main.viewmodel.MainViewModel
 
 class FavoriteAppsFragment: Fragment() {
     private val appAdapter = AppAdapter { app ->

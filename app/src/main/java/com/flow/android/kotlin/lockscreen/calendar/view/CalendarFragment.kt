@@ -1,4 +1,4 @@
-package com.flow.android.kotlin.lockscreen.calendar
+package com.flow.android.kotlin.lockscreen.calendar.view
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,14 +10,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.flow.android.kotlin.lockscreen.R
+import com.flow.android.kotlin.lockscreen.calendar.CalendarHelper
 import com.flow.android.kotlin.lockscreen.databinding.FragmentCalendarBinding
 import com.flow.android.kotlin.lockscreen.calendar.adapter.EventsAdapter
-import com.flow.android.kotlin.lockscreen.main.view_model.MainViewModel
+import com.flow.android.kotlin.lockscreen.main.viewmodel.MainViewModel
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 

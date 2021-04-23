@@ -1,11 +1,11 @@
 package com.flow.android.kotlin.lockscreen.favoriteapp.adapter
 
-import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.flow.android.kotlin.lockscreen.databinding.AppItemBinding
+import com.flow.android.kotlin.lockscreen.favoriteapp.entity.App
 import com.flow.android.kotlin.lockscreen.util.diff
 
 class AppAdapter(private val onItemClick: (app: App) -> Unit): RecyclerView.Adapter<AppAdapter.ViewHolder>() {
@@ -66,9 +66,3 @@ class AppAdapter(private val onItemClick: (app: App) -> Unit): RecyclerView.Adap
 
     override fun getItemCount(): Int = apps.count()
 }
-
-data class App(
-    val icon: Drawable,
-    val label: String,
-    val packageName: String
-)

@@ -13,7 +13,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.databinding.FragmentConfigurationBinding
-import com.flow.android.kotlin.lockscreen.main.view_model.MainViewModel
+import com.flow.android.kotlin.lockscreen.main.viewmodel.MainViewModel
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
 import com.flow.android.kotlin.lockscreen.configuration.adapter.AdapterItem
 import com.flow.android.kotlin.lockscreen.configuration.adapter.CheckBoxAdapter

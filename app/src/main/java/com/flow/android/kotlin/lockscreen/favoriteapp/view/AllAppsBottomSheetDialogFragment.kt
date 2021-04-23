@@ -11,9 +11,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.flow.android.kotlin.lockscreen.databinding.FragmentAllAppsBottomSheetDialogBinding
-import com.flow.android.kotlin.lockscreen.favoriteapp.adapter.App
 import com.flow.android.kotlin.lockscreen.favoriteapp.adapter.AppAdapter
-import com.flow.android.kotlin.lockscreen.main.view_model.MainViewModel
+import com.flow.android.kotlin.lockscreen.favoriteapp.entity.App
+import com.flow.android.kotlin.lockscreen.main.viewmodel.MainViewModel
 import com.flow.android.kotlin.lockscreen.preferences.PackageNamePreferences
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
