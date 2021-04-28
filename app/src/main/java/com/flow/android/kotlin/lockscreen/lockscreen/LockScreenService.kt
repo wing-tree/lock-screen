@@ -1,25 +1,48 @@
 package com.flow.android.kotlin.lockscreen.lockscreen
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
+import android.app.*
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
+import android.provider.Settings
+import android.util.DisplayMetrics
+import android.view.LayoutInflater
+import android.view.WindowInsets
+import android.view.WindowManager
 import androidx.core.app.JobIntentService
 import androidx.core.app.NotificationCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.flow.android.kotlin.lockscreen.R
+import com.flow.android.kotlin.lockscreen.databinding.HomeBinding
 import com.flow.android.kotlin.lockscreen.main.view.MainActivity
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
+import com.flow.android.kotlin.lockscreen.util.toPx
 
 class LockScreenService : JobIntentService() {
     object Action {
-        const val StopSelf = "com.flow.android.kotlin.lockscreen.lock_screen" +
-                ".lock_screen_service.action.stop_self"
+        const val HomeKeyPressed = "com.flow.android.kotlin.lockscreen.lockscreen" +
+                ".LockScreenService.Action.HomePressed"
+        const val RecentAppsPressed = "com.flow.android.kotlin.lockscreen.lockscreen" +
+                ".LockScreenService.Action.RecentAppsPressed"
+        const val StopSelf = "com.flow.android.kotlin.lockscreen.lockscreen" +
+                ".LockScreenService.Action.StopSelf"
     }
+
+    private val binding: HomeBinding by lazy {
+        HomeBinding.inflate(LayoutInflater.from(this))
+    }
+
+    private val localBroadcastManager: LocalBroadcastManager by lazy {
+        LocalBroadcastManager.getInstance(this)
+    }
+
+    private val windowManager: WindowManager by lazy {
+        getSystemService(WINDOW_SERVICE) as WindowManager
+    }
+
+    private var isHomeVisible = false
 
     private val broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -36,7 +59,7 @@ class LockScreenService : JobIntentService() {
                         return
 
                     Intent(context, MainActivity::class.java).apply {
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
                         startActivity(this)
                     }
                 }
@@ -45,8 +68,26 @@ class LockScreenService : JobIntentService() {
                         return
 
                     Intent(context, MainActivity::class.java).apply {
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
                         startActivity(this)
+                    }
+                }
+                else -> {
+
+                }
+            }
+        }
+    }
+
+    private val homeReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent) {
+            when (intent.action) {
+                Action.HomeKeyPressed, Action.RecentAppsPressed -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        if (Settings.canDrawOverlays(context))
+                            showHome()
+                    } else {
+                        showHome()
                     }
                 }
                 else -> {
@@ -61,16 +102,27 @@ class LockScreenService : JobIntentService() {
     }
 
     override fun onHandleWork(intent: Intent) {
-        val intentFilter = IntentFilter()
-        intentFilter.addAction(Action.StopSelf)
-        intentFilter.addAction(Intent.ACTION_SCREEN_ON)
-        intentFilter.addAction(Intent.ACTION_USER_PRESENT)
-        registerReceiver(broadcastReceiver, intentFilter)
+        localBroadcastManager.registerReceiver(homeReceiver, IntentFilter().apply {
+            addAction(Action.HomeKeyPressed)
+            addAction(Action.RecentAppsPressed)
+        })
+
+        registerReceiver(
+                broadcastReceiver,
+                IntentFilter().apply {
+                    addAction(Action.StopSelf)
+                    addAction(Intent.ACTION_SCREEN_ON)
+                    addAction(Intent.ACTION_USER_PRESENT)
+                }
+        )
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val importance = NotificationManager.IMPORTANCE_MIN
             val notificationChannel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, importance)
+
             notificationChannel.description = CHANNEL_DESCRIPTION
+            notificationChannel.setShowBadge(false)
+
             notificationManager.createNotificationChannel(notificationChannel)
         }
 
@@ -101,8 +153,78 @@ class LockScreenService : JobIntentService() {
     }
 
     override fun onDestroy() {
+        localBroadcastManager.unregisterReceiver(homeReceiver)
         unregisterReceiver(broadcastReceiver)
+
+        windowManager.removeViewImmediate(binding.root)
+        isHomeVisible = false
+
         super.onDestroy()
+    }
+
+    private fun showHome() {
+        if (isHomeVisible)
+            return
+
+        binding.textView.setOnClickListener {
+            windowManager.removeViewImmediate(binding.root)
+            isHomeVisible = false
+        }
+
+        val type =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                    WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+                else
+                    @Suppress("DEPRECATION")
+                    WindowManager.LayoutParams.TYPE_PHONE
+
+        val layoutParams = WindowManager.LayoutParams(
+                type,
+                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
+                        or WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+                        or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+        )
+
+        layoutParams.height = windowHeight()
+        layoutParams.windowAnimations = R.style.WindowAnimation
+
+        windowManager.addView(binding.root, layoutParams)
+        isHomeVisible = true
+    }
+
+    private fun windowHeight(): Int {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val windowMetrics = windowManager.currentWindowMetrics
+            val insets = windowMetrics.windowInsets.getInsetsIgnoringVisibility(WindowInsets.Type.systemBars())
+            windowMetrics.bounds.height() + insets.bottom + insets.top
+        } else {
+            val displayMetrics = DisplayMetrics()
+            @Suppress("DEPRECATION")
+            windowManager.defaultDisplay.getMetrics(displayMetrics)
+
+            val navigationBarHeight = navigationBarHeight() * 2
+            val statusBarHeight = statusBarHeight() * 2
+
+            displayMetrics.heightPixels + navigationBarHeight + statusBarHeight
+        }
+    }
+
+    private fun navigationBarHeight(): Int {
+        val identifier = resources.getIdentifier("navigation_bar_height", "dimen", "android")
+
+        if (identifier > 0)
+            return resources.getDimensionPixelSize(identifier)
+
+        return 48.toPx
+    }
+
+    private fun statusBarHeight(): Int {
+        val identifier = resources.getIdentifier("status_bar_height", "dimen", "android")
+
+        if (identifier > 0)
+            return resources.getDimensionPixelSize(identifier)
+
+        return 25.toPx
     }
 
     @Suppress("SpellCheckingInspection")

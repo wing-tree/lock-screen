@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.flow.android.kotlin.lockscreen.R
+import com.flow.android.kotlin.lockscreen.base.BaseFragment
 import com.flow.android.kotlin.lockscreen.calendar.CalendarHelper
 import com.flow.android.kotlin.lockscreen.databinding.FragmentCalendarBinding
 import com.flow.android.kotlin.lockscreen.calendar.adapter.EventsAdapter
@@ -21,7 +22,11 @@ import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 
-class CalendarFragment: Fragment() {
+class CalendarFragment: BaseFragment<FragmentCalendarBinding>() {
+    override fun inflate(inflater: LayoutInflater, container: ViewGroup?): FragmentCalendarBinding {
+        return FragmentCalendarBinding.inflate(inflater, container, false)
+    }
+
     private val eventsAdapter = EventsAdapter(arrayListOf()) {
         CalendarHelper.editEvent(requireActivity(), it)
     }
@@ -44,29 +49,17 @@ class CalendarFragment: Fragment() {
         SimpleDateFormat(getString(R.string.format_date_001), Locale.getDefault())
     }
 
-    private val viewModel: MainViewModel by lazy {
-        ViewModelProvider(requireActivity(), object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel?> create(modelClass: Class<T>): T =
-                MainViewModel(requireActivity().application) as T
-        }).get(MainViewModel::class.java)
-    }
-
-    private var _viewBinding: FragmentCalendarBinding? = null
-    private val viewBinding: FragmentCalendarBinding
-        get() = _viewBinding!!
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        _viewBinding = FragmentCalendarBinding.inflate(inflater, container, false)
+    ): View? {
+        val view = super.onCreateView(inflater, container, savedInstanceState)
 
         initializeView()
         initializeLiveData()
 
-        return viewBinding.root
+        return view
     }
 
     override fun onDestroyView() {

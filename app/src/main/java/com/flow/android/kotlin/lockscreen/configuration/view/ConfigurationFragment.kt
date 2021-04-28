@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -28,6 +29,12 @@ class ConfigurationFragment: Fragment() {
 
     private object Id {
         const val DisplayAfterUnlocking = 2249L
+    }
+
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            requireActivity().supportFragmentManager.popBackStackImmediate()
+        }
     }
 
     private val configurationAdapter: ConfigurationAdapter by lazy {
@@ -91,6 +98,8 @@ class ConfigurationFragment: Fragment() {
             layoutManager = LinearLayoutManager(requireContext())
         }
 
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, onBackPressedCallback)
+
         return viewBinding?.root
     }
 
@@ -114,6 +123,22 @@ class ConfigurationFragment: Fragment() {
         } ?: listOf()
 
         checkBoxAdapter.addAll(checkBoxItems)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        viewModel.setFloatingActionButtonVisibility(View.GONE)
+    }
+
+    override fun onStop() {
+        viewModel.setFloatingActionButtonVisibility(View.VISIBLE)
+        super.onStop()
+    }
+
+    override fun onDestroyView() {
+        onBackPressedCallback.isEnabled = false
+        onBackPressedCallback.remove()
+        super.onDestroyView()
     }
 
     private fun getDrawable(@DrawableRes id: Int) = ContextCompat.getDrawable(requireContext(), id)

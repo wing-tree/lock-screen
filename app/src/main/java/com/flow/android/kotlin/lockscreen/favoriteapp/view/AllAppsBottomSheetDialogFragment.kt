@@ -21,13 +21,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-
 class AllAppsBottomSheetDialogFragment: BottomSheetDialogFragment() {
     private val viewModel: MainViewModel by activityViewModels()
     private val appAdapter = AppAdapter { viewModel.addFavoriteApp(it) { app ->
         removeApp(app)
     } }
-    private val batchSize = 16
+    private val batchSize = 8
     private var viewBinding: FragmentAllAppsBottomSheetDialogBinding? = null
 
     override fun onCreateView(

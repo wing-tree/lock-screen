@@ -5,16 +5,18 @@ import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.flow.android.kotlin.lockscreen.calendar.view.CalendarFragment
 import com.flow.android.kotlin.lockscreen.favoriteapp.view.FavoriteAppsFragment
+import com.flow.android.kotlin.lockscreen.memo.view.MemoFragment
 
 class FragmentStateAdapter(fragmentActivity: FragmentActivity): FragmentStateAdapter(fragmentActivity) {
-    private val itemCount = 2
+    private val itemCount = 3
 
     override fun getItemCount(): Int = itemCount
 
     override fun createFragment(position: Int): Fragment {
         return when(position) {
-            0 -> CalendarFragment()
-            1 -> FavoriteAppsFragment()
+            0 -> MemoFragment()
+            1 -> CalendarFragment()
+            2 -> FavoriteAppsFragment()
             else -> throw IllegalStateException("Invalid position.")
         }
     }

@@ -9,6 +9,9 @@
 
     <string name="notification_content_text">This is a notification for stable execution.</string>
 
+    <!-- home -->
+    <string name="home_001">It cannot be unlocked with the home key.</string>
+
     <!-- Settings -->
     <string name="calendar">Calendar</string>
     <string name="display_after_unlocking">Display after unlocking</string>
@@ -18,4 +21,8 @@
     <!-- MainActivity -->
     <string name="main_activity_000">Calendar</string>
     <string name="main_activity_001">Favorite Apps</string>
+    <string name="main_activity_002">Todo List</string>
+
+    <!-- MemoFragment -->
+    <string name="memo_fragment_000">You may delay, but time will not. (Benjamin Franklin)</string>
 </resources>

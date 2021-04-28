@@ -12,7 +12,7 @@
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />
 
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:launchMode="singleInstance"
@@ -32,5 +32,4 @@
         <service android:name=".lockscreen.LockScreenService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
     </application>
-
 </manifest>

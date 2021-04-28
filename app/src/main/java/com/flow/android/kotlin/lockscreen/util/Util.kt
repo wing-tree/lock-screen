@@ -1,5 +1,6 @@
 package com.flow.android.kotlin.lockscreen.util
 
+import android.content.res.Resources
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -16,3 +17,9 @@ data class Diff<T>(
         val added: List<T>,
         val removed: List<T>
 )
+
+val Float.toDp get() = this / Resources.getSystem().displayMetrics.density
+val Float.toPx get() = this * Resources.getSystem().displayMetrics.density
+
+val Int.toDp get() = (this / Resources.getSystem().displayMetrics.density).toInt()
+val Int.toPx get() = (this * Resources.getSystem().displayMetrics.density).toInt()

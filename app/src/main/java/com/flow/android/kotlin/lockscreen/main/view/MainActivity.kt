@@ -8,23 +8,29 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.drawable.RippleDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
 import android.provider.Settings
+import android.view.View
 import android.view.View.GONE
+import android.view.View.VISIBLE
+import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.drawable.toDrawable
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.palette.graphics.Palette
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.calendar.CalendarHelper
@@ -32,8 +38,11 @@ import com.flow.android.kotlin.lockscreen.configuration.view.ConfigurationFragme
 import com.flow.android.kotlin.lockscreen.databinding.ActivityMainBinding
 import com.flow.android.kotlin.lockscreen.lockscreen.LockScreenService
 import com.flow.android.kotlin.lockscreen.main.adapter.FragmentStateAdapter
+import com.flow.android.kotlin.lockscreen.home.homewatcher.HomeWatcher
+import com.flow.android.kotlin.lockscreen.home.homewatcher.HomePressedListener
 import com.flow.android.kotlin.lockscreen.main.torch.Torch
 import com.flow.android.kotlin.lockscreen.main.viewmodel.MainViewModel
+import com.flow.android.kotlin.lockscreen.memo.entity.Memo
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
 import com.flow.android.kotlin.lockscreen.util.scale
 import com.google.android.material.tabs.TabLayout
@@ -49,26 +58,40 @@ import com.karumi.dexter.listener.single.PermissionListener
 import java.io.IOException
 import kotlin.math.pow
 
-
 class MainActivity : AppCompatActivity() {
+    private val localBroadcastManager: LocalBroadcastManager by lazy {
+        LocalBroadcastManager.getInstance(this)
+    }
 
     private val torch: Torch by lazy {
         Torch(this)
     }
-    private val viewModel: MainViewModel by lazy {
-        ViewModelProvider(this@MainActivity, object : ViewModelProvider.Factory {
-            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                @Suppress("UNCHECKED_CAST")
-                return MainViewModel(application) as T
+
+    private val viewModel: MainViewModel by viewModels()
+    private var _viewBinding: ActivityMainBinding? = null
+    private val viewBinding: ActivityMainBinding
+        get() = _viewBinding!!
+    private val textColorDark by lazy { ContextCompat.getColor(this, R.color.text_dark) }
+    private val textColorLight by lazy { ContextCompat.getColor(this, R.color.text_light) }
+
+    private val homeWatcher = HomeWatcher(this).apply {
+        setOnHomePressedListener(object : HomePressedListener {
+            override fun onHomeKeyPressed() {
+                localBroadcastManager.sendBroadcastSync(Intent(LockScreenService.Action.HomeKeyPressed))
+                finish()
             }
-        }).get(MainViewModel::class.java)
+
+            override fun onRecentAppsPressed() {
+                localBroadcastManager.sendBroadcastSync(Intent(LockScreenService.Action.RecentAppsPressed))
+                finish()
+            }
+        })
     }
-    private var viewBinding: ActivityMainBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewBinding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(viewBinding?.root)
+        _viewBinding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(viewBinding.root)
 
         if (ConfigurationPreferences.getShowOnLockScreen(this)) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
@@ -80,9 +103,9 @@ class MainActivity : AppCompatActivity() {
             } else {
                 @Suppress("DEPRECATION")
                 window.addFlags(
-                    WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD or
-                            WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
-                            WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                        WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD or
+                                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
+                                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
                 )
             }
         }
@@ -95,15 +118,34 @@ class MainActivity : AppCompatActivity() {
         checkManageOverlayPermission()
         checkPermission()
 
+        initializeLiveData()
         initializeView()
+        firstRun()
+    }
+
+    override fun onBackPressed() {
+        if (onBackPressedDispatcher.hasEnabledCallbacks())
+            onBackPressedDispatcher.onBackPressed()
+        else
+            viewBinding.floatingActionButton.forceRippleAnimation()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        homeWatcher.startWatch()
     }
 
     override fun onPause() {
-        val index = viewBinding?.centerAlignedTabLayout?.selectedTabPosition ?: 0
+        val index = viewBinding.centerAlignedTabLayout.selectedTabPosition
 
         ConfigurationPreferences.putSelectedTabIndex(this, index)
 
         super.onPause()
+    }
+
+    override fun onStop() {
+        homeWatcher.stopWatch()
+        super.onStop()
     }
 
     override fun finish() {
@@ -139,84 +181,104 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun initializeLiveData() {
+        viewModel.floatingActionButtonVisibility.observe(this, { visibility ->
+            if (visibility == VISIBLE)
+                viewBinding.floatingActionButton.show()
+            else if (visibility == GONE)
+                viewBinding.floatingActionButton.hide()
+        })
+
+
+    }
+
     private fun initializeView() {
-        viewBinding?.let { viewBinding ->
-            viewBinding.floatingActionButton.setOnClickListener {
-                finish()
-            }
+        viewBinding.floatingActionButton.setOnClickListener {
+            finish()
+        }
 
-            viewBinding.imageViewCamera.setOnClickListener {
-                Dexter.withContext(this)
-                        .withPermission(Manifest.permission.CAMERA)
-                        .withListener(object : PermissionListener {
-                            override fun onPermissionGranted(response: PermissionGrantedResponse) {
-                                Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { intent ->
-                                    startActivity(intent)
-                                }
-                            }
-
-                            override fun onPermissionDenied(response: PermissionDeniedResponse) {
-
-                            }
-
-                            override fun onPermissionRationaleShouldBeShown(permission: PermissionRequest?, token: PermissionToken?) {
-
-                            }
-                        }).check()
-            }
-
-            viewBinding.imageViewSettings.setOnClickListener {
-                ConfigurationFragment().apply {
-                    supportFragmentManager.beginTransaction()
-                            .replace(R.id.fragment_container_view, this, tag)
-                            .addToBackStack(null)
-                            .commit()
-                }
-            }
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                viewBinding.imageViewHighlight.setOnClickListener {
-                    torch.toggle()
-
-                    val color = when(torch.mode) {
-                        Torch.Mode.On -> ContextCompat.getColor(this, R.color.yellow_A_200)
-                        Torch.Mode.Off -> ContextCompat.getColor(this, R.color.black)
-                        else -> throw IllegalArgumentException("Invalid mode.")
+        viewBinding.imageViewCamera.setOnClickListener {
+            Dexter.withContext(this)
+                .withPermission(Manifest.permission.CAMERA)
+                .withListener(object : PermissionListener {
+                    override fun onPermissionGranted(response: PermissionGrantedResponse) {
+                        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { intent ->
+                            startActivity(intent)
+                        }
                     }
 
-                    (it as ImageView).setColorFilter(
-                            color,
-                            android.graphics.PorterDuff.Mode.SRC_IN
-                    )
-                }
-            } else
-                viewBinding.imageViewHighlight.visibility = GONE
+                    override fun onPermissionDenied(response: PermissionDeniedResponse) {
 
-            val tabTexts = arrayOf(
-                    getString(R.string.main_activity_000),
-                    getString(R.string.main_activity_001)
-            )
+                    }
 
-            viewBinding.viewPager2.adapter = FragmentStateAdapter(this)
-            TabLayoutMediator(viewBinding.centerAlignedTabLayout, viewBinding.viewPager2) { tab, position ->
-                tab.customView = layoutInflater.inflate(R.layout.tab_custom_view, null)
-                tab.customView?.findViewById<TextView>(R.id.text_view)?.text = tabTexts[position]
-            }.attach()
+                    override fun onPermissionRationaleShouldBeShown(
+                            permission: PermissionRequest?,
+                            token: PermissionToken?
+                    ) {
 
-            viewBinding.centerAlignedTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-                override fun onTabSelected(tab: TabLayout.Tab) {
-                    animateSelectedTab(tab)
-                }
-
-                override fun onTabUnselected(tab: TabLayout.Tab) {
-                    animateUnselectedTab(tab)
-                }
-
-                override fun onTabReselected(tab: TabLayout.Tab) {}
-            })
-
-            viewBinding.centerAlignedTabLayout.getTabAt(0)?.select()
+                    }
+                }).check()
         }
+
+        viewBinding.imageViewSettings.setOnClickListener {
+            ConfigurationFragment().apply {
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container_view, this, tag)
+                    .addToBackStack(null)
+                    .commit()
+            }
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            viewBinding.imageViewHighlight.setOnClickListener {
+                torch.toggle()
+
+                val color = when(torch.mode) {
+                    Torch.Mode.On -> ContextCompat.getColor(this, R.color.yellow_A_200)
+                    Torch.Mode.Off -> ContextCompat.getColor(this, R.color.black)
+                    else -> throw IllegalArgumentException("Invalid mode.")
+                }
+
+                (it as ImageView).setColorFilter(
+                        color,
+                        android.graphics.PorterDuff.Mode.SRC_IN
+                )
+            }
+        } else
+            viewBinding.imageViewHighlight.visibility = GONE
+
+        val tabTexts = arrayOf(
+                getString(R.string.main_activity_002),
+                getString(R.string.main_activity_000),
+                getString(R.string.main_activity_001)
+        )
+
+        viewBinding.viewPager2.adapter = FragmentStateAdapter(this)
+        TabLayoutMediator(viewBinding.centerAlignedTabLayout, viewBinding.viewPager2) { tab, position ->
+            tab.customView = layoutInflater.inflate(
+                    R.layout.tab_custom_view,
+                    viewBinding.root,
+                    false
+            )
+            tab.customView?.findViewById<TextView>(R.id.text_view)?.text = tabTexts[position]
+        }.attach()
+
+        viewBinding.centerAlignedTabLayout.addOnTabSelectedListener(object :
+                TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                animateSelectedTab(tab)
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab) {
+                animateUnselectedTab(tab)
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab) {}
+        })
+
+        val selectedTabIndex = ConfigurationPreferences.getSelectedTabIndex(this)
+
+        viewBinding.centerAlignedTabLayout.getTabAt(selectedTabIndex)?.select()
     }
 
     private fun animateSelectedTab(tab: TabLayout.Tab) {
@@ -229,7 +291,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setWallpaper() {
         wallpaper()?.let {
-            viewBinding?.root?.background = it.toDrawable(resources)
+            viewBinding.root.background = it.toDrawable(resources)
             setTextColor(it)
         }
     }
@@ -239,7 +301,9 @@ class MainActivity : AppCompatActivity() {
             val wallpaperManager = WallpaperManager.getInstance(this)
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                val wallpaperFile = wallpaperManager.getWallpaperFile(WallpaperManager.FLAG_LOCK) ?: wallpaperManager.getWallpaperFile(WallpaperManager.FLAG_SYSTEM)
+                val wallpaperFile = wallpaperManager.getWallpaperFile(WallpaperManager.FLAG_LOCK) ?: wallpaperManager.getWallpaperFile(
+                        WallpaperManager.FLAG_SYSTEM
+                )
 
                 wallpaperFile?.let {
                     val bitmap = BitmapFactory.decodeFileDescriptor(wallpaperFile.fileDescriptor)
@@ -261,22 +325,61 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setTextColor(bitmap: Bitmap) {
-        val width = resources.getDimensionPixelSize(R.dimen.constraint_layout_date_time_width)
-        val height = resources.getDimensionPixelSize(R.dimen.constraint_layout_date_time_height)
-
-        Palette.Builder(bitmap).setRegion(0, 0, width, height).generate { palette ->
-            val dominantColor = palette?.getDominantColor(Color.WHITE)
-            val dateTimeTextColor = getDateTimeTextColor(dominantColor ?: Color.WHITE)
-
-            viewBinding?.let {
-                it.textClockDate.setTextColor(dateTimeTextColor)
-                it.textClockTime.setTextColor(dateTimeTextColor)
+        viewBinding.textClockDate.viewTreeObserver.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                setTextColor(viewBinding.textClockDate, bitmap)
+                viewBinding.textClockDate.viewTreeObserver.removeOnGlobalLayoutListener(this)
             }
+        })
+
+        viewBinding.textClockTime.viewTreeObserver.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                setTextColor(viewBinding.textClockTime, bitmap)
+                viewBinding.textClockTime.viewTreeObserver.removeOnGlobalLayoutListener(this)
+            }
+        })
+
+        viewBinding.centerAlignedTabLayout.viewTreeObserver.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                val bottom = viewBinding.textClockDate.bottom
+                val left = viewBinding.textClockDate.left
+                val right = viewBinding.textClockDate.right
+                val top = viewBinding.textClockDate.top
+
+//                Palette.Builder(bitmap).setRegion(left, top, right, bottom).generate { palette ->
+//                    val dominantColor = palette?.getDominantColor(Color.WHITE)
+//                    val textColor = getTextColor(dominantColor ?: Color.WHITE)
+//
+//                    viewBinding.textClockDate.setTextColor(textColor)
+//                }
+
+                viewBinding.centerAlignedTabLayout.viewTreeObserver.removeOnGlobalLayoutListener(this)
+            }
+        })
+    }
+
+    private fun setTextColor(textView: TextView, bitmap: Bitmap) {
+        val bottom = textView.bottom
+        val left = textView.left
+        val right = textView.right
+        val top = textView.top
+
+        Palette.Builder(bitmap).setRegion(left, top, right, bottom).generate { palette ->
+            val dominantColor = palette?.getDominantColor(textColorLight) ?: textColorLight
+            val textColor = getTextColor(dominantColor)
+            val shadowColor =
+                if (textColor == textColorDark)
+                    textColorLight
+                else
+                    textColorDark
+
+            textView.setShadowLayer(4F, 4F, 4F, shadowColor)
+            textView.setTextColor(textColor)
         }
     }
 
     @ColorInt
-    private fun getDateTimeTextColor(@ColorInt colorInt: Int): Int {
+    private fun getTextColor(@ColorInt colorInt: Int): Int {
         var red = Color.red(colorInt) / 255.0
         var green = Color.green(colorInt) / 255.0
         var blue = Color.blue(colorInt) / 255.0
@@ -299,9 +402,9 @@ class MainActivity : AppCompatActivity() {
         val y = 0.2126 * red + 0.7152 * green + 0.0722 * blue
 
         return if (y > 0.179)
-            Color.BLACK
+            textColorDark
         else
-            Color.WHITE
+            textColorLight
     }
 
     private fun checkManageOverlayPermission() {
@@ -345,9 +448,37 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
 
-                    override fun onPermissionRationaleShouldBeShown(permissions: List<PermissionRequest>, token: PermissionToken) { /* ... */
+                    override fun onPermissionRationaleShouldBeShown(
+                            permissions: List<PermissionRequest>,
+                            token: PermissionToken
+                    ) { /* ... */
 
                     }
                 }).check()
+    }
+
+    private fun firstRun() {
+        if (ConfigurationPreferences.getFirstRun(this)) {
+            viewModel.insertMemo(
+                    Memo(
+                            content = getString(R.string.memo_fragment_000),
+                            modifiedTime = System.currentTimeMillis()
+                    )
+            )
+            ConfigurationPreferences.putFirstRun(this, false)
+        }
+    }
+
+    private fun View.forceRippleAnimation() {
+        if (background is RippleDrawable) {
+            val handler = Handler(Looper.getMainLooper())
+            val rippleDrawable = background
+
+            rippleDrawable.state = intArrayOf(
+                    android.R.attr.state_pressed,
+                    android.R.attr.state_enabled
+            )
+            handler.postDelayed({ rippleDrawable.state = intArrayOf() }, 200)
+        }
     }
 }

@@ -1,11 +1,13 @@
 package com.flow.android.kotlin.lockscreen.main.viewmodel
 
 import android.app.Application
+import android.opengl.Visibility
 import androidx.lifecycle.*
 import com.flow.android.kotlin.lockscreen.calendar.CalendarDisplay
 import com.flow.android.kotlin.lockscreen.calendar.CalendarHelper
 import com.flow.android.kotlin.lockscreen.calendar.Event
 import com.flow.android.kotlin.lockscreen.favoriteapp.entity.App
+import com.flow.android.kotlin.lockscreen.memo.entity.Memo
 import com.flow.android.kotlin.lockscreen.preferences.PackageNamePreferences
 import com.flow.android.kotlin.lockscreen.repository.LocalRepository
 import kotlinx.coroutines.Dispatchers
@@ -31,6 +33,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun contentResolver() = contentResolver
 
     private val _events = MutableLiveData<List<Event>>()
+
+    private val _floatingActionButtonVisibility = MutableLiveData<Int>()
+    val floatingActionButtonVisibility: LiveData<Int>
+        get() = _floatingActionButtonVisibility
+
+    fun setFloatingActionButtonVisibility(visibility: Int) {
+        _floatingActionButtonVisibility.value = visibility
+    }
 
     init {
         postFavoriteApps(application)
@@ -85,5 +95,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
         }
+    }
+
+    fun insertMemo(memo: Memo) {
+        localRepository.insertMemo(memo)
     }
 }

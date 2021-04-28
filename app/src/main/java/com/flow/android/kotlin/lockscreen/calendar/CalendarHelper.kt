@@ -110,8 +110,6 @@ object CalendarHelper {
             }
         }
 
-        Timber.d("calendarDisplays: $calendarDisplays")
-
         return calendarDisplays
     }
 
@@ -203,10 +201,6 @@ object CalendarHelper {
             @Suppress("LocalVariableName")
             val _id = cursor.getLongOrNull(Events.Index._ID) ?: continue
             val title = cursor.getStringOrNull(Events.Index.TITLE) ?: BLANK
-
-            Timber.d("events")
-            Timber.d("_id: $_id")
-            Timber.d("title: $title")
 
             instances(contentResolver, _id.toString(), DTSTART, DTEND)?.let { instances ->
                 events.addAll(instances)

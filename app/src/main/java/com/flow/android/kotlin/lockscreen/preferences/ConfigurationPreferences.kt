@@ -7,6 +7,7 @@ object ConfigurationPreferences {
     @Suppress("SpellCheckingInspection")
     private object Name {
         const val DisplayAfterUnlocking = "com.flow.android.kotlin.lockscreen.preferences.name.display_after_unlocking"
+        const val FirstRun = "com.flow.android.kotlin.lockscreen.preferences.name.first_run"
         const val SelectedTabIndex = "com.flow.android.kotlin.lockscreen.preferences.name.selected_tab_index"
         const val ShowOnLockScreen = "com.flow.android.kotlin.lockscreen.preferences.name.show_on_lock_screen"
         const val UncheckedCalendarIds = "com.flow.android.kotlin.lockscreen.preferences.name.unchecked_calendar_ids"
@@ -15,6 +16,7 @@ object ConfigurationPreferences {
     @Suppress("SpellCheckingInspection")
     private object Key {
         const val DisplayAfterUnlocking = "com.flow.android.kotlin.lockscreen.preferences.key.display_after_unlocking"
+        const val FirstRun = "com.flow.android.kotlin.lockscreen.preferences.key.first_run"
         const val SelectedTabIndex = "com.flow.android.kotlin.lockscreen.preferences.key.selected_tab_index"
         const val ShowOnLockScreen = "com.flow.android.kotlin.lockscreen.preferences.key.show_on_lock_screen"
         const val UncheckedCalendarIds = "com.flow.android.kotlin.lockscreen.preferences.key.unchecked_calendar_ids"
@@ -69,6 +71,16 @@ object ConfigurationPreferences {
     fun getSelectedTabIndex(context: Context): Int {
         val sharedPreferences = context.getSharedPreferences(Name.SelectedTabIndex, Context.MODE_PRIVATE)
 
-        return sharedPreferences.getInt(Key.SelectedTabIndex, 0)
+        return sharedPreferences.getInt(Key.SelectedTabIndex, 1)
+    }
+
+    fun putFirstRun(context: Context, firstRun: Boolean) {
+        val sharedPreferences = context.getSharedPreferences(Name.FirstRun, Context.MODE_PRIVATE).apply {
+            edit().putBoolean(Key.FirstRun, firstRun).apply()
+        }
+    }
+
+    fun getFirstRun(context: Context): Boolean {
+        return context.getSharedPreferences(Name.FirstRun, Context.MODE_PRIVATE).getBoolean(Key.FirstRun, true)
     }
 }

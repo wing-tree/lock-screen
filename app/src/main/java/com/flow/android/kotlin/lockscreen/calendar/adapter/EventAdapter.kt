@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class EventAdapter(private val onItemClick: (item: Event) -> Unit): ListAdapter<Event, EventAdapter.ViewHolder>(DiffCallback()) {
+    val simpleDateFormat = SimpleDateFormat("a hh:mm", Locale.getDefault())
 
     fun add(item: Event) {
         val list = currentList.toMutableList()
@@ -20,11 +21,7 @@ class EventAdapter(private val onItemClick: (item: Event) -> Unit): ListAdapter<
         submitList(list)
     }
 
-    class ViewHolder private constructor(
-            private val viewBinding: ViewBinding,
-            private val onItemClick: (item: Event) -> Unit,
-            private val simpleDateFormat: SimpleDateFormat
-    ): RecyclerView.ViewHolder(viewBinding.root) {
+    inner class ViewHolder(private val viewBinding: ViewBinding) : RecyclerView.ViewHolder(viewBinding.root) {
 
         fun bind(item: Event) {
             viewBinding as EventItemBinding
@@ -42,20 +39,17 @@ class EventAdapter(private val onItemClick: (item: Event) -> Unit): ListAdapter<
         }
 
         private fun Long.format() = simpleDateFormat.format(this)
+    }
 
-        companion object {
-            fun from(parent: ViewGroup, onItemClick: (item: Event) -> Unit): ViewHolder {
-                val inflater = LayoutInflater.from(parent.context)
-                val simpleDateFormat = SimpleDateFormat("a hh:mm", Locale.getDefault())
-                val viewBinding = EventItemBinding.inflate(inflater, parent, false)
+    private fun from(parent: ViewGroup, onItemClick: (item: Event) -> Unit): ViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        val viewBinding = EventItemBinding.inflate(inflater, parent, false)
 
-                return ViewHolder(viewBinding, onItemClick, simpleDateFormat)
-            }
-        }
+        return ViewHolder(viewBinding)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder.from(parent, onItemClick)
+        return from(parent, onItemClick)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -63,7 +57,7 @@ class EventAdapter(private val onItemClick: (item: Event) -> Unit): ListAdapter<
     }
 }
 
-internal class DiffCallback: DiffUtil.ItemCallback<Event>() {
+class DiffCallback: DiffUtil.ItemCallback<Event>() {
     override fun areItemsTheSame(oldItem: Event, newItem: Event): Boolean {
         return oldItem.id == newItem.id
     }

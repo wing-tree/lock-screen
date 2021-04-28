@@ -16,4 +16,7 @@
     <color name="yellow_A_200">#ffff00</color>
 
     <color name="event_item_background">#61212121</color>
+
+    <color name="text_dark">#DE212121</color>
+    <color name="text_light">@color/white</color>
 </resources>
