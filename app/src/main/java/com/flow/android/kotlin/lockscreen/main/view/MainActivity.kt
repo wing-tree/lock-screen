@@ -24,7 +24,6 @@ import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.viewModels
-import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -34,6 +33,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.palette.graphics.Palette
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.calendar.CalendarHelper
+import com.flow.android.kotlin.lockscreen.color.ColorHelper
 import com.flow.android.kotlin.lockscreen.configuration.view.ConfigurationFragment
 import com.flow.android.kotlin.lockscreen.databinding.ActivityMainBinding
 import com.flow.android.kotlin.lockscreen.lockscreen.LockScreenService
@@ -42,7 +42,10 @@ import com.flow.android.kotlin.lockscreen.home.homewatcher.HomeWatcher
 import com.flow.android.kotlin.lockscreen.home.homewatcher.HomePressedListener
 import com.flow.android.kotlin.lockscreen.main.torch.Torch
 import com.flow.android.kotlin.lockscreen.main.viewmodel.MainViewModel
+import com.flow.android.kotlin.lockscreen.main.viewmodel.MemoChanged
+import com.flow.android.kotlin.lockscreen.main.viewmodel.MemoChangedState
 import com.flow.android.kotlin.lockscreen.memo.entity.Memo
+import com.flow.android.kotlin.lockscreen.memo.view.MemoDetailDialogFragment
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
 import com.flow.android.kotlin.lockscreen.util.scale
 import com.google.android.material.tabs.TabLayout
@@ -56,9 +59,8 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.karumi.dexter.listener.single.PermissionListener
 import java.io.IOException
-import kotlin.math.pow
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), MemoDetailDialogFragment.OnMemoChangedListener {
     private val localBroadcastManager: LocalBroadcastManager by lazy {
         LocalBroadcastManager.getInstance(this)
     }
@@ -67,12 +69,14 @@ class MainActivity : AppCompatActivity() {
         Torch(this)
     }
 
+    private val colorHelper: ColorHelper by lazy {
+        ColorHelper.getInstance(application)
+    }
+
     private val viewModel: MainViewModel by viewModels()
     private var _viewBinding: ActivityMainBinding? = null
     private val viewBinding: ActivityMainBinding
         get() = _viewBinding!!
-    private val textColorDark by lazy { ContextCompat.getColor(this, R.color.text_dark) }
-    private val textColorLight by lazy { ContextCompat.getColor(this, R.color.text_light) }
 
     private val homeWatcher = HomeWatcher(this).apply {
         setOnHomePressedListener(object : HomePressedListener {
@@ -96,16 +100,17 @@ class MainActivity : AppCompatActivity() {
         if (ConfigurationPreferences.getShowOnLockScreen(this)) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
                 setShowWhenLocked(true)
-                setTurnScreenOn(true)
+                window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
                 val keyguardManager = getSystemService(KEYGUARD_SERVICE) as KeyguardManager
+
                 keyguardManager.requestDismissKeyguard(this, null)
             } else {
                 @Suppress("DEPRECATION")
                 window.addFlags(
                         WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD or
-                                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
-                                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or
+                                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
                 )
             }
         }
@@ -260,6 +265,7 @@ class MainActivity : AppCompatActivity() {
                     viewBinding.root,
                     false
             )
+
             tab.customView?.findViewById<TextView>(R.id.text_view)?.text = tabTexts[position]
         }.attach()
 
@@ -281,6 +287,32 @@ class MainActivity : AppCompatActivity() {
         viewBinding.centerAlignedTabLayout.getTabAt(selectedTabIndex)?.select()
     }
 
+    private fun setTabTextColor(bitmap: Bitmap) {
+        viewBinding.centerAlignedTabLayout.viewTreeObserver.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                val bottom = viewBinding.centerAlignedTabLayout.bottom
+                val left = viewBinding.centerAlignedTabLayout.left
+                val right = viewBinding.centerAlignedTabLayout.right
+                val top = viewBinding.centerAlignedTabLayout.top
+
+                Palette.Builder(bitmap).setRegion(left, top, right, bottom).generate { palette ->
+                    val dominantColor = palette?.getDominantColor(Color.WHITE)
+                    val textColor = colorHelper.colorDependingOnBackground(dominantColor ?: Color.WHITE)
+
+                    val tabCount = viewBinding.centerAlignedTabLayout.tabCount
+
+                    for (i in 0 until tabCount) {
+                        val tab = viewBinding.centerAlignedTabLayout.getTabAt(i) ?: continue
+
+                        tab.customView?.findViewById<TextView>(R.id.text_view)?.setTextColor(textColor)
+                    }
+                }
+
+                viewBinding.centerAlignedTabLayout.viewTreeObserver.removeOnGlobalLayoutListener(this)
+            }
+        })
+    }
+
     private fun animateSelectedTab(tab: TabLayout.Tab) {
         tab.view.scale(1.5F)
     }
@@ -291,8 +323,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun setWallpaper() {
         wallpaper()?.let {
+            colorHelper.setViewPagerRegionColor(viewBinding.viewPager2, it)
             viewBinding.root.background = it.toDrawable(resources)
+            viewModel.setWallpaper(it)
             setTextColor(it)
+            setTabTextColor(it)
         }
     }
 
@@ -325,86 +360,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setTextColor(bitmap: Bitmap) {
-        viewBinding.textClockDate.viewTreeObserver.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                setTextColor(viewBinding.textClockDate, bitmap)
-                viewBinding.textClockDate.viewTreeObserver.removeOnGlobalLayoutListener(this)
-            }
-        })
-
-        viewBinding.textClockTime.viewTreeObserver.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                setTextColor(viewBinding.textClockTime, bitmap)
-                viewBinding.textClockTime.viewTreeObserver.removeOnGlobalLayoutListener(this)
-            }
-        })
-
-        viewBinding.centerAlignedTabLayout.viewTreeObserver.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                val bottom = viewBinding.textClockDate.bottom
-                val left = viewBinding.textClockDate.left
-                val right = viewBinding.textClockDate.right
-                val top = viewBinding.textClockDate.top
-
-//                Palette.Builder(bitmap).setRegion(left, top, right, bottom).generate { palette ->
-//                    val dominantColor = palette?.getDominantColor(Color.WHITE)
-//                    val textColor = getTextColor(dominantColor ?: Color.WHITE)
-//
-//                    viewBinding.textClockDate.setTextColor(textColor)
-//                }
-
-                viewBinding.centerAlignedTabLayout.viewTreeObserver.removeOnGlobalLayoutListener(this)
-            }
-        })
-    }
-
-    private fun setTextColor(textView: TextView, bitmap: Bitmap) {
-        val bottom = textView.bottom
-        val left = textView.left
-        val right = textView.right
-        val top = textView.top
-
-        Palette.Builder(bitmap).setRegion(left, top, right, bottom).generate { palette ->
-            val dominantColor = palette?.getDominantColor(textColorLight) ?: textColorLight
-            val textColor = getTextColor(dominantColor)
-            val shadowColor =
-                if (textColor == textColorDark)
-                    textColorLight
-                else
-                    textColorDark
-
-            textView.setShadowLayer(4F, 4F, 4F, shadowColor)
-            textView.setTextColor(textColor)
-        }
-    }
-
-    @ColorInt
-    private fun getTextColor(@ColorInt colorInt: Int): Int {
-        var red = Color.red(colorInt) / 255.0
-        var green = Color.green(colorInt) / 255.0
-        var blue = Color.blue(colorInt) / 255.0
-
-        if (red <= 0.03928)
-            red /= 12.92
-        else
-            red = ((red + 0.055) / 1.055).pow(2.4)
-
-        if (green <= 0.03928)
-            green /= 12.92
-        else
-            green = ((green + 0.055) / 1.055).pow(2.4)
-
-        if (blue <= 0.03928)
-            blue /= 12.92
-        else
-            blue = ((red + 0.055) / 1.055).pow(2.4)
-
-        val y = 0.2126 * red + 0.7152 * green + 0.0722 * blue
-
-        return if (y > 0.179)
-            textColorDark
-        else
-            textColorLight
+        colorHelper.setTextColor(viewBinding.textClockDate, bitmap)
+        colorHelper.setTextColor(viewBinding.textClockTime, bitmap)
     }
 
     private fun checkManageOverlayPermission() {
@@ -417,13 +374,10 @@ class MainActivity : AppCompatActivity() {
             } else {
                 val intent = Intent(applicationContext, LockScreenService::class.java)
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    LockScreenService().enqueueWork(this, intent)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                     startForegroundService(intent)
-                } else {
-                    LockScreenService().enqueueWork(this, intent)
+                else
                     startService(intent)
-                }
             }
         }
     }
@@ -451,8 +405,8 @@ class MainActivity : AppCompatActivity() {
                     override fun onPermissionRationaleShouldBeShown(
                             permissions: List<PermissionRequest>,
                             token: PermissionToken
-                    ) { /* ... */
-
+                    ) {
+                        token.continuePermissionRequest()
                     }
                 }).check()
     }
@@ -460,10 +414,11 @@ class MainActivity : AppCompatActivity() {
     private fun firstRun() {
         if (ConfigurationPreferences.getFirstRun(this)) {
             viewModel.insertMemo(
-                    Memo(
-                            content = getString(R.string.memo_fragment_000),
-                            modifiedTime = System.currentTimeMillis()
-                    )
+                Memo(
+                    content = getString(R.string.memo_fragment_000),
+                    modifiedTime = System.currentTimeMillis(),
+                    priority = System.currentTimeMillis()
+                )
             )
             ConfigurationPreferences.putFirstRun(this, false)
         }
@@ -480,5 +435,13 @@ class MainActivity : AppCompatActivity() {
             )
             handler.postDelayed({ rippleDrawable.state = intArrayOf() }, 200)
         }
+    }
+
+    override fun onMemoDeleted(memo: Memo) {
+        viewModel.notifyMemoChanged(MemoChanged(memo, MemoChangedState.Deleted))
+    }
+
+    override fun onMemoDone(memo: Memo) {
+        viewModel.notifyMemoChanged(MemoChanged(memo, MemoChangedState.Modified))
     }
 }

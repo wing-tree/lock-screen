@@ -21,7 +21,11 @@
     <!-- MainActivity -->
     <string name="main_activity_000">캘린더</string>
     <string name="main_activity_001">즐겨찾는 앱</string>
-    <string name="main_activity_002">할 일</string>
+    <string name="main_activity_002">메모</string>
+
+    <!-- MemoDetailDialogFragment -->
+    <string name="memo_detail_dialog_fragment_000">닫기</string>
+    <string name="memo_detail_dialog_fragment_001">완료</string>
 
     <!-- MemoFragment -->
     <string name="memo_fragment_000">당신은 지체할 수도 있지만 시간은 그러하지 않을 것이다. (벤자민 프랭클린)</string>

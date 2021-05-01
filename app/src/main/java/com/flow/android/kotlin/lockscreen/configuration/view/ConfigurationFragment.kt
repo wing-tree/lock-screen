@@ -53,13 +53,10 @@ class ConfigurationFragment: Fragment() {
 
                                 val intent = Intent(requireContext(), LockScreenService::class.java)
 
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                    LockScreenService().enqueueWork(requireContext(), intent)
-                                    requireActivity().startForegroundService(intent)
-                                } else {
-                                    LockScreenService().enqueueWork(requireContext(), intent)
-                                    requireActivity().startService(intent)
-                                }
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                                    requireContext().startForegroundService(intent)
+                                else
+                                    requireContext().startService(intent)
                             } else {
                                 configurationAdapter.hideItem(Id.DisplayAfterUnlocking)
                                 requireContext().sendBroadcast(Intent(LockScreenService.Action.StopSelf))

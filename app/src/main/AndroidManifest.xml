@@ -21,7 +21,9 @@
         android:showOnLockScreen="true"
         android:supportsRtl="true"
         android:theme="@style/Theme.LockScreen">
-        <activity android:name=".main.view.MainActivity">
+
+        <activity android:name=".main.view.MainActivity"
+            android:excludeFromRecents="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -29,7 +31,6 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".lockscreen.LockScreenService"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service android:name=".lockscreen.LockScreenService" />
     </application>
 </manifest>

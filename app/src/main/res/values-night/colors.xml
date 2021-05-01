@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="short_anim_duration">100</integer>
+    <color name="background">@color/grey_900</color>
 </resources>

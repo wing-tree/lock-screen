@@ -19,6 +19,7 @@
         android:id="@+id/text_view_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="@dimen/text_size_large"
         app:layout_constraintBottom_toTopOf="@+id/view_pager2"
         app:layout_constraintEnd_toStartOf="@+id/image_view_forward"
         app:layout_constraintStart_toEndOf="@+id/image_view_back"
@@ -27,19 +28,19 @@
 
     <ImageView
         android:id="@+id/image_view_back"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
         app:layout_constraintStart_toStartOf="@+id/view_pager2"
-        app:layout_constraintTop_toBottomOf="@+id/app_compat_image_view"
+        app:layout_constraintTop_toTopOf="@+id/text_view_date"
         app:srcCompat="@drawable/ic_round_arrow_back_ios_48"
         tools:ignore="ContentDescription" />
 
     <ImageView
         android:id="@+id/image_view_forward"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
         app:layout_constraintEnd_toEndOf="@+id/view_pager2"
-        app:layout_constraintTop_toBottomOf="@+id/app_compat_image_view"
+        app:layout_constraintTop_toTopOf="@+id/text_view_date"
         app:srcCompat="@drawable/ic_round_arrow_forward_ios_48"
         tools:ignore="ContentDescription" />
 

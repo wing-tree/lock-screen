@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
+import android.os.IBinder
 import android.provider.Settings
 import android.util.DisplayMetrics
 import android.view.LayoutInflater
@@ -19,8 +20,11 @@ import com.flow.android.kotlin.lockscreen.databinding.HomeBinding
 import com.flow.android.kotlin.lockscreen.main.view.MainActivity
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
 import com.flow.android.kotlin.lockscreen.util.toPx
+import timber.log.Timber
+import java.util.concurrent.locks.Lock
+import kotlin.Exception
 
-class LockScreenService : JobIntentService() {
+class LockScreenService : Service() {
     object Action {
         const val HomeKeyPressed = "com.flow.android.kotlin.lockscreen.lockscreen" +
                 ".LockScreenService.Action.HomePressed"
@@ -54,7 +58,7 @@ class LockScreenService : JobIntentService() {
                     stopSelf()
                     notificationManager.cancelAll()
                 }
-                Intent.ACTION_SCREEN_ON -> {
+                Intent.ACTION_SCREEN_OFF -> {
                     if (showOnLockScreen.not() || displayAfterUnlocking)
                         return
 
@@ -101,7 +105,11 @@ class LockScreenService : JobIntentService() {
         getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
 
-    override fun onHandleWork(intent: Intent) {
+    override fun onCreate() {
+        super.onCreate()
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         localBroadcastManager.registerReceiver(homeReceiver, IntentFilter().apply {
             addAction(Action.HomeKeyPressed)
             addAction(Action.RecentAppsPressed)
@@ -111,7 +119,7 @@ class LockScreenService : JobIntentService() {
                 broadcastReceiver,
                 IntentFilter().apply {
                     addAction(Action.StopSelf)
-                    addAction(Intent.ACTION_SCREEN_ON)
+                    addAction(Intent.ACTION_SCREEN_OFF)
                     addAction(Intent.ACTION_USER_PRESENT)
                 }
         )
@@ -143,24 +151,28 @@ class LockScreenService : JobIntentService() {
         val notification: Notification = builder.build()
 
         startForeground(1, notification)
-    }
 
-    fun enqueueWork(context: Context?, work: Intent?) {
-        context ?: return
-        work ?: return
-
-        enqueueWork(context, LockScreenService::class.java, JOB_ID, work)
+        return START_STICKY
     }
 
     override fun onDestroy() {
-        localBroadcastManager.unregisterReceiver(homeReceiver)
-        unregisterReceiver(broadcastReceiver)
+        try {
+            localBroadcastManager.unregisterReceiver(homeReceiver)
+            unregisterReceiver(broadcastReceiver)
 
-        windowManager.removeViewImmediate(binding.root)
+            if (isHomeVisible)
+                windowManager.removeViewImmediate(binding.root)
+        } catch (e: Exception) {
+            Timber.e(e)
+            //stopSelf()
+        }
+
         isHomeVisible = false
 
         super.onDestroy()
     }
+
+    override fun onBind(intent: Intent?): IBinder? = null
 
     private fun showHome() {
         if (isHomeVisible)
@@ -202,10 +214,10 @@ class LockScreenService : JobIntentService() {
             @Suppress("DEPRECATION")
             windowManager.defaultDisplay.getMetrics(displayMetrics)
 
-            val navigationBarHeight = navigationBarHeight() * 2
-            val statusBarHeight = statusBarHeight() * 2
+            val navigationBarHeight = navigationBarHeight()
+            val statusBarHeight = statusBarHeight()
 
-            displayMetrics.heightPixels + navigationBarHeight + statusBarHeight
+            displayMetrics.heightPixels + navigationBarHeight.times(2) + statusBarHeight.times(2)
         }
     }
 
@@ -229,7 +241,6 @@ class LockScreenService : JobIntentService() {
 
     @Suppress("SpellCheckingInspection")
     companion object {
-        const val JOB_ID = 2251
         private const val CHANNEL_NAME = "com.flow.android.kotlin.lockscreen.lock_screen.channel_name"
         private const val CHANNEL_DESCRIPTION = "com.flow.android.kotlin.lockscreen.lock_screen.channel_description" // todo change real des.
         private const val CHANNEL_ID = "com.flow.android.kotlin.lockscreen.lock_screen.channel_id"

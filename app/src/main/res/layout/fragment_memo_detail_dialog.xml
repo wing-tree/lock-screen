@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/rounded_corners"
+    android:backgroundTint="@color/background">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:id="@+id/relative_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/text_view_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:padding="@dimen/padding_small"
+                tools:text="4월 29일"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/image_view_delete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toStartOf="@id/image_view_edit"
+                android:layout_marginEnd="@dimen/spacing_small"
+                android:layout_marginTop="@dimen/spacing_small"
+                app:srcCompat="@drawable/ic_round_delete_24"
+                tools:ignore="ContentDescription" />
+
+            <ImageView
+                android:id="@+id/image_view_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="@dimen/spacing_small"
+                android:layout_marginTop="@dimen/spacing_small"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_round_edit_24"
+                tools:ignore="ContentDescription" />
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/text_view_content"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/padding_small"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/relative_layout"
+            tools:text="Content" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/material_button_close"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="1dp"
+            android:background="@drawable/rounded_corner_bottom_left"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/memo_detail_dialog_fragment_000"
+            app:layout_constraintEnd_toStartOf="@+id/material_button_done"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_view_content" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/material_button_done"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="1dp"
+            android:background="@drawable/rounded_corner_bottom_right"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/memo_detail_dialog_fragment_001"
+            app:layout_constraintBottom_toBottomOf="@+id/material_button_close"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/material_button_close"
+            app:layout_constraintTop_toTopOf="@+id/material_button_close" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>

@@ -1,7 +1,8 @@
 package com.flow.android.kotlin.lockscreen.main.viewmodel
 
 import android.app.Application
-import android.opengl.Visibility
+import android.graphics.Bitmap
+import android.os.Parcelable
 import androidx.lifecycle.*
 import com.flow.android.kotlin.lockscreen.calendar.CalendarDisplay
 import com.flow.android.kotlin.lockscreen.calendar.CalendarHelper
@@ -10,6 +11,7 @@ import com.flow.android.kotlin.lockscreen.favoriteapp.entity.App
 import com.flow.android.kotlin.lockscreen.memo.entity.Memo
 import com.flow.android.kotlin.lockscreen.preferences.PackageNamePreferences
 import com.flow.android.kotlin.lockscreen.repository.LocalRepository
+import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -38,8 +40,24 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val floatingActionButtonVisibility: LiveData<Int>
         get() = _floatingActionButtonVisibility
 
+    private val _wallpaper = MutableLiveData<Bitmap>()
+    val wallpaper: LiveData<Bitmap>
+        get() = _wallpaper
+
+    fun setWallpaper(value: Bitmap) {
+        _wallpaper.value = value
+    }
+
     fun setFloatingActionButtonVisibility(visibility: Int) {
         _floatingActionButtonVisibility.value = visibility
+    }
+
+    private val _memoChanged = MutableLiveData<MemoChanged>()
+    val memoChanged: LiveData<MemoChanged>
+        get() = _memoChanged
+
+    fun notifyMemoChanged(value: MemoChanged) {
+        _memoChanged.value = value
     }
 
     init {
@@ -100,4 +118,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun insertMemo(memo: Memo) {
         localRepository.insertMemo(memo)
     }
+}
+
+@Parcelize
+data class MemoChanged(
+    val memo: Memo,
+    val state: Int
+) : Parcelable
+
+object MemoChangedState {
+    const val Deleted = 0
+    const val Modified = 1
 }

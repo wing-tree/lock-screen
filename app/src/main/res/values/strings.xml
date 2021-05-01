@@ -21,7 +21,11 @@
     <!-- MainActivity -->
     <string name="main_activity_000">Calendar</string>
     <string name="main_activity_001">Favorite Apps</string>
-    <string name="main_activity_002">Todo List</string>
+    <string name="main_activity_002">Memo</string>
+
+    <!-- MemoDetailDialogFragment -->
+    <string name="memo_detail_dialog_fragment_000">Close</string>
+    <string name="memo_detail_dialog_fragment_001">Done</string>
 
     <!-- MemoFragment -->
     <string name="memo_fragment_000">You may delay, but time will not. (Benjamin Franklin)</string>

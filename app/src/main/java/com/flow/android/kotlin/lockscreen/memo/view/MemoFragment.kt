@@ -4,9 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.flow.android.kotlin.lockscreen.base.BaseFragment
 import com.flow.android.kotlin.lockscreen.databinding.FragmentMemoBinding
+import com.flow.android.kotlin.lockscreen.memo.adapter.ItemTouchCallback
 import com.flow.android.kotlin.lockscreen.memo.adapter.MemoAdapter
 
 class MemoFragment: BaseFragment<FragmentMemoBinding>() {
@@ -14,9 +16,15 @@ class MemoFragment: BaseFragment<FragmentMemoBinding>() {
         return FragmentMemoBinding.inflate(inflater, container, false)
     }
 
-    private val memoAdapter = MemoAdapter {
+    private val memoAdapter: MemoAdapter = MemoAdapter (arrayListOf(), { memo ->
+        MemoDetailDialogFragment.getInstance(memo.deepCopy()).also {
+            it.show(requireActivity().supportFragmentManager, it.tag)
+        }
+    }, {
+        itemTouchHelper.startDrag(it)
+    })
 
-    }
+    private val itemTouchHelper = ItemTouchHelper(ItemTouchCallback(memoAdapter))
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -30,14 +38,19 @@ class MemoFragment: BaseFragment<FragmentMemoBinding>() {
             adapter = memoAdapter
         }
 
+        itemTouchHelper.attachToRecyclerView(viewBinding.recyclerView)
         initializeLiveData()
 
         return view
     }
 
     private fun initializeLiveData() {
+        viewModel.memoChanged.observe(viewLifecycleOwner, {
+            // update adapter.
+        })
+
         viewModel.memos.observe(viewLifecycleOwner, {
-            memoAdapter.submitList(it)
+            memoAdapter.addAll(it)
         })
     }
 }

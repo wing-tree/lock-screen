@@ -1,12 +1,10 @@
 package com.flow.android.kotlin.lockscreen.calendar.view
 
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.flow.android.kotlin.lockscreen.R
@@ -14,7 +12,6 @@ import com.flow.android.kotlin.lockscreen.base.BaseFragment
 import com.flow.android.kotlin.lockscreen.calendar.CalendarHelper
 import com.flow.android.kotlin.lockscreen.databinding.FragmentCalendarBinding
 import com.flow.android.kotlin.lockscreen.calendar.adapter.EventsAdapter
-import com.flow.android.kotlin.lockscreen.main.viewmodel.MainViewModel
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,6 +27,7 @@ class CalendarFragment: BaseFragment<FragmentCalendarBinding>() {
     private val eventsAdapter = EventsAdapter(arrayListOf()) {
         CalendarHelper.editEvent(requireActivity(), it)
     }
+
     private val itemCount = 7
     private val onPageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
@@ -45,6 +43,7 @@ class CalendarFragment: BaseFragment<FragmentCalendarBinding>() {
             viewBinding.textViewDate.text = text
         }
     }
+
     private val simpleDateFormat: SimpleDateFormat by lazy {
         SimpleDateFormat(getString(R.string.format_date_001), Locale.getDefault())
     }
@@ -58,6 +57,8 @@ class CalendarFragment: BaseFragment<FragmentCalendarBinding>() {
 
         initializeView()
         initializeLiveData()
+        setIconColor()
+        setTextColor()
 
         return view
     }
@@ -105,6 +106,16 @@ class CalendarFragment: BaseFragment<FragmentCalendarBinding>() {
             if (viewBinding.viewPager2.currentItem < itemCount)
                 viewBinding.viewPager2.currentItem += 1
         }
+    }
+
+    private fun setIconColor() {
+        viewBinding.imageViewBack.setColorFilter(colorHelper.viewPagerRegionColor(), PorterDuff.Mode.SRC_IN)
+        viewBinding.imageViewForward.setColorFilter(colorHelper.viewPagerRegionColor(), PorterDuff.Mode.SRC_IN)
+        viewBinding.appCompatImageView.setColorFilter(colorHelper.viewPagerRegionColor(), PorterDuff.Mode.SRC_IN)
+    }
+
+    private fun setTextColor() {
+        viewBinding.textViewDate.setTextColor(colorHelper.viewPagerRegionColor())
     }
 
     private fun Long.format() = simpleDateFormat.format(this)

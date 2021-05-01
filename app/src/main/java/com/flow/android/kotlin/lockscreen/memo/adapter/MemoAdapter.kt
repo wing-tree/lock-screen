@@ -1,7 +1,9 @@
 package com.flow.android.kotlin.lockscreen.memo.adapter
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -12,14 +14,31 @@ import com.flow.android.kotlin.lockscreen.memo.entity.Memo
 import java.text.SimpleDateFormat
 import java.util.*
 
-class MemoAdapter(private val onItemClick: (item: Memo) -> Unit): ListAdapter<Memo, MemoAdapter.ViewHolder>(DiffCallback()) {
+class MemoAdapter(
+    private val items: ArrayList<Memo>,
+    private val onItemClick: (item: Memo) -> Unit,
+    private val onSwapTouch: (viewHolder: ViewHolder) -> Unit
+) : RecyclerView.Adapter<MemoAdapter.ViewHolder>() {
     private var inflater: LayoutInflater? = null
     private var simpleDateFormat: SimpleDateFormat? = null
 
     inner class ViewHolder(private val binding: MemoBinding) : RecyclerView.ViewHolder(binding.root) {
+        @SuppressLint("ClickableViewAccessibility")
         fun bind(item: Memo) {
             binding.textViewContent.text = item.content
             binding.textViewDate.text = item.modifiedTime.format(binding.root.context)
+
+            binding.imageViewSwap.setOnTouchListener { _, event ->
+                when(event.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        onSwapTouch(this)
+                        return@setOnTouchListener true
+                    }
+                }
+
+                false
+            }
+
 
             binding.root.setOnClickListener {
                 onItemClick(item)
@@ -41,7 +60,23 @@ class MemoAdapter(private val onItemClick: (item: Memo) -> Unit): ListAdapter<Me
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(items[position])
+    }
+
+    fun addAll(list: List<Memo>) {
+        val positionStart = items.count()
+
+        items.addAll(list)
+        notifyItemRangeInserted(positionStart, list.count())
+    }
+
+    fun onMove(from: Int, to: Int) {
+        val priority = items[from].priority
+        items[from].priority = items[to].priority
+        items[to].priority = priority
+        Collections.swap(items, from, to)
+
+        notifyItemMoved(from, to)
     }
 
     private fun Long.format(context: Context): String {
@@ -50,14 +85,6 @@ class MemoAdapter(private val onItemClick: (item: Memo) -> Unit): ListAdapter<Me
 
         return simpleDateFormat.format(this)
     }
-}
 
-class DiffCallback: DiffUtil.ItemCallback<Memo>() {
-    override fun areItemsTheSame(oldItem: Memo, newItem: Memo): Boolean {
-        return oldItem.id == newItem.id
-    }
-
-    override fun areContentsTheSame(oldItem: Memo, newItem: Memo): Boolean {
-        return oldItem == newItem
-    }
+    override fun getItemCount(): Int = items.count()
 }
