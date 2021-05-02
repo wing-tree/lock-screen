@@ -254,6 +254,9 @@ private fun wallpaper(): Bitmap? {
     return null
 }
 ```
+## [Migrating Room databases](https://developer.android.com/training/data-storage/room/migrating-db-versions)
+### [Handle column default value when upgrading to Room 2.2.0](https://developer.android.com/training/data-storage/room/migrating-db-versions#handle-default-values-migrations)
+
 ## [Palette](https://developer.android.com/reference/android/support/v7/graphics/Palette.html)
 ```
 implementation 'androidx.palette:palette-ktx:1.0.0'
