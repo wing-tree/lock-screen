@@ -44,8 +44,8 @@ import com.flow.android.kotlin.lockscreen.main.torch.Torch
 import com.flow.android.kotlin.lockscreen.main.viewmodel.MainViewModel
 import com.flow.android.kotlin.lockscreen.main.viewmodel.MemoChanged
 import com.flow.android.kotlin.lockscreen.main.viewmodel.MemoChangedState
+import com.flow.android.kotlin.lockscreen.memo.listener.OnMemoChangedListener
 import com.flow.android.kotlin.lockscreen.memo.entity.Memo
-import com.flow.android.kotlin.lockscreen.memo.view.MemoDetailDialogFragment
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
 import com.flow.android.kotlin.lockscreen.util.scale
 import com.google.android.material.tabs.TabLayout
@@ -60,7 +60,7 @@ import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.karumi.dexter.listener.single.PermissionListener
 import java.io.IOException
 
-class MainActivity : AppCompatActivity(), MemoDetailDialogFragment.OnMemoChangedListener {
+class MainActivity : AppCompatActivity(), OnMemoChangedListener {
     private val localBroadcastManager: LocalBroadcastManager by lazy {
         LocalBroadcastManager.getInstance(this)
     }
@@ -416,6 +416,7 @@ class MainActivity : AppCompatActivity(), MemoDetailDialogFragment.OnMemoChanged
             viewModel.insertMemo(
                 Memo(
                     content = getString(R.string.memo_fragment_000),
+                    color = ContextCompat.getColor(this, R.color.unselected),
                     modifiedTime = System.currentTimeMillis(),
                     priority = System.currentTimeMillis()
                 )
@@ -438,10 +439,14 @@ class MainActivity : AppCompatActivity(), MemoDetailDialogFragment.OnMemoChanged
     }
 
     override fun onMemoDeleted(memo: Memo) {
-        viewModel.notifyMemoChanged(MemoChanged(memo, MemoChangedState.Deleted))
+        viewModel.deleteMemo(memo)
     }
 
-    override fun onMemoDone(memo: Memo) {
-        viewModel.notifyMemoChanged(MemoChanged(memo, MemoChangedState.Modified))
+    override fun onMemoInserted(memo: Memo) {
+        viewModel.insertMemo(memo)
+    }
+
+    override fun onMemoUpdated(memo: Memo) {
+        viewModel.updateMemo(memo)
     }
 }

@@ -9,7 +9,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.flow.android.kotlin.lockscreen.persistence.dao.MemoDao
 import com.flow.android.kotlin.lockscreen.memo.entity.Memo
 
-@Database(entities = [Memo::class], version = 2, exportSchema = false)
+@Database(entities = [Memo::class], version = 3, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun memoDao(): MemoDao
 
@@ -26,6 +26,13 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE memo ADD COLUMN color INTEGER NOT NULL DEFAULT 0")
+                database.execSQL("ALTER TABLE memo ADD COLUMN detail TEXT NOT NULL DEFAULT \"\"")
+            }
+        }
+
         fun getInstance(context: Context): AppDatabase {
             synchronized(this) {
                 var instance = INSTANCE
@@ -36,7 +43,7 @@ abstract class AppDatabase : RoomDatabase() {
                             AppDatabase::class.java,
                             name
                     )
-                        .addMigrations(MIGRATION_1_2)
+                        .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                         .fallbackToDestructiveMigration()
                         .build()
 

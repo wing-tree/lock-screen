@@ -1,21 +1,22 @@
 package com.flow.android.kotlin.lockscreen.persistence.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.flow.android.kotlin.lockscreen.memo.entity.Memo
+import io.reactivex.Completable
+import io.reactivex.Flowable
 
 @Dao
 interface MemoDao {
     @Delete
-    suspend fun delete(memo: Memo)
+    fun delete(memo: Memo): Completable
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(memo: Memo): Completable
+
+    @Update
+    fun update(memo: Memo): Completable
 
     @Transaction
     @Query("SELECT * FROM memo ORDER BY modifiedTime DESC")
-    fun getAll(): LiveData<List<Memo>>
-
-    @Insert
-    suspend fun insert(memo: Memo)
-
-    @Update
-    suspend fun update(memo: Memo)
+    fun getAll(): Flowable<List<Memo>>
 }

@@ -7,21 +7,21 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.Transformation
 
-fun View.collapse(targetHeight: Int, duration: Number) {
-    val initialHeight: Int = this.measuredHeight
+fun View.collapse(to: Int, duration: Number) {
+    val measuredHeight: Int = this.measuredHeight
     val animation: Animation = object : Animation() {
         override fun applyTransformation(
                 interpolatedTime: Float,
                 t: Transformation?
         ) {
             if (interpolatedTime == 1F) {
-                this@collapse.layoutParams.height = targetHeight
+                this@collapse.layoutParams.height = to
             } else {
                 this@collapse.layoutParams.height =
-                        if ((initialHeight - (initialHeight * interpolatedTime).toInt()) > targetHeight)
-                            initialHeight - (initialHeight * interpolatedTime).toInt()
+                        if ((measuredHeight - (measuredHeight * interpolatedTime).toInt()) > to)
+                            measuredHeight - (measuredHeight * interpolatedTime).toInt()
                         else
-                            targetHeight
+                            to
             }
 
             this@collapse.requestLayout()
@@ -32,28 +32,26 @@ fun View.collapse(targetHeight: Int, duration: Number) {
         }
     }
 
-    // 1dp/ms collapse rate
-    // animation.duration = (initialHeight / this.context.resources.displayMetrics.density).toLong()
-
     animation.duration = duration.toLong()
     this.fadeOut(animation.duration)
     this.startAnimation(animation)
 }
 
 fun View.expand(duration: Number) {
-    val matchParentMeasureSpec: Int = View.MeasureSpec.makeMeasureSpec(
+    val widthMeasureSpec: Int = View.MeasureSpec.makeMeasureSpec(
             (this.parent as View).width,
             View.MeasureSpec.EXACTLY
     )
 
-    val wrapContentMeasureSpec: Int =
+    val heightMeasureSpec: Int =
             View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-    this.measure(matchParentMeasureSpec, wrapContentMeasureSpec)
-    val targetHeight: Int = this.measuredHeight
-    val originHeight = this.height
 
-    // Older versions of Android (prior to API 21) cancel the animation of 0 height views.
-    this.layoutParams.height = originHeight
+    this.measure(widthMeasureSpec, heightMeasureSpec)
+
+    val to: Int = this.measuredHeight
+    val height = this.height
+
+    this.layoutParams.height = height
     this.visibility = View.VISIBLE
 
     val animation: Animation = object : Animation() {
@@ -65,10 +63,10 @@ fun View.expand(duration: Number) {
                 this@expand.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
             else
                 this@expand.layoutParams.height =
-                        if ((targetHeight * interpolatedTime).toInt() < originHeight)
-                            originHeight
+                        if ((to * interpolatedTime).toInt() < height)
+                            height
                         else
-                            (targetHeight * interpolatedTime).toInt()
+                            (to * interpolatedTime).toInt()
             this@expand.requestLayout()
         }
 
@@ -77,40 +75,43 @@ fun View.expand(duration: Number) {
         }
     }
 
-    // 1dp/ms expansion rate
-    //animation.duration = (targetHeight / this.context.resources.displayMetrics.density).toLong()
     animation.duration = duration.toLong()
     this.fadeIn(animation.duration)
     this.startAnimation(animation)
 }
 
-fun View.fadeIn(duration: Number) {
-        this.apply {
-                alpha = 0F
-                visibility = View.VISIBLE
+fun View.fadeIn(duration: Number, onAnimationEnd: (() -> Unit)? = null, alphaFrom: Float = 0F) {
+    this.apply {
+        alpha = alphaFrom
+        visibility = View.VISIBLE
 
-                animate()
-                        .alpha(1F)
-                        .setDuration(duration.toLong())
-                        .setListener(null)
-        }
+        animate()
+            .alpha(1F)
+            .setDuration(duration.toLong())
+            .setListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator?) {
+                    this@fadeIn.visibility = View.VISIBLE
+                    onAnimationEnd?.invoke()
+                    super.onAnimationEnd(animation)
+                }
+            })
+    }
 }
 
 fun View.fadeOut(duration: Number, onAnimationEnd: (() -> Unit)? = null) {
     this.apply {
         alpha = 1F
-        visibility = View.VISIBLE
 
         animate()
-                .alpha(0F)
-                .setDuration(duration.toLong())
-                .setListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator?) {
-                        this@fadeOut.visibility = View.GONE
-                        onAnimationEnd?.invoke()
-                        super.onAnimationEnd(animation)
-                    }
-                })
+            .alpha(0F)
+            .setDuration(duration.toLong())
+            .setListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator?) {
+                    this@fadeOut.visibility = View.GONE
+                    onAnimationEnd?.invoke()
+                    super.onAnimationEnd(animation)
+                }
+            })
     }
 }
 
@@ -130,4 +131,50 @@ fun View.scale(scale: Float, duration: Number = 200) {
             .scaleY(scale)
             .setDuration(duration.toLong())
             .start()
+}
+
+fun View.translateToBottom(duration: Number, onAnimationEnd: (() -> Unit)? = null) {
+    this.apply {
+        alpha = 0F
+
+        animate()
+            .alpha(1F)
+            .setDuration(duration.toLong())
+            .setListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator?) {
+                    onAnimationEnd?.invoke()
+                    super.onAnimationEnd(animation)
+                }
+            })
+            .translationY(0F)
+    }
+}
+
+fun View.translateToTop(duration: Number, onAnimationEnd: (() -> Unit)? = null) {
+    this.apply {
+        alpha = 1F
+
+        animate()
+            .alpha(0F)
+            .setDuration(duration.toLong())
+            .setListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator?) {
+                    onAnimationEnd?.invoke()
+                    super.onAnimationEnd(animation)
+                }
+            })
+            .translationY(-height.toFloat())
+    }
+}
+
+fun View.hide(invisible: Boolean = false) {
+    visibility =
+        if (invisible)
+            View.INVISIBLE
+        else
+            View.GONE
+}
+
+fun View.show() {
+    visibility = View.VISIBLE
 }

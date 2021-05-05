@@ -78,7 +78,7 @@ class ConfigurationFragment: Fragment() {
                 ),
                 AdapterItem.ListItem(
                         adapter = checkBoxAdapter,
-                        drawable = getDrawable(R.drawable.ic_round_calendar_today_24),
+                        drawable = getDrawable(R.drawable.ic_round_today_24),
                         onClick = { listItemBinding, listItem ->
 
                         },

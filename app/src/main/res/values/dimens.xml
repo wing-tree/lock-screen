@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="spacing_small">8dp</dimen>
+    <dimen name="spacing_medium_small">12dp</dimen>
     <dimen name="spacing_medium">16dp</dimen>
+    <dimen name="spacing_medium_large">32dp</dimen>
     <dimen name="spacing_large">24dp</dimen>
     <dimen name="spacing_extra_large">48dp</dimen>
 
@@ -28,8 +30,6 @@
     <dimen name="text_size_text_clock_date">32sp</dimen>
     <dimen name="text_size_text_clock_time">36sp</dimen>
 
-    <dimen name="image_view_camera_margin_top">48dp</dimen>
-
     <dimen name="text_description_margin_end">20dp</dimen>
     <dimen name="text_title_margin_end">20dp</dimen>
     <dimen name="text_title_margin_start">20dp</dimen>
@@ -40,4 +40,10 @@
     <dimen name="app_label_height">40dp</dimen>
 
     <dimen name="floating_action_button_margin_bottom">112dp</dimen>
+
+    <dimen name="text_size_edit_text_content">@dimen/text_size_medium</dimen>
+    <dimen name="text_size_edit_text_detail">14sp</dimen>
+
+    <dimen name="edit_text_content_max_height">72dp</dimen>
+    <dimen name="edit_text_detail_max_height">120dp</dimen>
 </resources>

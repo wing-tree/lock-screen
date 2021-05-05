@@ -10,7 +10,7 @@ import com.flow.android.kotlin.lockscreen.calendar.Event
 import com.flow.android.kotlin.lockscreen.favoriteapp.entity.App
 import com.flow.android.kotlin.lockscreen.memo.entity.Memo
 import com.flow.android.kotlin.lockscreen.preferences.PackageNamePreferences
-import com.flow.android.kotlin.lockscreen.repository.LocalRepository
+import com.flow.android.kotlin.lockscreen.repository.Repository
 import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,7 +18,7 @@ import kotlinx.coroutines.withContext
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val contentResolver = application.contentResolver
-    private val localRepository = LocalRepository(application)
+    private val repository = Repository(application)
     private val packageManager = application.packageManager
 
     private val _calendarDisplays = MutableLiveData<List<CalendarDisplay>>()
@@ -29,7 +29,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val favoriteApps: LiveData<List<App>>
         get() = _favoriteApps
 
-    val memos = localRepository.getAllMemos()
+    val memos = repository.getAllMemos()
 
     fun calendarDisplays() = calendarDisplays.value
     fun contentResolver() = contentResolver
@@ -56,7 +56,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val memoChanged: LiveData<MemoChanged>
         get() = _memoChanged
 
-    fun notifyMemoChanged(value: MemoChanged) {
+    private fun notifyMemoChanged(value: MemoChanged) {
         _memoChanged.value = value
     }
 
@@ -115,8 +115,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun deleteMemo(memo: Memo) {
+        repository.deleteMemo(memo) {
+            notifyMemoChanged(MemoChanged(it, MemoChangedState.Deleted))
+        }
+    }
+
     fun insertMemo(memo: Memo) {
-        localRepository.insertMemo(memo)
+        repository.insertMemo(memo) {
+            notifyMemoChanged(MemoChanged(it, MemoChangedState.Inserted))
+        }
+    }
+
+    fun updateMemo(memo: Memo) {
+        repository.updateMemo(memo) {
+            notifyMemoChanged(MemoChanged(it, MemoChangedState.Updated))
+        }
     }
 }
 
@@ -128,5 +142,6 @@ data class MemoChanged(
 
 object MemoChangedState {
     const val Deleted = 0
-    const val Modified = 1
+    const val Inserted = 1
+    const val Updated = 2
 }

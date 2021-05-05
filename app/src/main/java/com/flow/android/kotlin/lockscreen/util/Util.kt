@@ -9,13 +9,13 @@ fun Long.toDateString(simpleDateFormat: SimpleDateFormat): String {
 }
 
 fun <T> List<T>.diff(list: List<T>) = Diff(
-        added = list.filterNot { this.contains(it) },
-        removed = this.filterNot { list.contains(it) }
+        first = list.filterNot { this.contains(it) },
+        second = this.filterNot { list.contains(it) }
 )
 
 data class Diff<T>(
-        val added: List<T>,
-        val removed: List<T>
+        val first: List<T>,
+        val second: List<T>
 )
 
 val Float.toDp get() = this / Resources.getSystem().displayMetrics.density

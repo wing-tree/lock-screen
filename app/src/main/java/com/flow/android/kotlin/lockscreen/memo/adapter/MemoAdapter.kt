@@ -5,12 +5,11 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.databinding.MemoBinding
 import com.flow.android.kotlin.lockscreen.memo.entity.Memo
+import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -61,6 +60,30 @@ class MemoAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(items[position])
+    }
+
+    fun add(item: Memo) {
+        items.add(0, item)
+        notifyItemInserted(0)
+    }
+
+    fun remove(item: Memo) {
+        val index = items.indexOf(items.find { it.id == item.id })
+
+        items.removeAt(index)
+        notifyItemRemoved(index)
+    }
+
+    // todo deep copy 문제 발생가능함 응 발생함 ㅅㅂ.
+    fun change(item: Memo) {
+        val index = items.indexOf(items.find { it.id == item.id })
+
+        println("ZIO XIAL: $index")
+        println("ZIO XIAL22: $item")
+        println("ZIO XIAL333: ${items[index]}")
+
+        items[index] = item
+        notifyItemChanged(index)
     }
 
     fun addAll(list: List<Memo>) {

@@ -47,6 +47,7 @@ class ColorHelper private constructor(private val application: Application) {
                 val right = textView.right
                 val top = textView.top
 
+                // todo; error point
                 Palette.Builder(bitmap).setRegion(left, top, right, bottom).generate { palette ->
                     val dominantColor = palette?.getDominantColor(dark) ?: light
                     val textColor = colorDependingOnBackground(dominantColor)
@@ -109,6 +110,35 @@ class ColorHelper private constructor(private val application: Application) {
 
                 return instance
             }
+        }
+
+        @ColorInt
+        fun colorDependingOnBackground(@ColorInt colorInt: Int, @ColorInt dark: Int, @ColorInt light: Int): Int {
+            var red = Color.red(colorInt) / 255.0
+            var green = Color.green(colorInt) / 255.0
+            var blue = Color.blue(colorInt) / 255.0
+
+            if (red <= 0.03928)
+                red /= 12.92
+            else
+                red = ((red + 0.055) / 1.055).pow(2.4)
+
+            if (green <= 0.03928)
+                green /= 12.92
+            else
+                green = ((green + 0.055) / 1.055).pow(2.4)
+
+            if (blue <= 0.03928)
+                blue /= 12.92
+            else
+                blue = ((red + 0.055) / 1.055).pow(2.4)
+
+            val y = 0.2126 * red + 0.7152 * green + 0.0722 * blue
+
+            return if (y > 0.179)
+                dark
+            else
+                light
         }
     }
 }

@@ -21,8 +21,8 @@ class AppAdapter(private val onItemClick: (app: App) -> Unit): RecyclerView.Adap
     fun submit(list: List<App>) {
         val diff = apps.diff(list)
 
-        apps.addAll(diff.added)
-        apps.removeAll(diff.removed)
+        apps.addAll(diff.first)
+        apps.removeAll(diff.second)
 
         notifyDataSetChanged()
     }
