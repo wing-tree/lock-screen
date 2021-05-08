@@ -254,10 +254,14 @@ private fun wallpaper(): Bitmap? {
     return null
 }
 ```
+## [Migrating Room databases](https://developer.android.com/training/data-storage/room/migrating-db-versions)
+### [Handle column default value when upgrading to Room 2.2.0](https://developer.android.com/training/data-storage/room/migrating-db-versions#handle-default-values-migrations)
+
 ## [Palette](https://developer.android.com/reference/android/support/v7/graphics/Palette.html)
 ```
 implementation 'androidx.palette:palette-ktx:1.0.0'
 ```
+## [Return to app after requesting SYSTEM_ALERT_WINDOW permission](https://stackoverflow.com/questions/40663777/return-to-app-after-requesting-system-alert-window-permission)
 ## [Selecting Colors with the Palette API](https://developer.android.com/training/material/palette-colors)
 ## [Using Sync Adapter to transfer data in android](https://nyamebismark12-nb.medium.com/using-sync-adapter-to-transfer-data-ad1e6c3f2d64)
 ## [ViewBinding - how to get binding for included layouts?](https://stackoverflow.com/questions/58730127/viewbinding-how-to-get-binding-for-included-layouts)
