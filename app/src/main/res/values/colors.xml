@@ -13,11 +13,16 @@
     <color name="grey_800">#424242</color>
     <color name="grey_900">#212121</color>
     <color name="yellow_A_200">#ffff00</color>
+    <color name="ivory">#FFFFF0</color>
 
+    <color name="background">@color/white</color>
     <color name="surface">@color/white</color>
 
-    <color name="edit_text_background">@color/white</color>
+    <color name="high_emphasis_text">#DE000000</color>
+    <color name="medium_emphasis_text">#99000000</color>
+    <color name="disabled_text">#61000000</color>
 
+    <color name="edit_text_background">@color/ivory</color>
     <color name="event_item_background">#61212121</color>
 
     <color name="dark">#DE212121</color>
@@ -64,5 +69,8 @@
     <color name="unselected">@color/grey_900</color>
 
     <color name="header_background">@color/grey_800</color>
-    <color name="material_button_background_tint">@color/grey_800</color>
+    <color name="material_button_background_tint">@color/ivory</color>
+
+    <color name="button_text_disabled">@color/disabled_text</color>
+    <color name="button_text_enabled">@color/high_emphasis_text</color>
 </resources>

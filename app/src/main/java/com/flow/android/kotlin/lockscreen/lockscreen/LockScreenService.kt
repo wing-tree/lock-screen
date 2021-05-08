@@ -107,9 +107,7 @@ class LockScreenService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-    }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         localBroadcastManager.registerReceiver(homeReceiver, IntentFilter().apply {
             addAction(Action.HomeKeyPressed)
             addAction(Action.RecentAppsPressed)
@@ -123,7 +121,9 @@ class LockScreenService : Service() {
                     addAction(Intent.ACTION_USER_PRESENT)
                 }
         )
+    }
 
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val importance = NotificationManager.IMPORTANCE_MIN
             val notificationChannel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, importance)
@@ -158,11 +158,12 @@ class LockScreenService : Service() {
     override fun onDestroy() {
         try {
             localBroadcastManager.unregisterReceiver(homeReceiver)
+            //IllegalArgumentException: Receiver not registered: todo
             unregisterReceiver(broadcastReceiver)
 
             if (isHomeVisible)
                 windowManager.removeViewImmediate(binding.root)
-        } catch (e: Exception) {
+        } catch (e: IllegalArgumentException) {
             Timber.e(e)
             //stopSelf()
         }

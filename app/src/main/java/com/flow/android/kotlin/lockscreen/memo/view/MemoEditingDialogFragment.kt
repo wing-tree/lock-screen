@@ -19,6 +19,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.flow.android.kotlin.lockscreen.R
+import com.flow.android.kotlin.lockscreen.base.BaseDialogFragment
 import com.flow.android.kotlin.lockscreen.color.widget.ColorPickerLayout
 import com.flow.android.kotlin.lockscreen.databinding.FragmentMemoEditingDialogBinding
 import com.flow.android.kotlin.lockscreen.datepicker.DatePickerDialogFragment
@@ -28,7 +29,11 @@ import com.flow.android.kotlin.lockscreen.util.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-class MemoEditingDialogFragment : DialogFragment() {
+class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBinding>() {
+    override fun inflate(inflater: LayoutInflater, container: ViewGroup?): FragmentMemoEditingDialogBinding {
+        return FragmentMemoEditingDialogBinding.inflate(inflater, container, false)
+    }
+
     private val simpleDateFormat by lazy {
         SimpleDateFormat(getString(R.string.format_date_001), Locale.getDefault())
     }
@@ -85,7 +90,6 @@ class MemoEditingDialogFragment : DialogFragment() {
                 ".MemoEditingDialogFragment.Name.Date"
     }
 
-    private lateinit var viewBinding: FragmentMemoEditingDialogBinding
     private val duration = 200
     private val currentTimeMillis = System.currentTimeMillis()
     private var mode = Mode.Add
@@ -107,8 +111,8 @@ class MemoEditingDialogFragment : DialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        viewBinding = FragmentMemoEditingDialogBinding.inflate(inflater, container, false)
+    ): View? {
+        val view = super.onCreateView(inflater, container, savedInstanceState)
 
         val memo = arguments?.getParcelable<Memo>(KEY_MEMO)
 
@@ -138,7 +142,7 @@ class MemoEditingDialogFragment : DialogFragment() {
 
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
-        return viewBinding.root
+        return view
     }
 
     override fun onDestroyView() {
@@ -162,7 +166,7 @@ class MemoEditingDialogFragment : DialogFragment() {
         }
 
         viewBinding.textViewDate.setOnClickListener {
-            DatePickerDialogFragment.getInstance(memo?.modifiedTime ?: currentTimeMillis).also {
+            DatePickerDialogFragment.getInstance(memo()?.modifiedTime ?: currentTimeMillis).also {
                 it.show(requireActivity().supportFragmentManager, it.tag)
             }
         }

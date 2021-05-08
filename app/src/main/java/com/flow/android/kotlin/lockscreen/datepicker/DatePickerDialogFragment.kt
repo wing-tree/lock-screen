@@ -8,22 +8,25 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
-import androidx.fragment.app.DialogFragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.flow.android.kotlin.lockscreen.base.BaseDialogFragment
 import com.flow.android.kotlin.lockscreen.databinding.FragmentDatePickerDialogBinding
-import com.flow.android.kotlin.lockscreen.memo.entity.Memo
 import com.flow.android.kotlin.lockscreen.memo.view.MemoEditingDialogFragment
 import java.util.*
 
-class DatePickerDialogFragment: DialogFragment() {
+class DatePickerDialogFragment: BaseDialogFragment<FragmentDatePickerDialogBinding>() {
     private lateinit var date: Date
+
+    override fun inflate(inflater: LayoutInflater, container: ViewGroup?): FragmentDatePickerDialogBinding {
+        return FragmentDatePickerDialogBinding.inflate(inflater, container, false)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        val viewBinding = FragmentDatePickerDialogBinding.inflate(inflater, container, false)
+    ): View? {
+        val view = super.onCreateView(inflater, container, savedInstanceState)
         val timeInMillis = arguments?.getLong(KEY_TIME_IN_MILLIS) ?: System.currentTimeMillis()
 
         val calendar: Calendar = Calendar.getInstance().apply {
@@ -55,7 +58,7 @@ class DatePickerDialogFragment: DialogFragment() {
 
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
-        return viewBinding.root
+        return view
     }
 
     companion object {

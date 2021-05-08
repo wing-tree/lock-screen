@@ -1,12 +1,17 @@
 package com.flow.android.kotlin.lockscreen.main.viewmodel
 
 import android.app.Application
+import android.content.ContentResolver
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.os.Parcelable
+import androidx.annotation.ColorInt
 import androidx.lifecycle.*
 import com.flow.android.kotlin.lockscreen.calendar.CalendarDisplay
 import com.flow.android.kotlin.lockscreen.calendar.CalendarHelper
 import com.flow.android.kotlin.lockscreen.calendar.Event
+import com.flow.android.kotlin.lockscreen.color.ColorDependingOnBackground
+import com.flow.android.kotlin.lockscreen.color.ColorHelper
 import com.flow.android.kotlin.lockscreen.favoriteapp.entity.App
 import com.flow.android.kotlin.lockscreen.memo.entity.Memo
 import com.flow.android.kotlin.lockscreen.preferences.PackageNamePreferences
@@ -21,6 +26,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = Repository(application)
     private val packageManager = application.packageManager
 
+    private var _viewPagerRegionColor = Color.WHITE
+    val viewPagerRegionColor: Int
+        @ColorInt
+        get() = _viewPagerRegionColor
+
+    override fun onCleared() {
+        repository.clearCompositeDisposable()
+        super.onCleared()
+    }
+
     private val _calendarDisplays = MutableLiveData<List<CalendarDisplay>>()
     val calendarDisplays: LiveData<List<CalendarDisplay>>
         get() = _calendarDisplays
@@ -32,21 +47,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val memos = repository.getAllMemos()
 
     fun calendarDisplays() = calendarDisplays.value
-    fun contentResolver() = contentResolver
+    fun contentResolver(): ContentResolver = contentResolver
 
     private val _events = MutableLiveData<List<Event>>()
 
     private val _floatingActionButtonVisibility = MutableLiveData<Int>()
     val floatingActionButtonVisibility: LiveData<Int>
         get() = _floatingActionButtonVisibility
-
-    private val _wallpaper = MutableLiveData<Bitmap>()
-    val wallpaper: LiveData<Bitmap>
-        get() = _wallpaper
-
-    fun setWallpaper(value: Bitmap) {
-        _wallpaper.value = value
-    }
 
     fun setFloatingActionButtonVisibility(visibility: Int) {
         _floatingActionButtonVisibility.value = visibility
@@ -58,6 +65,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun notifyMemoChanged(value: MemoChanged) {
         _memoChanged.value = value
+    }
+
+    private val _colorDependingOnBackground = MutableLiveData<ColorDependingOnBackground>()
+    val colorDependingOnBackground: LiveData<ColorDependingOnBackground>
+        get() = _colorDependingOnBackground
+
+    fun setColorDependingOnBackground(value: ColorDependingOnBackground) {
+        _colorDependingOnBackground.value = value
     }
 
     init {
@@ -130,6 +145,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun updateMemo(memo: Memo) {
         repository.updateMemo(memo) {
             notifyMemoChanged(MemoChanged(it, MemoChangedState.Updated))
+        }
+    }
+
+    fun updateMemos(list: List<Memo>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateMemos(list)
         }
     }
 }

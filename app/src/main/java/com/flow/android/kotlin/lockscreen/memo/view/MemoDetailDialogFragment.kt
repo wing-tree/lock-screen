@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -15,15 +16,23 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.flow.android.kotlin.lockscreen.R
+import com.flow.android.kotlin.lockscreen.base.BaseDialogFragment
 import com.flow.android.kotlin.lockscreen.databinding.FragmentMemoDetailDialogBinding
 import com.flow.android.kotlin.lockscreen.memo.listener.OnMemoChangedListener
 import com.flow.android.kotlin.lockscreen.memo.entity.Memo
+import com.flow.android.kotlin.lockscreen.memo.util.share
+import com.flow.android.kotlin.lockscreen.util.show
 import com.flow.android.kotlin.lockscreen.util.toDateString
+import com.flow.android.kotlin.lockscreen.util.view.ConfirmationDialogFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.text.SimpleDateFormat
 import java.util.*
 
-class MemoDetailDialogFragment : DialogFragment() {
-    private lateinit var viewBinding: FragmentMemoDetailDialogBinding
+class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBinding>() {
+    override fun inflate(inflater: LayoutInflater, container: ViewGroup?): FragmentMemoDetailDialogBinding {
+        return FragmentMemoDetailDialogBinding.inflate(inflater, container, false)
+    }
+
     private val simpleDateFormat by lazy {
         SimpleDateFormat(getString(R.string.format_date_001), Locale.getDefault())
     }
@@ -64,8 +73,8 @@ class MemoDetailDialogFragment : DialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        viewBinding = FragmentMemoDetailDialogBinding.inflate(inflater, container, false)
+    ): View? {
+        val view = super.onCreateView(inflater, container, savedInstanceState)
 
         val memo = arguments?.getParcelable<Memo>(KEY_MEMO)
 
@@ -79,7 +88,7 @@ class MemoDetailDialogFragment : DialogFragment() {
 
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
-        return viewBinding.root
+        return view
     }
 
     override fun onDestroyView() {
@@ -89,20 +98,39 @@ class MemoDetailDialogFragment : DialogFragment() {
     }
 
     private fun initializeView(memo: Memo) {
+        viewBinding.viewMemoColor.backgroundTintList = ColorStateList.valueOf(memo.color)
         viewBinding.textViewDate.text = memo.modifiedTime.toDateString(simpleDateFormat)
         viewBinding.textViewContent.text = memo.content
 
+        if (memo.detail.isNotBlank()) {
+            viewBinding.textViewDetail.show()
+            viewBinding.textViewDetail.text = memo.detail
+        }
+
         viewBinding.imageViewDelete.setOnClickListener {
-            onMemoChangedListener?.onMemoDeleted(memo)
-            dismiss()
+            ConfirmationDialogFragment().also {
+                it.setTitle("Text for Title Test")
+                it.setMessage(getString(R.string.memo_detail_dialog_fragment_002))
+                it.setNegativeButton(getString(R.string.memo_detail_dialog_fragment_003)) { dialogFragment ->
+                    dialogFragment.dismiss()
+                }
+
+                it.setPositiveButton(getString(R.string.memo_detail_dialog_fragment_004)) { dialogFragment ->
+                    onMemoChangedListener?.onMemoDeleted(memo)
+                    dialogFragment.dismiss()
+                    this.dismiss()
+                }
+
+                it.show(requireActivity().supportFragmentManager, it.tag)
+            }
         }
 
         viewBinding.imageViewShare.setOnClickListener {
-
+            share(requireContext(), memo)
         }
 
         viewBinding.imageViewCalendar.setOnClickListener {
-            addToCalendar(memo)
+            insertToCalendar(memo)
         }
 
         viewBinding.imageViewEdit.setOnClickListener {
@@ -120,7 +148,7 @@ class MemoDetailDialogFragment : DialogFragment() {
         }
     }
 
-    private fun addToCalendar(memo: Memo) {
+    private fun insertToCalendar(memo: Memo) {
         val gregorianCalendar = GregorianCalendar.getInstance().apply {
             timeInMillis = memo.modifiedTime
         }

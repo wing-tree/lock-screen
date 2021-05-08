@@ -16,7 +16,10 @@ interface MemoDao {
     @Update
     fun update(memo: Memo): Completable
 
+    @Update
+    suspend fun updateList(list: List<Memo>)
+
     @Transaction
-    @Query("SELECT * FROM memo ORDER BY modifiedTime DESC")
+    @Query("SELECT * FROM memo ORDER BY priority DESC")
     fun getAll(): Flowable<List<Memo>>
 }

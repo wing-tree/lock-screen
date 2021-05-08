@@ -1,5 +1,6 @@
 package com.flow.android.kotlin.lockscreen.memo.view
 
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -56,6 +57,12 @@ class MemoFragment: BaseFragment<FragmentMemoBinding>() {
         return view
     }
 
+    override fun onPause() {
+        viewModel.updateMemos(memoAdapter.items())
+
+        super.onPause()
+    }
+
     override fun onDestroy() {
         compositeDisposable.clear()
         super.onDestroy()
@@ -76,6 +83,10 @@ class MemoFragment: BaseFragment<FragmentMemoBinding>() {
                 MemoChangedState.Inserted -> memoAdapter.add(it.memo)
                 MemoChangedState.Updated -> memoAdapter.change(it.memo)
             }
+        })
+
+        viewModel.colorDependingOnBackground.observe(viewLifecycleOwner, {
+            viewBinding.appCompatImageView.setColorFilter(it.onViewPagerColor, PorterDuff.Mode.SRC_IN)
         })
     }
 }

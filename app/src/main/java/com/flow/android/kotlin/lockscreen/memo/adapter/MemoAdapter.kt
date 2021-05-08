@@ -2,6 +2,7 @@ package com.flow.android.kotlin.lockscreen.memo.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.ViewGroup
@@ -24,6 +25,7 @@ class MemoAdapter(
     inner class ViewHolder(private val binding: MemoBinding) : RecyclerView.ViewHolder(binding.root) {
         @SuppressLint("ClickableViewAccessibility")
         fun bind(item: Memo) {
+            binding.viewMemoColor.backgroundTintList = ColorStateList.valueOf(item.color)
             binding.textViewContent.text = item.content
             binding.textViewDate.text = item.modifiedTime.format(binding.root.context)
 
@@ -62,6 +64,8 @@ class MemoAdapter(
         holder.bind(items[position])
     }
 
+    fun items() = items
+
     fun add(item: Memo) {
         items.add(0, item)
         notifyItemInserted(0)
@@ -74,7 +78,7 @@ class MemoAdapter(
         notifyItemRemoved(index)
     }
 
-    // todo deep copy 문제 발생가능함 응 발생함 ㅅㅂ.
+    // todo deep copy 문제 발생가능함 응 발생함 ㅅㅂ. 맞나? 해결했엇나 기억안나넴.
     fun change(item: Memo) {
         val index = items.indexOf(items.find { it.id == item.id })
 

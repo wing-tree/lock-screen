@@ -90,7 +90,6 @@ fun View.fadeIn(duration: Number, onAnimationEnd: (() -> Unit)? = null, alphaFro
             .setDuration(duration.toLong())
             .setListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator?) {
-                    this@fadeIn.visibility = View.VISIBLE
                     onAnimationEnd?.invoke()
                     super.onAnimationEnd(animation)
                 }

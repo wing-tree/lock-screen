@@ -87,6 +87,13 @@ class CalendarFragment: BaseFragment<FragmentCalendarBinding>() {
                 }
             }
         })
+
+        viewModel.colorDependingOnBackground.observe(viewLifecycleOwner, {
+            viewBinding.appCompatImageView.setColorFilter(it.onViewPagerColor, PorterDuff.Mode.SRC_IN)
+            viewBinding.imageViewBack.setColorFilter(it.onViewPagerColor, PorterDuff.Mode.SRC_IN)
+            viewBinding.imageViewForward.setColorFilter(it.onViewPagerColor, PorterDuff.Mode.SRC_IN)
+            viewBinding.textViewDate.setTextColor(it.onViewPagerColor)
+        })
     }
 
     private fun initializeView() {
@@ -109,13 +116,13 @@ class CalendarFragment: BaseFragment<FragmentCalendarBinding>() {
     }
 
     private fun setIconColor() {
-        viewBinding.imageViewBack.setColorFilter(colorHelper.viewPagerRegionColor(), PorterDuff.Mode.SRC_IN)
-        viewBinding.imageViewForward.setColorFilter(colorHelper.viewPagerRegionColor(), PorterDuff.Mode.SRC_IN)
-        viewBinding.appCompatImageView.setColorFilter(colorHelper.viewPagerRegionColor(), PorterDuff.Mode.SRC_IN)
+        viewBinding.imageViewBack.setColorFilter(viewModel.viewPagerRegionColor, PorterDuff.Mode.SRC_IN)
+        viewBinding.imageViewForward.setColorFilter(viewModel.viewPagerRegionColor, PorterDuff.Mode.SRC_IN)
+        viewBinding.appCompatImageView.setColorFilter(viewModel.viewPagerRegionColor, PorterDuff.Mode.SRC_IN)
     }
 
     private fun setTextColor() {
-        viewBinding.textViewDate.setTextColor(colorHelper.viewPagerRegionColor())
+        viewBinding.textViewDate.setTextColor(viewModel.viewPagerRegionColor)
     }
 
     private fun Long.format() = simpleDateFormat.format(this)

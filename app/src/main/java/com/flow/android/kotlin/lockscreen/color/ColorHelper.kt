@@ -1,73 +1,137 @@
 package com.flow.android.kotlin.lockscreen.color
 
-import android.app.Application
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
-import android.view.ViewTreeObserver.*
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 import androidx.palette.graphics.Palette
-import androidx.viewpager2.widget.ViewPager2
 import com.flow.android.kotlin.lockscreen.R
+import com.flow.android.kotlin.lockscreen.preferences.ColorPreferences
+import com.flow.android.kotlin.lockscreen.util.toPx
+import timber.log.Timber
 import kotlin.math.pow
 
-class ColorHelper private constructor(private val application: Application) {
-    private val dark: Int by lazy { ContextCompat.getColor(application, R.color.dark) }
-    private val light: Int by lazy { ContextCompat.getColor(application, R.color.light) }
+object ColorHelper {
+    fun colorDependingOnBackground(context: Context, bitmap: Bitmap, screenWidth: Int): ColorDependingOnBackground {
+        @ColorInt
+        val dark: Int = ContextCompat.getColor(context, R.color.dark)
+        @ColorInt
+        val light: Int = ContextCompat.getColor(context, R.color.light)
 
-    private var viewPagerRegionColor = light
+        val dateTimeBottom = 168.toPx
+        val dateTimeLeft = 24.toPx
+        val dateTimeRight = screenWidth / 2
+        val dateTimeTop = 64.toPx
 
-    fun viewPagerRegionColor() = viewPagerRegionColor
-    fun setViewPagerRegionColor(viewPager2: ViewPager2, bitmap: Bitmap) {
-        viewPager2.viewTreeObserver.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                val bottom = viewPager2.bottom
-                val left = viewPager2.left
-                val right = viewPager2.right
-                val top = viewPager2.top
+        val iconBottom = 72.toPx
+        val iconLeft = screenWidth / 2
+        val iconRight = screenWidth - 24.toPx
+        val iconTop = 48.toPx
 
-                Palette.Builder(bitmap).setRegion(left, top, right, bottom).generate { palette ->
-                    val dominantColor = palette?.getDominantColor(dark) ?: light
+        val tabLayoutBottom = 224.toPx
+        val tabLayoutLeft = 24.toPx
+        val tabLayoutRight = screenWidth - 24.toPx
+        val tabLayoutTop = 168.toPx
 
-                    viewPagerRegionColor = colorDependingOnBackground(dominantColor)
-                }
+        val viewPagerBottom = 324.toPx
+        val viewPagerLeft = 24.toPx
+        val viewPagerRight = screenWidth - 24.toPx
+        val viewPagerTop = 224.toPx
 
-                viewPager2.viewTreeObserver.removeOnGlobalLayoutListener(this)
+        val floatingActionButtonBottom = 380.toPx
+        val floatingActionButtonLeft = screenWidth / 2 - 28.toPx
+        val floatingActionButtonRight = screenWidth / 2 + 28.toPx
+        val floatingActionButtonTop = 324.toPx
+
+        var dateTimeTextColor = light
+        var iconTint = light
+        var tabTextColor = light
+        var onViewPagerColor = light
+        var floatingActionButtonTint = light
+
+        try {
+            val builder = Palette.Builder(bitmap)
+
+            builder.setRegion(
+                    dateTimeLeft,
+                    dateTimeTop,
+                    dateTimeRight,
+                    dateTimeBottom
+            ).generate().also {
+                val dominantColor = it.getDominantColor(dark)
+
+                dateTimeTextColor = colorDependingOnBackground(dominantColor, dark, light)
+                ColorPreferences.putIconTint(context, dateTimeTextColor)
             }
-        })
-    }
 
-    fun setTextColor(textView: TextView, bitmap: Bitmap) {
-        textView.viewTreeObserver.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                val bottom = textView.bottom
-                val left = textView.left
-                val right = textView.right
-                val top = textView.top
+            builder.setRegion(
+                    iconLeft,
+                    iconTop,
+                    iconRight,
+                    iconBottom
+            ).generate().also {
+                val dominantColor = it.getDominantColor(dark)
 
-                // todo; error point
-                Palette.Builder(bitmap).setRegion(left, top, right, bottom).generate { palette ->
-                    val dominantColor = palette?.getDominantColor(dark) ?: light
-                    val textColor = colorDependingOnBackground(dominantColor)
-                    val shadowColor =
-                            if (textColor == dark)
-                                light
-                            else
-                                dark
-
-                    textView.setShadowLayer(4F, 4F, 4F, shadowColor)
-                    textView.setTextColor(textColor)
-                }
-
-                textView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                iconTint = colorDependingOnBackground(dominantColor, dark, light)
+                ColorPreferences.putIconTint(context, iconTint)
             }
-        })
+
+            builder.setRegion(
+                    tabLayoutLeft,
+                    tabLayoutTop,
+                    tabLayoutRight,
+                    tabLayoutBottom
+            ).generate().also {
+                val dominantColor = it.getDominantColor(dark)
+
+                tabTextColor = colorDependingOnBackground(dominantColor, dark, light)
+                ColorPreferences.putIconTint(context, tabTextColor)
+            }
+
+            builder.setRegion(
+                    viewPagerLeft,
+                    viewPagerTop,
+                    viewPagerRight,
+                    viewPagerBottom
+            ).generate().also {
+                val dominantColor = it.getDominantColor(dark)
+
+                onViewPagerColor = colorDependingOnBackground(dominantColor, dark, light)
+                ColorPreferences.putIconTint(context, onViewPagerColor)
+            }
+
+            builder.setRegion(
+                    floatingActionButtonLeft,
+                    floatingActionButtonTop,
+                    floatingActionButtonRight,
+                    floatingActionButtonBottom
+            ).generate().also {
+                val dominantColor = it.getDominantColor(dark)
+
+                floatingActionButtonTint = colorDependingOnBackground(dominantColor, dark, light)
+                ColorPreferences.putIconTint(context, floatingActionButtonTint)
+            }
+        } catch(e: IllegalArgumentException) {
+            Timber.e(e)
+            dateTimeTextColor = ColorPreferences.getDateTimeTextColor(context)
+            iconTint = ColorPreferences.getIconTint(context)
+            tabTextColor = ColorPreferences.getTabTextColor(context)
+            onViewPagerColor = ColorPreferences.getOnViewPagerColor(context)
+            floatingActionButtonTint = ColorPreferences.getFloatingActionButtonTint(context)
+        } finally {
+            return ColorDependingOnBackground(
+                    dateTimeTextColor = dateTimeTextColor,
+                    iconTint = iconTint,
+                    tabTextColor = tabTextColor,
+                    onViewPagerColor = onViewPagerColor,
+                    floatingActionButtonTint = floatingActionButtonTint
+            )
+        }
     }
 
     @ColorInt
-    fun colorDependingOnBackground(@ColorInt colorInt: Int): Int {
+    fun colorDependingOnBackground(@ColorInt colorInt: Int, @ColorInt dark: Int, @ColorInt light: Int): Int {
         var red = Color.red(colorInt) / 255.0
         var green = Color.green(colorInt) / 255.0
         var blue = Color.blue(colorInt) / 255.0
@@ -94,51 +158,17 @@ class ColorHelper private constructor(private val application: Application) {
         else
             light
     }
-
-    companion object {
-        @Volatile
-        private var INSTANCE: ColorHelper? = null
-
-        fun getInstance(application: Application): ColorHelper {
-            synchronized(this) {
-                var instance = INSTANCE
-
-                if (instance == null) {
-                    instance = ColorHelper(application)
-                    INSTANCE = instance
-                }
-
-                return instance
-            }
-        }
-
-        @ColorInt
-        fun colorDependingOnBackground(@ColorInt colorInt: Int, @ColorInt dark: Int, @ColorInt light: Int): Int {
-            var red = Color.red(colorInt) / 255.0
-            var green = Color.green(colorInt) / 255.0
-            var blue = Color.blue(colorInt) / 255.0
-
-            if (red <= 0.03928)
-                red /= 12.92
-            else
-                red = ((red + 0.055) / 1.055).pow(2.4)
-
-            if (green <= 0.03928)
-                green /= 12.92
-            else
-                green = ((green + 0.055) / 1.055).pow(2.4)
-
-            if (blue <= 0.03928)
-                blue /= 12.92
-            else
-                blue = ((red + 0.055) / 1.055).pow(2.4)
-
-            val y = 0.2126 * red + 0.7152 * green + 0.0722 * blue
-
-            return if (y > 0.179)
-                dark
-            else
-                light
-        }
-    }
 }
+
+data class ColorDependingOnBackground(
+        @ColorInt
+        val dateTimeTextColor: Int,
+        @ColorInt
+        var iconTint: Int,
+        @ColorInt
+        var tabTextColor: Int,
+        @ColorInt
+        var onViewPagerColor: Int,
+        @ColorInt
+        var floatingActionButtonTint: Int
+)

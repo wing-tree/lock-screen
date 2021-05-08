@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/rounded_corners"
+    android:backgroundTint="@color/surface">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/text_view_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_medium"
+            android:layout_marginTop="@dimen/spacing_medium"
+            android:textSize="@dimen/text_size_large"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="메모를 삭제합니다." />
+
+        <TextView
+            android:id="@+id/text_view_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_medium"
+            android:layout_marginTop="@dimen/spacing_medium"
+            android:textSize="@dimen/text_size_medium"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_view_title"
+            tools:text="선택한 메모를 삭제하시겠습니까?" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/material_button_cancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="1dp"
+            android:layout_marginTop="@dimen/spacing_medium"
+            android:background="@drawable/rounded_corner_bottom_left"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/memo_editing_dialog_fragment_000"
+            app:layout_constraintEnd_toStartOf="@+id/material_button_confirm"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_view_message" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/material_button_confirm"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="1dp"
+            android:background="@drawable/rounded_corner_bottom_right"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/memo_editing_dialog_fragment_001"
+            app:layout_constraintBottom_toBottomOf="@+id/material_button_cancel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/material_button_cancel"
+            app:layout_constraintTop_toTopOf="@+id/material_button_cancel" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>
