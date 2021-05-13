@@ -11,10 +11,18 @@
 
     <!-- fragment_permission_rationale_dialog -->
     <string name="fragment_permission_rationale_dialog_000">App permissions</string>
-    <string name="fragment_permission_rationale_dialog_001">Confirm</string>
+    <string name="fragment_permission_rationale_dialog_001">Deny</string>
+    <string name="fragment_permission_rationale_dialog_002">Allow</string>
 
     <!-- home -->
     <string name="home_001">It cannot be unlocked with the home key.</string>
+
+    <!-- ConfigurationFragment -->
+    <string name="configuration_fragment_000">Lock setting, Lock type</string>
+
+    <!-- LockScreenConfigurationFragment -->
+    <string name="lock_screen_configuration_fragment_000">Lock setting</string>
+    <string name="lock_screen_configuration_fragment_001">Lock type</string>
 
     <!-- Settings -->
     <string name="calendar">Calendar</string>

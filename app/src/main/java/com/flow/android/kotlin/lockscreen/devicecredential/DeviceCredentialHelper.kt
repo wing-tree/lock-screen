@@ -1,93 +1,44 @@
 package com.flow.android.kotlin.lockscreen.devicecredential
 
 import android.annotation.TargetApi
+import android.app.Activity
 import android.app.KeyguardManager
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Context.KEYGUARD_SERVICE
+import android.hardware.biometrics.BiometricManager.Authenticators.BIOMETRIC_STRONG
+import android.hardware.biometrics.BiometricManager.Authenticators.DEVICE_CREDENTIAL
 import android.hardware.biometrics.BiometricPrompt
 import android.os.Build
 import android.os.CancellationSignal
 import android.provider.Settings
+import android.widget.Toast
+import androidx.annotation.RequiresApi
+import androidx.fragment.app.Fragment
 
 
 object DeviceCredentialHelper {
-    fun confirmDeviceCredential(context: Context) {
+    fun requireUnlock(context: Context): Boolean {
         val keyguardManager = context.getSystemService(KEYGUARD_SERVICE) as KeyguardManager
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                val biometricPrompt = BiometricPrompt.Builder(context)
-                        .setTitle("title")
-                        .setNegativeButton("negative", {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1)
+            return keyguardManager.isDeviceLocked
 
-                        }, { i, j ->
-
-                        }).build()
-
-                biometricPrompt.allowedAuthenticators
-            } else {
-                @Suppress("DEPRECATION")
-                val biometricPrompt = BiometricPrompt.Builder(context)
-                        .setTitle("title")
-                        .setDeviceCredentialAllowed(true)
-                        .build()
-
-                biometricPrompt.authenticate(CancellationSignal(), context.mainExecutor, object : BiometricPrompt.AuthenticationCallback() {
-                    override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult?) {
-                        super.onAuthenticationSucceeded(result)
-                    }
-
-                    override fun onAuthenticationError(errorCode: Int, errString: CharSequence?) {
-                        super.onAuthenticationError(errorCode, errString)
-                    }
-
-                    override fun onAuthenticationHelp(helpCode: Int, helpString: CharSequence?) {
-                        super.onAuthenticationHelp(helpCode, helpString)
-                    }
-
-                    override fun onAuthenticationFailed() {
-                        super.onAuthenticationFailed()
-                    }
-                })
-            }
-        } else {
-            @Suppress("DEPRECATION")
-            val intent = keyguardManager.createConfirmDeviceCredentialIntent("title", "description")
-
-            context.startActivity(intent)
-        }
+        return keyguardManager.isKeyguardLocked
     }
 
-    fun isDeviceScreenLocked(context: Context): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-            isDeviceLocked(context)
-        else
-            isPatternSet(context) || isPassOrPinSet(context)
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun confirmDeviceCredential(activity: Activity, keyguardDismissCallback: KeyguardManager.KeyguardDismissCallback) {
+        val keyguardManager = activity.getSystemService(KeyguardManager::class.java)
+
+        keyguardManager.requestDismissKeyguard(activity, keyguardDismissCallback)
     }
 
-    private fun isPatternSet(context: Context): Boolean {
-        return try {
-            @Suppress("DEPRECATION")
-            val lockPatternEnable: Int = Settings.Secure.getInt(
-                    context.contentResolver,
-                    Settings.Secure.LOCK_PATTERN_ENABLED
-            )
+    fun confirmDeviceCredential(fragment: Fragment) {
+        val keyguardManager = fragment.requireActivity().getSystemService(KEYGUARD_SERVICE) as KeyguardManager
 
-            lockPatternEnable == 1
-        } catch (e: Settings.SettingNotFoundException) {
-            false
-        }
-    }
+        val intent = keyguardManager.createConfirmDeviceCredentialIntent("asdfdsfa", "sasdfdsf")
 
-    private fun isPassOrPinSet(context: Context): Boolean {
-        val keyguardManager = context.getSystemService(KEYGUARD_SERVICE) as KeyguardManager //api 16+
-        return keyguardManager.isKeyguardSecure
-    }
-
-    @TargetApi(23)
-    private fun isDeviceLocked(context: Context): Boolean {
-        val keyguardManager = context.getSystemService(KEYGUARD_SERVICE) as KeyguardManager //api 23+
-        return keyguardManager.isDeviceSecure
+        fragment.startActivityForResult(intent, 1)
     }
 }

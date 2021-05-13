@@ -39,9 +39,6 @@ class ConfigurationFragment: Fragment() {
 
     private val configurationAdapter: ConfigurationAdapter by lazy {
         ConfigurationAdapter(arrayListOf(
-                AdapterItem.SubtitleItem(
-                        subtitle = getString(R.string.lock_screen)
-                ),
                 AdapterItem.SwitchItem(
                         drawable = getDrawable(R.drawable.ic_round_lock_24),
                         isChecked = ConfigurationPreferences.getShowOnLockScreen(requireContext()),

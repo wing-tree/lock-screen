@@ -15,7 +15,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
-import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.flow.android.kotlin.lockscreen.R
@@ -24,7 +23,7 @@ import com.flow.android.kotlin.lockscreen.color.widget.ColorPickerLayout
 import com.flow.android.kotlin.lockscreen.databinding.FragmentMemoEditingDialogBinding
 import com.flow.android.kotlin.lockscreen.datepicker.DatePickerDialogFragment
 import com.flow.android.kotlin.lockscreen.memo.entity.Memo
-import com.flow.android.kotlin.lockscreen.memo.listener.OnMemoChangedListener
+import com.flow.android.kotlin.lockscreen.memo._interface.OnMemoChangedListener
 import com.flow.android.kotlin.lockscreen.util.*
 import java.text.SimpleDateFormat
 import java.util.*

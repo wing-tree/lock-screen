@@ -35,10 +35,33 @@
             app:layout_constraintTop_toBottomOf="@+id/text_view_title" />
 
         <com.google.android.material.button.MaterialButton
-            android:layout_width="match_parent"
+            android:id="@+id/material_button_deny"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="@drawable/rounded_corners_bottom"
+            android:layout_marginEnd="1dp"
+            android:layout_marginTop="@dimen/spacing_medium"
+            android:background="@drawable/rounded_corner_bottom_left"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
             android:text="@string/fragment_permission_rationale_dialog_001"
+            app:layout_constraintEnd_toStartOf="@+id/material_button_allow"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/recycler_view" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/material_button_allow"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="1dp"
+            android:background="@drawable/rounded_corner_bottom_right"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/fragment_permission_rationale_dialog_002"
+            app:layout_constraintBottom_toBottomOf="@+id/material_button_deny"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/material_button_deny"
+            app:layout_constraintTop_toTopOf="@+id/material_button_deny" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </RelativeLayout>

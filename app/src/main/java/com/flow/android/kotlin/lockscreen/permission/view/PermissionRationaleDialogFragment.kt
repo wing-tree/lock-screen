@@ -1,4 +1,4 @@
-package com.flow.android.kotlin.lockscreen.permissionrationale.view
+package com.flow.android.kotlin.lockscreen.permission.view
 
 import android.Manifest
 import android.content.Context
@@ -11,19 +11,27 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
-import androidx.annotation.StringRes
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.base.BaseDialogFragment
 import com.flow.android.kotlin.lockscreen.databinding.FragmentPermissionRationaleDialogBinding
-import com.flow.android.kotlin.lockscreen.permissionrationale.adapter.PermissionRationaleAdapter
+import com.flow.android.kotlin.lockscreen.permission._interface.OnPermissionAllowClickListener
+import com.flow.android.kotlin.lockscreen.permission.adapter.PermissionRationaleAdapter
 
 @RequiresApi(Build.VERSION_CODES.M)
 class PermissionRationaleDialogFragment: BaseDialogFragment<FragmentPermissionRationaleDialogBinding>() {
     private val permissionsDenied = mutableListOf<PermissionRationale>()
+    private var onPermissionAllowClickListener: OnPermissionAllowClickListener? = null
 
     override fun inflate(inflater: LayoutInflater, container: ViewGroup?): FragmentPermissionRationaleDialogBinding {
         return FragmentPermissionRationaleDialogBinding.inflate(inflater, container, false)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        if (context is OnPermissionAllowClickListener)
+            onPermissionAllowClickListener = context
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,6 +81,15 @@ class PermissionRationaleDialogFragment: BaseDialogFragment<FragmentPermissionRa
         viewBinding.recyclerView.apply {
             adapter = PermissionRationaleAdapter(permissionsDenied)
             layoutManager = LinearLayoutManager(requireContext())
+        }
+
+        viewBinding.materialButtonAllow.setOnClickListener {
+            onPermissionAllowClickListener?.onPermissionAllowClick()
+            dismiss()
+        }
+
+        viewBinding.materialButtonDeny.setOnClickListener {
+            dismiss()
         }
 
         return view

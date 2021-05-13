@@ -2,7 +2,7 @@ package com.flow.android.kotlin.lockscreen.main.viewmodel
 
 import android.app.Application
 import android.content.ContentResolver
-import android.graphics.Bitmap
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Parcelable
 import androidx.annotation.ColorInt
@@ -11,8 +11,7 @@ import com.flow.android.kotlin.lockscreen.calendar.CalendarDisplay
 import com.flow.android.kotlin.lockscreen.calendar.CalendarHelper
 import com.flow.android.kotlin.lockscreen.calendar.Event
 import com.flow.android.kotlin.lockscreen.color.ColorDependingOnBackground
-import com.flow.android.kotlin.lockscreen.color.ColorHelper
-import com.flow.android.kotlin.lockscreen.favoriteapp.entity.App
+import com.flow.android.kotlin.lockscreen.shortcut.entity.App
 import com.flow.android.kotlin.lockscreen.memo.entity.Memo
 import com.flow.android.kotlin.lockscreen.preferences.PackageNamePreferences
 import com.flow.android.kotlin.lockscreen.repository.Repository
@@ -20,6 +19,7 @@ import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val contentResolver = application.contentResolver
@@ -102,13 +102,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private fun postFavoriteApps(application: Application) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                _favoriteApps.postValue(PackageNamePreferences.getPackageNames(application).map {
-                    val info = packageManager.getApplicationInfo(it, 0)
-                    val icon = packageManager.getApplicationIcon(info)
-                    val label = packageManager.getApplicationLabel(info).toString()
+                val apps = arrayListOf<App>()
 
-                    App(icon, label, it)
-                })
+                for (packageName in PackageNamePreferences.getPackageNames(application)) {
+                    try {
+                        val info = packageManager.getApplicationInfo(packageName, 0)
+                        val icon = packageManager.getApplicationIcon(info)
+                        val label = packageManager.getApplicationLabel(info).toString()
+
+                        apps.add(App(icon, label, packageName))
+                    } catch (e: PackageManager.NameNotFoundException) {
+                        Timber.e(e)
+                        PackageNamePreferences.removePackageName(application, packageName)
+                    }
+                }
+
+                _favoriteApps.postValue(apps)
             }
         }
     }

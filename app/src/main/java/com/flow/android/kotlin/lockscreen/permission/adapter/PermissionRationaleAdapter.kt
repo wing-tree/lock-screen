@@ -1,19 +1,17 @@
-package com.flow.android.kotlin.lockscreen.permissionrationale.adapter
+package com.flow.android.kotlin.lockscreen.permission.adapter
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.flow.android.kotlin.lockscreen.databinding.PermissionRationaleBinding
-import com.flow.android.kotlin.lockscreen.permissionrationale.view.PermissionRationale
+import com.flow.android.kotlin.lockscreen.permission.view.PermissionRationale
 
 class PermissionRationaleAdapter(private val items: List<PermissionRationale>): RecyclerView.Adapter<PermissionRationaleAdapter.ViewHolder>() {
     private var inflater: LayoutInflater? = null
 
     class ViewHolder private constructor(private val binding: PermissionRationaleBinding): RecyclerView.ViewHolder(binding.root) {
         fun bind(item: PermissionRationale) {
-            val context = binding.root.context
-
             binding.imageViewIcon.setImageResource(item.icon)
             binding.textViewPermission.text = item.permissionName
             binding.textViewRationale.text = item.rationale

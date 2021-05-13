@@ -1,4 +1,4 @@
-package com.flow.android.kotlin.lockscreen.memo.listener
+package com.flow.android.kotlin.lockscreen.memo._interface
 
 import com.flow.android.kotlin.lockscreen.memo.entity.Memo
 

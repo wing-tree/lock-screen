@@ -48,8 +48,9 @@ import com.flow.android.kotlin.lockscreen.main.adapter.FragmentStateAdapter
 import com.flow.android.kotlin.lockscreen.main.torch.Torch
 import com.flow.android.kotlin.lockscreen.main.viewmodel.MainViewModel
 import com.flow.android.kotlin.lockscreen.memo.entity.Memo
-import com.flow.android.kotlin.lockscreen.memo.listener.OnMemoChangedListener
-import com.flow.android.kotlin.lockscreen.permissionrationale.view.PermissionRationaleDialogFragment
+import com.flow.android.kotlin.lockscreen.memo._interface.OnMemoChangedListener
+import com.flow.android.kotlin.lockscreen.permission._interface.OnPermissionAllowClickListener
+import com.flow.android.kotlin.lockscreen.permission.view.PermissionRationaleDialogFragment
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
 import com.flow.android.kotlin.lockscreen.util.fadeIn
 import com.flow.android.kotlin.lockscreen.util.scale
@@ -68,8 +69,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.IOException
 
-
-class MainActivity : AppCompatActivity(), OnMemoChangedListener {
+class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAllowClickListener {
     private val duration = 200L
     private val localBroadcastManager: LocalBroadcastManager by lazy {
         LocalBroadcastManager.getInstance(this)
@@ -98,7 +98,7 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener {
         })
     }
 
-    private val delayMillis = 600L
+    private val delayMillis = 1000L
     private val handler by lazy { Handler(mainLooper) }
     private val checkManageOverlayPermission: Runnable = object : Runnable {
         @TargetApi(23)
@@ -147,16 +147,21 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener {
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
         )
 
-        if (PermissionRationaleDialogFragment.permissionsGranted(this).not()) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (PermissionRationaleDialogFragment.permissionsGranted(this).not()) {
                 PermissionRationaleDialogFragment().also {
                     it.show(supportFragmentManager, it.tag)
                 }
+            } else {
+                startService()
+                setWallpaper()
+                viewModel.postCalendarDisplays()
             }
+        } else {
+            startService()
+            setWallpaper()
+            viewModel.postCalendarDisplays()
         }
-
-        checkManageOverlayPermission()
-        //checkPermission() todo 다이얼로그에 임베드 할 것.
 
         initializeLiveData()
         initializeView()
@@ -353,7 +358,7 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener {
         tab.view.scale(1.0F)
     }
 
-    private fun setWallpaper(readExternalStoragePermissionGranted: Boolean) {
+    private fun setWallpaper() {
         val screenWith = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             val currentWindowMetrics = windowManager.currentWindowMetrics
             val insets = currentWindowMetrics.windowInsets.getInsetsIgnoringVisibility(
@@ -376,42 +381,21 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener {
             displayMetrics.widthPixels
         }
 
-        if (readExternalStoragePermissionGranted) {
-            wallpaper()?.let { wallpaper ->
-                viewBinding.root.background = wallpaper.toDrawable(resources)
+        wallpaper()?.let { wallpaper ->
+            viewBinding.root.background = wallpaper.toDrawable(resources)
 
-                lifecycleScope.launch {
-                    val colorDependingOnBackground: ColorDependingOnBackground
+            lifecycleScope.launch {
+                val colorDependingOnBackground: ColorDependingOnBackground
 
-                    withContext(Dispatchers.IO) {
-                        colorDependingOnBackground = ColorHelper.colorDependingOnBackground(
-                                this@MainActivity,
-                                wallpaper,
-                                screenWith
-                        )
-                    }
-
-                    viewModel.setColorDependingOnBackground(colorDependingOnBackground)
+                withContext(Dispatchers.IO) {
+                    colorDependingOnBackground = ColorHelper.colorDependingOnBackground(
+                            this@MainActivity,
+                            wallpaper,
+                            screenWith
+                    )
                 }
-            }
-        } else {
-            val wallpaperManager = getSystemService(WALLPAPER_SERVICE) as WallpaperManager
 
-            wallpaperManager.builtInDrawable.let {
-                viewBinding.root.background = it
-
-                lifecycleScope.launch {
-                    val colorDependingOnBackground: ColorDependingOnBackground
-
-                    withContext(Dispatchers.IO) {
-                        colorDependingOnBackground = ColorHelper.colorDependingOnBackground(
-                                this@MainActivity,
-                                it.toBitmap(), screenWith
-                        )
-                    }
-
-                    viewModel.setColorDependingOnBackground(colorDependingOnBackground)
-                }
+                viewModel.setColorDependingOnBackground(colorDependingOnBackground)
             }
         }
     }
@@ -453,15 +437,18 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener {
 
                 startActivityForResult(intent, 0)
                 handler.postDelayed(checkManageOverlayPermission, delayMillis)
-            } else {
-                val intent = Intent(applicationContext, LockScreenService::class.java)
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                    startForegroundService(intent)
-                else
-                    startService(intent)
-            }
+            } else
+                startService()
         }
+    }
+
+    private fun startService() {
+        val intent = Intent(applicationContext, LockScreenService::class.java)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            startForegroundService(intent)
+        else
+            startService(intent)
     }
 
     private fun checkPermission() {
@@ -474,7 +461,7 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener {
                         for (grantedPermissionResponse in report.grantedPermissionResponses) {
                             when (grantedPermissionResponse.permissionName) {
                                 Manifest.permission.READ_CALENDAR -> viewModel.postCalendarDisplays()
-                                Manifest.permission.READ_EXTERNAL_STORAGE -> setWallpaper(true)
+                                Manifest.permission.READ_EXTERNAL_STORAGE -> setWallpaper()
                             }
                         }
 
@@ -484,10 +471,12 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener {
                                 }
                                 Manifest.permission.READ_EXTERNAL_STORAGE -> {
                                     // 기본벽지로 로드 후, 토스트, 설정탭에서 설정할수 잇습니다.
-                                    setWallpaper(false)
+                                    // 투명에 화이트 테마로 해야할듯.
                                 }
                             }
                         }
+
+                        checkManageOverlayPermission()
                     }
 
                     override fun onPermissionRationaleShouldBeShown(
@@ -536,6 +525,17 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener {
     }
 
     override fun onMemoUpdated(memo: Memo) {
-        viewModel.updateMemo(memo)
+        viewModel.updateMemo(memo.apply {
+            priority = if (isDone)
+                -System.currentTimeMillis()
+            else
+                modifiedTime
+        })
+    }
+
+    override fun onPermissionAllowClick() {
+        checkPermission()
+        //Toast.makeText(this, "what the fuck.", Toast.LENGTH_SHORT).show()
+        //checkManageOverlayPermission()
     }
 }

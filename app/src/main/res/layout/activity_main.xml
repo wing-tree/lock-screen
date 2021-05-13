@@ -112,8 +112,8 @@
 
         <ImageView
             android:id="@+id/image_view_settings"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:layout_marginEnd="@dimen/spacing_medium"
             android:background="?attr/selectableItemBackgroundBorderless"
             app:layout_constraintBottom_toBottomOf="@+id/image_view_highlight"

@@ -1,4 +1,4 @@
-package com.flow.android.kotlin.lockscreen.favoriteapp.view
+package com.flow.android.kotlin.lockscreen.shortcut.view
 
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -11,8 +11,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.flow.android.kotlin.lockscreen.databinding.FragmentAllAppsBottomSheetDialogBinding
-import com.flow.android.kotlin.lockscreen.favoriteapp.adapter.AppAdapter
-import com.flow.android.kotlin.lockscreen.favoriteapp.entity.App
+import com.flow.android.kotlin.lockscreen.shortcut.adapter.ShortcutAdapter
+import com.flow.android.kotlin.lockscreen.shortcut.entity.App
 import com.flow.android.kotlin.lockscreen.main.viewmodel.MainViewModel
 import com.flow.android.kotlin.lockscreen.preferences.PackageNamePreferences
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -23,7 +23,7 @@ import timber.log.Timber
 
 class AllAppsBottomSheetDialogFragment: BottomSheetDialogFragment() {
     private val viewModel: MainViewModel by activityViewModels()
-    private val appAdapter = AppAdapter { viewModel.addFavoriteApp(it) { app ->
+    private val appAdapter = ShortcutAdapter { viewModel.addFavoriteApp(it) { app ->
         removeApp(app)
     } }
     private val batchSize = 8

@@ -1,4 +1,4 @@
-package com.flow.android.kotlin.lockscreen.favoriteapp.entity
+package com.flow.android.kotlin.lockscreen.shortcut.entity
 
 import android.graphics.drawable.Drawable
 

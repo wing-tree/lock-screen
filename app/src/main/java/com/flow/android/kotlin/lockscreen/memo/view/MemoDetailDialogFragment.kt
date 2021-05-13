@@ -13,18 +13,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
-import androidx.fragment.app.DialogFragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.base.BaseDialogFragment
 import com.flow.android.kotlin.lockscreen.databinding.FragmentMemoDetailDialogBinding
-import com.flow.android.kotlin.lockscreen.memo.listener.OnMemoChangedListener
+import com.flow.android.kotlin.lockscreen.memo._interface.OnMemoChangedListener
 import com.flow.android.kotlin.lockscreen.memo.entity.Memo
 import com.flow.android.kotlin.lockscreen.memo.util.share
 import com.flow.android.kotlin.lockscreen.util.show
 import com.flow.android.kotlin.lockscreen.util.toDateString
 import com.flow.android.kotlin.lockscreen.util.view.ConfirmationDialogFragment
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -144,7 +142,11 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
         }
 
         viewBinding.materialButtonDone.setOnClickListener {
-            onMemoChangedListener?.onMemoUpdated(memo.apply { isDone = isDone.not() })
+            onMemoChangedListener?.onMemoUpdated(memo.apply {
+                isDone = isDone.not()
+            })
+
+            dismiss()
         }
     }
 

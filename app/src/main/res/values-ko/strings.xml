@@ -11,10 +11,17 @@
 
     <!-- fragment_permission_rationale_dialog -->
     <string name="fragment_permission_rationale_dialog_000">앱 권한</string>
-    <string name="fragment_permission_rationale_dialog_001">확인</string>
+    <string name="fragment_permission_rationale_dialog_001">거부</string>
+    <string name="fragment_permission_rationale_dialog_002">허용</string>
 
     <!-- home -->
     <string name="home_001">홈 키로 잠금 해제 할 수 없습니다.</string>
+
+    <!-- ConfigurationFragment -->
+    <string name="configuration_fragment_000">잠금 설정, 잠금 방식</string>
+
+    <!-- LockScreenConfigurationFragment -->
+    <string name="lock_screen_configuration_fragment_000">잠금 설정</string>
 
     <!-- Settings -->
     <string name="calendar">캘린더</string>

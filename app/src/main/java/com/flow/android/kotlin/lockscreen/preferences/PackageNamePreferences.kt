@@ -27,4 +27,14 @@ object PackageNamePreferences {
             sharedPreferences.edit().putStringSet(Key.PackageName, it).apply()
         }
     }
+
+    fun removePackageName(context: Context, packageName: String) {
+        val sharedPreferences = context.getSharedPreferences(Name.PackageName, Context.MODE_PRIVATE)
+        val packageNames = getPackageNames(context).toMutableSet()
+
+        packageNames.also {
+            it.remove(packageName)
+            sharedPreferences.edit().putStringSet(Key.PackageName, it).apply()
+        }
+    }
 }

@@ -131,10 +131,22 @@ object ColorHelper {
     }
 
     @ColorInt
-    fun colorDependingOnBackground(@ColorInt colorInt: Int, @ColorInt dark: Int, @ColorInt light: Int): Int {
+    fun colorDependingOnBackground(
+        @ColorInt colorInt: Int,
+        @ColorInt dark: Int,
+        @ColorInt light: Int,
+        useSimpleFormula: Boolean = true
+    ): Int {
         var red = Color.red(colorInt) / 255.0
         var green = Color.green(colorInt) / 255.0
         var blue = Color.blue(colorInt) / 255.0
+
+        if (useSimpleFormula) {
+            return if (red * 0.299 + green * 0.587 + blue * 0.114 > 186)
+                dark
+            else
+                light
+        }
 
         if (red <= 0.03928)
             red /= 12.92

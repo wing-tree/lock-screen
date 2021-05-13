@@ -3,6 +3,7 @@ package com.flow.android.kotlin.lockscreen.memo.adapter
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.ViewGroup
@@ -14,10 +15,11 @@ import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
 
+
 class MemoAdapter(
-    private val items: ArrayList<Memo>,
-    private val onItemClick: (item: Memo) -> Unit,
-    private val onSwapTouch: (viewHolder: ViewHolder) -> Unit
+        private val items: ArrayList<Memo>,
+        private val onItemClick: (item: Memo) -> Unit,
+        private val onSwapTouch: (viewHolder: ViewHolder) -> Unit
 ) : RecyclerView.Adapter<MemoAdapter.ViewHolder>() {
     private var inflater: LayoutInflater? = null
     private var simpleDateFormat: SimpleDateFormat? = null
@@ -28,6 +30,18 @@ class MemoAdapter(
             binding.viewMemoColor.backgroundTintList = ColorStateList.valueOf(item.color)
             binding.textViewContent.text = item.content
             binding.textViewDate.text = item.modifiedTime.format(binding.root.context)
+
+            if (item.isDone) {
+                binding.textViewContent.apply {
+                    text = item.content
+                    paintFlags = paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                }
+
+                binding.textViewDate.apply {
+                    text = item.modifiedTime.format(binding.root.context)
+                    paintFlags = paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                }
+            }
 
             binding.imageViewSwap.setOnTouchListener { _, event ->
                 when(event.action) {
@@ -80,14 +94,21 @@ class MemoAdapter(
 
     // todo deep copy 문제 발생가능함 응 발생함 ㅅㅂ. 맞나? 해결했엇나 기억안나넴.
     fun change(item: Memo) {
-        val index = items.indexOf(items.find { it.id == item.id })
+        if (item.isDone) {
+            val fromPosition = items.indexOf(items.find { it.id == item.id })
 
-        println("ZIO XIAL: $index")
-        println("ZIO XIAL22: $item")
-        println("ZIO XIAL333: ${items[index]}")
+            notifyItemChanged(fromPosition)
 
-        items[index] = item
-        notifyItemChanged(index)
+            items[fromPosition] = items.last()
+            items[items.count().dec()] = item
+
+            notifyItemMoved(fromPosition, items.count().dec())
+        } else {
+            val index = items.indexOf(items.find { it.id == item.id })
+
+            items[index] = item
+            notifyItemChanged(index)
+        }
     }
 
     fun addAll(list: List<Memo>) {
