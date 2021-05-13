@@ -492,10 +492,11 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
         if (ConfigurationPreferences.getFirstRun(this)) {
             viewModel.insertMemo(
                     Memo(
-                            content = getString(R.string.memo_fragment_000),
-                            color = ContextCompat.getColor(this, R.color.unselected),
-                            modifiedTime = System.currentTimeMillis(),
-                            priority = System.currentTimeMillis()
+                        content = getString(R.string.memo_fragment_000),
+                        color = ContextCompat.getColor(this, R.color.unselected),
+                        id = -20210513L,
+                        modifiedTime = System.currentTimeMillis(),
+                        priority = System.currentTimeMillis()
                     )
             )
 

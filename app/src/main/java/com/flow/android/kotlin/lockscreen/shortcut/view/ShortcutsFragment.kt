@@ -1,10 +1,8 @@
 package com.flow.android.kotlin.lockscreen.shortcut.view
 
 import android.app.KeyguardManager
-import android.content.Context
 import android.content.Intent
 import android.graphics.PorterDuff
-import android.hardware.biometrics.BiometricPrompt
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -16,16 +14,20 @@ import com.flow.android.kotlin.lockscreen.databinding.FragmentFavoriteAppsBindin
 import com.flow.android.kotlin.lockscreen.devicecredential.DeviceCredentialHelper
 import com.flow.android.kotlin.lockscreen.devicecredential.RequireDeviceCredential
 import com.flow.android.kotlin.lockscreen.shortcut.adapter.ShortcutAdapter
+import com.flow.android.kotlin.lockscreen.util.BLANK
 import timber.log.Timber
 
-class ShortcutsFragment: BaseFragment<FragmentFavoriteAppsBinding>(), RequireDeviceCredential {
+class ShortcutsFragment: BaseFragment<FragmentFavoriteAppsBinding>(), RequireDeviceCredential<ShortcutsFragment.Value> {
     override fun inflate(inflater: LayoutInflater, container: ViewGroup?): FragmentFavoriteAppsBinding {
         return FragmentFavoriteAppsBinding.inflate(inflater, container, false)
     }
 
     private val appAdapter = ShortcutAdapter { app ->
-
-        launchApplication(app.packageName)
+        if (DeviceCredentialHelper.requireUnlock(requireContext())) {
+            confirmDeviceCredential(Value(true, app.packageName))
+        } else {
+            launchApplication(app.packageName)
+        }
     }
 
     override fun onCreateView(
@@ -51,7 +53,7 @@ class ShortcutsFragment: BaseFragment<FragmentFavoriteAppsBinding>(), RequireDev
 
         viewBinding.appCompatImageView.setOnClickListener {
             if (DeviceCredentialHelper.requireUnlock(requireContext())) {
-                confirmDeviceCredential()
+                confirmDeviceCredential(Value(false))
             } else {
                 AllAppsBottomSheetDialogFragment().also {
                     it.show(requireActivity().supportFragmentManager, it.tag)
@@ -82,24 +84,45 @@ class ShortcutsFragment: BaseFragment<FragmentFavoriteAppsBinding>(), RequireDev
         intent?.let { startActivity(it) }
     }
 
-    override fun confirmDeviceCredential() {
+    override fun confirmDeviceCredential(value: Value) {
+        val shortcutClicked = value.shortcutClicked
+        val packageName = value.packageName
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             DeviceCredentialHelper.confirmDeviceCredential(requireActivity(), object : KeyguardManager.KeyguardDismissCallback() {
+                override fun onDismissCancelled() {
+                    super.onDismissCancelled()
+                }
+
                 override fun onDismissError() {
                     super.onDismissError()
                 }
 
                 override fun onDismissSucceeded() {
                     super.onDismissSucceeded()
+
+                    if (shortcutClicked)
+                        launchApplication(packageName)
+                    else {
+                        AllAppsBottomSheetDialogFragment().also {
+                            it.show(requireActivity().supportFragmentManager, it.tag)
+                        }
+                    }
                 }
 
-                override fun onDismissCancelled() {
-                    super.onDismissCancelled()
-                }
             })
         } else {
             DeviceCredentialHelper.confirmDeviceCredential(this)
         }
-
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        when(requestCode) {
+            DeviceCredentialHelper.RequestCode.ConfirmDeviceCredential -> showToast("fucking man")
+        }
+    }
+
+    data class Value(val shortcutClicked : Boolean, val packageName: String = BLANK)
 }

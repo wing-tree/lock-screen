@@ -20,8 +20,13 @@
     <!-- ConfigurationFragment -->
     <string name="configuration_fragment_000">잠금 설정, 잠금 방식</string>
 
+    <!-- DeviceCredentialHelper -->
+    <string name="device_credential_helper_000">잠금해제 패턴을 그리세요</string>
+    <string name="device_credential_helper_001">비밀번호 또는 PIN을 입력하세요</string>
+
     <!-- LockScreenConfigurationFragment -->
     <string name="lock_screen_configuration_fragment_000">잠금 설정</string>
+    <string name="lock_screen_configuration_fragment_001">잠금 방식</string>
 
     <!-- Settings -->
     <string name="calendar">캘린더</string>

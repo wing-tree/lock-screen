@@ -12,6 +12,7 @@ import androidx.annotation.ColorInt
 import androidx.core.database.getIntOrNull
 import androidx.core.database.getLongOrNull
 import androidx.core.database.getStringOrNull
+import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.util.BLANK
 import timber.log.Timber
 import java.util.*
@@ -223,7 +224,9 @@ object CalendarHelper {
         val intent = Intent(Intent.ACTION_INSERT)
                 .setData(CalendarContract.Events.CONTENT_URI)
         // todo. set flag action..
-        activity.startActivityForResult(intent, RequestCode.InsertEvent)
+        val chooser = Intent.createChooser(intent, BLANK)
+
+        activity.startActivityForResult(chooser, RequestCode.InsertEvent)
     }
 }
 
