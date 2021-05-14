@@ -15,9 +15,16 @@ import android.provider.Settings
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
+import com.flow.android.kotlin.lockscreen.R
+import com.flow.android.kotlin.lockscreen.util.BLANK
+import timber.log.Timber
 
 
 object DeviceCredentialHelper {
+    object RequestCode {
+        const val ConfirmDeviceCredential = 1309
+    }
+
     fun requireUnlock(context: Context): Boolean {
         val keyguardManager = context.getSystemService(KEYGUARD_SERVICE) as KeyguardManager
 
@@ -36,9 +43,28 @@ object DeviceCredentialHelper {
 
     fun confirmDeviceCredential(fragment: Fragment) {
         val keyguardManager = fragment.requireActivity().getSystemService(KEYGUARD_SERVICE) as KeyguardManager
+        val title = if (lockPatternEnable(fragment.requireContext()))
+            fragment.getString(R.string.device_credential_helper_000)
+        else
+            fragment.getString(R.string.device_credential_helper_001)
 
-        val intent = keyguardManager.createConfirmDeviceCredentialIntent("asdfdsfa", "sasdfdsf")
+        val intent = keyguardManager.createConfirmDeviceCredentialIntent(title, BLANK)
 
-        fragment.startActivityForResult(intent, 1)
+        fragment.startActivityForResult(intent, RequestCode.ConfirmDeviceCredential)
+    }
+
+    private fun lockPatternEnable(context: Context): Boolean {
+        return try {
+            @Suppress("DEPRECATION")
+            val lockPatternEnable: Int = Settings.Secure.getInt(
+                    context.contentResolver,
+                    Settings.Secure.LOCK_PATTERN_ENABLED
+            )
+
+            lockPatternEnable == 1
+        } catch (e: Settings.SettingNotFoundException) {
+            Timber.e(e)
+            false
+        }
     }
 }

@@ -20,6 +20,10 @@
     <!-- ConfigurationFragment -->
     <string name="configuration_fragment_000">Lock setting, Lock type</string>
 
+    <!-- DeviceCredentialHelper -->
+    <string name="device_credential_helper_000">Draw unlock pattern</string>
+    <string name="device_credential_helper_001">Enter password or PIN</string>
+
     <!-- LockScreenConfigurationFragment -->
     <string name="lock_screen_configuration_fragment_000">Lock setting</string>
     <string name="lock_screen_configuration_fragment_001">Lock type</string>

@@ -1,5 +1,5 @@
 package com.flow.android.kotlin.lockscreen.devicecredential
 
-interface RequireDeviceCredential {
-    fun confirmDeviceCredential()
+interface RequireDeviceCredential<T> {
+    fun confirmDeviceCredential(value: T)
 }

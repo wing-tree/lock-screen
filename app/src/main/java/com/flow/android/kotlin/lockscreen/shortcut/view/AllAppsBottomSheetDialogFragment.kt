@@ -73,6 +73,8 @@ class AllAppsBottomSheetDialogFragment: BottomSheetDialogFragment() {
 
                     if (addedPackageNames.contains(packageName))
                         continue
+                    else if (packageName == requireContext().packageName)
+                        continue
 
                     apps.add(
                             App(
