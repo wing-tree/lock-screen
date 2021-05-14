@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
     <uses-permission android:name="android.permission.READ_CALENDAR" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
@@ -33,6 +34,18 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".configuration.view.ConfigurationActivity"
+            android:excludeFromRecents="true"
+            android:screenOrientation="portrait" />
+
         <service android:name=".lockscreen.LockScreenService" />
+
+        <receiver
+            android:name=".devicebootreceiver.DeviceBootReceiver"
+            android:enabled="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>

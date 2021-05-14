@@ -51,14 +51,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _events = MutableLiveData<List<Event>>()
 
-    private val _floatingActionButtonVisibility = MutableLiveData<Int>()
-    val floatingActionButtonVisibility: LiveData<Int>
-        get() = _floatingActionButtonVisibility
-
-    fun setFloatingActionButtonVisibility(visibility: Int) {
-        _floatingActionButtonVisibility.value = visibility
-    }
-
     private val _memoChanged = MutableLiveData<MemoChanged>()
     val memoChanged: LiveData<MemoChanged>
         get() = _memoChanged

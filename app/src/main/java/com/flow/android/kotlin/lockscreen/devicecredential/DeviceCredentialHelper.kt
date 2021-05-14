@@ -19,7 +19,6 @@ import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.util.BLANK
 import timber.log.Timber
 
-
 object DeviceCredentialHelper {
     object RequestCode {
         const val ConfirmDeviceCredential = 1309

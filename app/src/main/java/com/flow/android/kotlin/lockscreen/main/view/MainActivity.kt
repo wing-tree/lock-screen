@@ -39,7 +39,7 @@ import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.calendar.CalendarHelper
 import com.flow.android.kotlin.lockscreen.color.ColorDependingOnBackground
 import com.flow.android.kotlin.lockscreen.color.ColorHelper
-import com.flow.android.kotlin.lockscreen.configuration.view.ConfigurationFragment
+import com.flow.android.kotlin.lockscreen.configuration.view.ConfigurationActivity
 import com.flow.android.kotlin.lockscreen.databinding.ActivityMainBinding
 import com.flow.android.kotlin.lockscreen.home.homewatcher.HomePressedListener
 import com.flow.android.kotlin.lockscreen.home.homewatcher.HomeWatcher
@@ -228,13 +228,6 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
     }
 
     private fun initializeLiveData() {
-        viewModel.floatingActionButtonVisibility.observe(this, { visibility ->
-            if (visibility == VISIBLE)
-                viewBinding.floatingActionButton.show()
-            else if (visibility == GONE)
-                viewBinding.floatingActionButton.hide()
-        })
-
         viewModel.colorDependingOnBackground.observe(this, {
             viewBinding.textClockDate.setTextColor(it.dateTimeTextColor)
             viewBinding.textClockTime.setTextColor(it.dateTimeTextColor)
@@ -281,11 +274,8 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
         }
 
         viewBinding.imageViewSettings.setOnClickListener {
-            ConfigurationFragment().apply {
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container_view, this, tag)
-                    .addToBackStack(null)
-                    .commit()
+            Intent(this, ConfigurationActivity::class.java).also {
+                startActivity(it)
             }
         }
 
