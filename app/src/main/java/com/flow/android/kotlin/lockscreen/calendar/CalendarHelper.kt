@@ -13,11 +13,9 @@ import androidx.core.database.getIntOrNull
 import androidx.core.database.getLongOrNull
 import androidx.core.database.getStringOrNull
 import com.flow.android.kotlin.lockscreen.util.BLANK
-import timber.log.Timber
 import java.util.*
 
 object CalendarHelper {
-
     private object Calendars {
         val projection: Array<String> = arrayOf(
                 CalendarContract.Calendars._ID,
@@ -41,21 +39,10 @@ object CalendarHelper {
         }
     }
 
-    private object Events {
-        val projection: Array<String> = arrayOf(
-                CalendarContract.Events._ID,
-                CalendarContract.Events.TITLE
-        )
-
-        object Index {
-            @Suppress("ObjectPropertyName")
-            const val _ID = 0
-            const val TITLE = 1
-        }
-    }
-
     private object Instances {
         val projection: Array<String> = arrayOf(
+                CalendarContract.Instances._ID,
+                CalendarContract.Instances.ALL_DAY,
                 CalendarContract.Instances.BEGIN,
                 CalendarContract.Instances.CALENDAR_COLOR,
                 CalendarContract.Instances.CALENDAR_DISPLAY_NAME,
@@ -67,15 +54,18 @@ object CalendarHelper {
         )
 
         object Index {
-            const val BEGIN = 0
-            const val CALENDAR_COLOR = 1
-            const val CALENDAR_DISPLAY_NAME = 2
-            const val CALENDAR_ID = 3
-            const val END = 4
-            const val EVENT_ID = 5
+            @Suppress("ObjectPropertyName")
+            const val _ID = 0
+            const val ALL_DAY = 1
+            const val BEGIN = 2
+            const val CALENDAR_COLOR = 3
+            const val CALENDAR_DISPLAY_NAME = 4
+            const val CALENDAR_ID = 5
+            const val END = 6
+            const val EVENT_ID = 7
             @Suppress("SpellCheckingInspection")
-            const val RRULE = 6
-            const val TITLE = 7
+            const val RRULE = 8
+            const val TITLE = 9
         }
     }
 
@@ -84,43 +74,39 @@ object CalendarHelper {
         const val InsertEvent = 2057
     }
 
-    @SuppressLint("Recycle")
     fun calendarDisplays(contentResolver: ContentResolver): List<CalendarDisplay> {
+        val calendarDisplays = mutableListOf<CalendarDisplay>()
         val contentUri = CalendarContract.Calendars.CONTENT_URI
         val cursor = contentResolver.query(
                 contentUri,
                 Calendars.projection,
                 null,
                 null,
-                null)
+                null
+        )
 
-        val calendarDisplays = mutableListOf<CalendarDisplay>()
+        cursor ?: return emptyList()
 
-        cursor?.let {
-            cursor.moveToFirst()
+        cursor.moveToFirst()
 
-            while (cursor.moveToNext()) {
-                @Suppress("LocalVariableName")
-                val _id = cursor.getLong(Calendars.Index._ID)
-                val calendarDisplayName = cursor.getString(Calendars.Index.CALENDAR_DISPLAY_NAME)
-                val isPrimary = cursor.getString(Calendars.Index.IS_PRIMARY)
+        while (cursor.moveToNext()) {
+            @Suppress("LocalVariableName")
+            val _id = cursor.getLong(Calendars.Index._ID)
+            val calendarDisplayName = cursor.getString(Calendars.Index.CALENDAR_DISPLAY_NAME)
+            // val isPrimary = cursor.getString(Calendars.Index.IS_PRIMARY)
 
-                if (isPrimary == "1")
-                    calendarDisplays.add(CalendarDisplay(_id, calendarDisplayName))
-            }
+            // if (isPrimary == "1")
+            calendarDisplays.add(CalendarDisplay(_id, calendarDisplayName))
         }
+
+        cursor.close()
 
         return calendarDisplays
     }
 
     @Suppress("SpellCheckingInspection")
-    @SuppressLint("Recycle")
-    fun instances(contentResolver: ContentResolver, eventId: String, DTSTART: Calendar, DTEND: Calendar): ArrayList<Event>? {
-
+    fun instances(contentResolver: ContentResolver, selection: String, DTSTART: Calendar, DTEND: Calendar): ArrayList<Event>? {
         val events = arrayListOf<Event>()
-
-        val selection = "${CalendarContract.Instances.EVENT_ID} = ?"
-        val selectionArgs: Array<String> = arrayOf(eventId)
 
         val builder: Uri.Builder = CalendarContract.Instances.CONTENT_URI.buildUpon()
         ContentUris.appendId(builder, DTSTART.timeInMillis)
@@ -130,19 +116,39 @@ object CalendarHelper {
                 builder.build(),
                 Instances.projection,
                 selection,
-                selectionArgs,
+                null,
                 null
-        ) ?: return null
+        )
+
+        cursor ?: return null
 
         while (cursor.moveToNext()) {
+            @Suppress("LocalVariableName")
+            val _id = cursor.getLongOrNull(Instances.Index._ID) ?: 0L
+            val allDay = cursor.getIntOrNull(Instances.Index.ALL_DAY) ?: 0
             val begin = cursor.getLongOrNull(Instances.Index.BEGIN) ?: 0L
             val calendarColor = cursor.getIntOrNull(Instances.Index.CALENDAR_COLOR) ?: Color.TRANSPARENT
             val calendarDisplayName = cursor.getStringOrNull(Instances.Index.CALENDAR_DISPLAY_NAME) ?: BLANK
             val calendarId = cursor.getLongOrNull(Instances.Index.CALENDAR_ID) ?: continue
             val end = cursor.getLongOrNull(Instances.Index.END) ?: 0L
-            val id = cursor.getLongOrNull(Instances.Index.EVENT_ID) ?: continue
+            val eventId = cursor.getLongOrNull(Instances.Index.EVENT_ID) ?: continue
             val rrule = cursor.getStringOrNull(Instances.Index.RRULE) ?: BLANK
             val title = cursor.getStringOrNull(Instances.Index.TITLE) ?: BLANK
+
+            if (allDay == 1) {
+                val gregorianCalendar = GregorianCalendar.getInstance().apply {
+                    timeInMillis = DTSTART.timeInMillis
+                }
+
+                val yesterday = gregorianCalendar.apply {
+                    add(GregorianCalendar.DATE, -1)
+                }.time
+
+                if (yesterday.time <= begin && begin <= DTSTART.timeInMillis) {
+                    if (DTSTART.timeInMillis <= end && end <= DTEND.timeInMillis)
+                        continue
+                }
+            }
 
             events.add(Event(
                     begin = begin,
@@ -150,17 +156,20 @@ object CalendarHelper {
                     calendarDisplayName = calendarDisplayName,
                     calendarId = calendarId,
                     end = end,
-                    id = id,
+                    eventId = eventId,
+                    id = _id,
                     rrule = rrule,
                     title = title
             ))
         }
 
+        cursor.close()
+
         return events
     }
 
     @SuppressLint("Recycle")
-    fun events(contentResolver: ContentResolver, calendarDisplays: List<CalendarDisplay>, amount: Int): ArrayList<Event>? {
+    fun events(contentResolver: ContentResolver, calendarDisplays: List<CalendarDisplay>, amount: Int): ArrayList<Event> {
 
         val events = arrayListOf<Event>()
 
@@ -183,28 +192,10 @@ object CalendarHelper {
         DTEND.add(Calendar.DATE, 1)
 
         val string = calendarDisplays.map { it.id }.joinToString(separator = ", ") { "\"$it\"" }
-        val selection = "(${CalendarContract.Events.CALENDAR_ID} IN ($string)) AND " +
-                "(${CalendarContract.Events.DELETED} = 0)"
+        val selection = "(${CalendarContract.Instances.CALENDAR_ID} IN ($string))"
 
-        val cursor = contentResolver.query(
-                CalendarContract.Events.CONTENT_URI,
-                Events.projection,
-                selection,
-                null,
-                null
-        ) ?: return null
-
-        cursor.moveToFirst()
-
-        @Suppress("SpellCheckingInspection")
-        while (cursor.moveToNext()) {
-            @Suppress("LocalVariableName")
-            val _id = cursor.getLongOrNull(Events.Index._ID) ?: continue
-            val title = cursor.getStringOrNull(Events.Index.TITLE) ?: BLANK
-
-            instances(contentResolver, _id.toString(), DTSTART, DTEND)?.let { instances ->
-                events.addAll(instances)
-            }
+        instances(contentResolver, selection, DTSTART, DTEND)?.let { instances ->
+            events.addAll(instances)
         }
 
         return events
@@ -239,6 +230,7 @@ data class Event(
         val calendarDisplayName: String,
         val calendarId: Long,
         val end: Long,
+        val eventId: Long,
         val id: Long,
         @Suppress("SpellCheckingInspection")
         val rrule: String,

@@ -81,7 +81,7 @@ class CalendarFragment: BaseFragment<FragmentCalendarBinding>() {
                             }, i
                     ).also { events ->
                         withContext(Dispatchers.Main) {
-                            events?.let { eventsAdapter.add(it) }
+                            events.let { eventsAdapter.add(it) }
                         }
                     }
                 }
