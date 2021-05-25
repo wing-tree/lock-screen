@@ -1,9 +1,6 @@
 package com.flow.android.kotlin.lockscreen.memo.view
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -12,6 +9,7 @@ import android.provider.CalendarContract
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.flow.android.kotlin.lockscreen.R
@@ -23,6 +21,8 @@ import com.flow.android.kotlin.lockscreen.memo.util.share
 import com.flow.android.kotlin.lockscreen.util.show
 import com.flow.android.kotlin.lockscreen.util.toDateString
 import com.flow.android.kotlin.lockscreen.util.view.ConfirmationDialogFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.dialog.MaterialDialogs
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -84,8 +84,6 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
 
         localBroadcastManager.registerReceiver(localBroadcastReceiver, IntentFilter(Action.Memo))
 
-        dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-
         return view
     }
 
@@ -123,18 +121,22 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
             }
         }
 
-        viewBinding.imageViewShare.setOnClickListener {
-            share(requireContext(), memo)
-        }
-
-        viewBinding.imageViewCalendar.setOnClickListener {
-            insertToCalendar(memo)
-        }
-
         viewBinding.imageViewEdit.setOnClickListener {
             MemoEditingDialogFragment.getInstance(memo).also {
                 it.show(requireActivity().supportFragmentManager, it.tag)
             }
+        }
+
+        viewBinding.imageViewMoreVert.setOnClickListener {
+            val items = resources.getStringArray(R.array.memo_detail_dialog_fragment_005)
+
+            MaterialAlertDialogBuilder(requireContext()).setItems(items) { _: DialogInterface, i: Int ->
+                when(i) {
+                    0 -> insertToCalendar(memo)
+                    1 -> share(requireContext(), memo)
+                    2 -> { /* notification. */ }
+                }
+            }.show()
         }
 
         viewBinding.materialButtonClose.setOnClickListener {

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">잠금 화면</string>
+    <string name="app_name">잠금화면</string>
 
     <string name="today">오늘</string>
 
@@ -17,12 +17,25 @@
     <!-- home -->
     <string name="home_001">홈 키로 잠금 해제 할 수 없습니다.</string>
 
-    <!-- ConfigurationFragment -->
-    <string name="configuration_fragment_000">잠금 설정, 잠금 방식</string>
+    <!-- ConfigurationActivity -->
+    <string name="configuration_activity_000">잠금 설정, 잠금 방식</string>
+    <string name="configuration_activity_001">디스플레이</string>
+    <string name="configuration_activity_002">다크 모드, 잠금화면 글자 색상</string>
+    <string name="configuration_activity_003">잠금화면</string>
 
     <!-- DeviceCredentialHelper -->
     <string name="device_credential_helper_000">잠금해제 패턴을 그리세요</string>
     <string name="device_credential_helper_001">비밀번호 또는 PIN을 입력하세요</string>
+
+    <!-- DisplayConfigurationFragment -->
+    <string name="display_configuration_fragment_000">다크 모드</string>
+    <string name="display_configuration_fragment_001">잠금화면 글자 색상</string>
+
+    <string-array name="display_configuration_fragment_002">
+        <item>블랙</item>
+        <item>화이트</item>
+        <item>배경화면에 따라</item>
+    </string-array>
 
     <!-- LockScreenConfigurationFragment -->
     <string name="lock_screen_configuration_fragment_000">잠금 설정</string>
@@ -31,8 +44,8 @@
     <!-- Settings -->
     <string name="calendar">캘린더</string>
     <string name="display_after_unlocking">잠금 해제 후 표시</string>
-    <string name="lock_screen">잠금 화면</string>
-    <string name="show_on_lock_screen">잠금 화면에 표시</string>
+    <string name="lock_screen">잠금화면</string>
+    <string name="show_on_lock_screen">잠금화면에 표시</string>
 
     <!-- MainActivity -->
     <string name="main_activity_000">캘린더</string>
@@ -45,7 +58,12 @@
     <string name="memo_detail_dialog_fragment_002">메모를 삭제할까요?</string>
     <string name="memo_detail_dialog_fragment_003">취소</string>
     <string name="memo_detail_dialog_fragment_004">삭제</string>
-    메모를 삭제할까요?
+
+    <string-array name="memo_detail_dialog_fragment_005">
+        <item>캘린더</item>
+        <item>공유</item>
+        <item>알림 표시</item>
+    </string-array>
 
     <!-- MemoEditingDialogFragment -->
     <string name="memo_editing_dialog_fragment_000">취소</string>

@@ -7,9 +7,16 @@
 
     <color name="unselected">@color/white</color>
 
+    <color name="high_emphasis">#DEFFFFFF</color>
+    <color name="medium_emphasis">#99FFFFFF</color>
+    <color name="disabled">#61FFFFFF</color>
+
+    <color name="active">#DEFFFFFF</color>
+    <color name="inactive">#99FFFFFF</color>
+
     <color name="header_background">@color/grey_800</color>
     <color name="material_button_background_tint">@color/grey_800</color>
 
-    <color name="button_text_disabled">@color/disabled_text</color>
+    <color name="button_text_disabled">@color/disabled</color>
     <color name="button_text_enabled">@color/white</color>
 </resources>

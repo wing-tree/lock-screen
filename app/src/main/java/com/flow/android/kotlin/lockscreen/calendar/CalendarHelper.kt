@@ -8,6 +8,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.provider.CalendarContract
+import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.ColorInt
 import androidx.core.database.getIntOrNull
 import androidx.core.database.getLongOrNull
@@ -68,6 +69,8 @@ object CalendarHelper {
             const val TITLE = 9
         }
     }
+
+    const val ExtraName = "com.flow.android.kotlin.lockscreen.calendar.CalendarHelper.ExtraName"
 
     object RequestCode {
         const val EditEvent = 2056
@@ -201,22 +204,12 @@ object CalendarHelper {
         return events
     }
 
-    fun editEvent(activity: Activity, event: Event) {
-        val uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, event.id)
-        val intent = Intent(Intent.ACTION_INSERT)
-                .setData(uri)
-
-        // todo. consider add some flag.
-        activity.startActivityForResult(intent, RequestCode.EditEvent)
+    fun editEvent(activityResultLauncher: ActivityResultLauncher<Event?>, event: Event) {
+        activityResultLauncher.launch(event)
     }
 
-    fun insertEvent(activity: Activity) {
-        val intent = Intent(Intent.ACTION_INSERT)
-                .setData(CalendarContract.Events.CONTENT_URI)
-        // todo. set flag action..
-        val chooser = Intent.createChooser(intent, BLANK)
-
-        activity.startActivityForResult(chooser, RequestCode.InsertEvent)
+    fun insertEvent(activityResultLauncher: ActivityResultLauncher<Event?>) {
+        activityResultLauncher.launch(null)
     }
 }
 

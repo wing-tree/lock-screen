@@ -17,12 +17,25 @@
     <!-- home -->
     <string name="home_001">It cannot be unlocked with the home key.</string>
 
-    <!-- ConfigurationFragment -->
-    <string name="configuration_fragment_000">Lock setting, Lock type</string>
+    <!-- ConfigurationActivity -->
+    <string name="configuration_activity_000">Lock setting, Lock type</string>
+    <string name="configuration_activity_001">Display</string>
+    <string name="configuration_activity_002">Dark mode, Lock screen text color</string>
+    <string name="configuration_activity_003">Lock screen</string>
 
     <!-- DeviceCredentialHelper -->
     <string name="device_credential_helper_000">Draw unlock pattern</string>
     <string name="device_credential_helper_001">Enter password or PIN</string>
+
+    <!-- DisplayConfigurationFragment -->
+    <string name="display_configuration_fragment_000">Dark mode</string>
+    <string name="display_configuration_fragment_001">Lock screen text color</string>
+
+    <string-array name="display_configuration_fragment_002">
+        <item>Black</item>
+        <item>White</item>
+        <item>Depending on the wallpaper</item>
+    </string-array>
 
     <!-- LockScreenConfigurationFragment -->
     <string name="lock_screen_configuration_fragment_000">Lock setting</string>
@@ -45,6 +58,12 @@
     <string name="memo_detail_dialog_fragment_002">Delete memo?</string>
     <string name="memo_detail_dialog_fragment_003">Cancel</string>
     <string name="memo_detail_dialog_fragment_004">Delete</string>
+
+    <string-array name="memo_detail_dialog_fragment_005">
+        <item>Calendar</item>
+        <item>Share</item>
+        <item>Show notification</item>
+    </string-array>
 
     <!-- MemoEditingDialogFragment -->
     <string name="memo_editing_dialog_fragment_000">Cancel</string>

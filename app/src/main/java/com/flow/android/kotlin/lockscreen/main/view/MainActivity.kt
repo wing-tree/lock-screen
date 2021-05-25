@@ -22,7 +22,6 @@ import android.util.DisplayMetrics
 import android.util.Size
 import android.view.View
 import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.ImageView
@@ -87,11 +86,17 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
     private val homeWatcher = HomeWatcher(this).apply {
         setOnHomePressedListener(object : HomePressedListener {
             override fun onHomeKeyPressed() {
+                if (isFinishing)
+                    return
+
                 localBroadcastManager.sendBroadcastSync(Intent(LockScreenService.Action.HomeKeyPressed))
                 finish()
             }
 
             override fun onRecentAppsPressed() {
+                if (isFinishing)
+                    return
+
                 localBroadcastManager.sendBroadcastSync(Intent(LockScreenService.Action.RecentAppsPressed))
                 finish()
             }
@@ -208,11 +213,13 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
                 CalendarHelper.RequestCode.EditEvent -> {
                     data ?: return
 
-                    viewModel.calendarDisplays()?.let { calendarDisplays ->
-//                        CalendarHelper.events(contentResolver, calendarDisplays).also { events ->
-//                            events?.let { viewModel.submitEvents(it) }
+                    viewModel.callRefreshEvents()
+
+//                    viewModel.calendarDisplays()?.let { calendarDisplays ->
+//                        CalendarHelper.events(contentResolver, calendarDisplays, 0).also { events ->
+//                            events.let { viewModel.submitEvents(it) }
 //                        }
-                    }
+//                    }
                 }
                 CalendarHelper.RequestCode.InsertEvent -> {
                     data ?: return
@@ -378,7 +385,7 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
                 val colorDependingOnBackground: ColorDependingOnBackground
 
                 withContext(Dispatchers.IO) {
-                    colorDependingOnBackground = ColorHelper.colorDependingOnBackground(
+                    colorDependingOnBackground = ColorHelper.colorDependingOnWallpaper(
                             this@MainActivity,
                             wallpaper,
                             screenWith
@@ -425,7 +432,7 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
                 val uri = Uri.fromParts("package", packageName, null)
                 val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, uri)
 
-                startActivityForResult(intent, 0)
+                startActivity(intent)
                 handler.postDelayed(checkManageOverlayPermission, delayMillis)
             } else
                 startService()

@@ -6,9 +6,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.flow.android.kotlin.lockscreen.databinding.ShortcutBinding
 import com.flow.android.kotlin.lockscreen.shortcut.entity.App
-import com.flow.android.kotlin.lockscreen.util.diff
 
-class ShortcutAdapter(private val onItemClick: (app: App) -> Unit): RecyclerView.Adapter<ShortcutAdapter.ViewHolder>() {
+class AppAdapter(private val onItemClick: (app: App) -> Unit): RecyclerView.Adapter<AppAdapter.ViewHolder>() {
     private val apps = arrayListOf<App>()
     private var layoutInflater: LayoutInflater? = null
 
@@ -16,15 +15,6 @@ class ShortcutAdapter(private val onItemClick: (app: App) -> Unit): RecyclerView
         val positionStart = apps.count()
         apps.addAll(list)
         notifyItemRangeInserted(positionStart, list.count())
-    }
-
-    fun submit(list: List<App>) {
-        val diff = apps.diff(list)
-
-        apps.addAll(diff.first)
-        apps.removeAll(diff.second)
-
-        notifyDataSetChanged()
     }
 
     fun remove(app: App) {

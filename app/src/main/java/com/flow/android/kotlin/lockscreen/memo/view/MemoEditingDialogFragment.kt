@@ -139,9 +139,14 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
         initializeView(memo)
         localBroadcastManager.registerReceiver(localBroadcastReceiver, IntentFilter(Action.Date))
 
-        dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-
         return view
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        if (mode == Mode.Edit)
+            dialog?.window?.setWindowAnimations(R.style.WindowAnimation_DialogFragment_Null)
     }
 
     override fun onDestroyView() {

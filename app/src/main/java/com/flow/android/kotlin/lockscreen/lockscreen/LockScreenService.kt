@@ -130,7 +130,7 @@ class LockScreenService : Service() {
 
             notificationChannel.description = CHANNEL_DESCRIPTION
             notificationChannel.setShowBadge(false)
-
+            
             notificationManager.createNotificationChannel(notificationChannel)
         }
 

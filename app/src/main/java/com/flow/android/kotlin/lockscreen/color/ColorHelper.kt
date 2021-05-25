@@ -13,7 +13,7 @@ import timber.log.Timber
 import kotlin.math.pow
 
 object ColorHelper {
-    fun colorDependingOnBackground(context: Context, bitmap: Bitmap, screenWidth: Int): ColorDependingOnBackground {
+    fun colorDependingOnWallpaper(context: Context, wallpaper: Bitmap, screenWidth: Int): ColorDependingOnBackground {
         @ColorInt
         val dark: Int = ContextCompat.getColor(context, R.color.dark)
         @ColorInt
@@ -51,7 +51,7 @@ object ColorHelper {
         var floatingActionButtonTint = light
 
         try {
-            val builder = Palette.Builder(bitmap)
+            val builder = Palette.Builder(wallpaper)
 
             builder.setRegion(
                     dateTimeLeft,
@@ -61,7 +61,7 @@ object ColorHelper {
             ).generate().also {
                 val dominantColor = it.getDominantColor(dark)
 
-                dateTimeTextColor = colorDependingOnBackground(dominantColor, dark, light)
+                dateTimeTextColor = colorDependingOnWallpaper(dominantColor, dark, light)
                 ColorPreferences.putIconTint(context, dateTimeTextColor)
             }
 
@@ -73,7 +73,7 @@ object ColorHelper {
             ).generate().also {
                 val dominantColor = it.getDominantColor(dark)
 
-                iconTint = colorDependingOnBackground(dominantColor, dark, light)
+                iconTint = colorDependingOnWallpaper(dominantColor, dark, light)
                 ColorPreferences.putIconTint(context, iconTint)
             }
 
@@ -85,7 +85,7 @@ object ColorHelper {
             ).generate().also {
                 val dominantColor = it.getDominantColor(dark)
 
-                tabTextColor = colorDependingOnBackground(dominantColor, dark, light)
+                tabTextColor = colorDependingOnWallpaper(dominantColor, dark, light)
                 ColorPreferences.putIconTint(context, tabTextColor)
             }
 
@@ -97,7 +97,7 @@ object ColorHelper {
             ).generate().also {
                 val dominantColor = it.getDominantColor(dark)
 
-                onViewPagerColor = colorDependingOnBackground(dominantColor, dark, light)
+                onViewPagerColor = colorDependingOnWallpaper(dominantColor, dark, light)
                 ColorPreferences.putIconTint(context, onViewPagerColor)
             }
 
@@ -109,7 +109,7 @@ object ColorHelper {
             ).generate().also {
                 val dominantColor = it.getDominantColor(dark)
 
-                floatingActionButtonTint = colorDependingOnBackground(dominantColor, dark, light)
+                floatingActionButtonTint = colorDependingOnWallpaper(dominantColor, dark, light)
                 ColorPreferences.putIconTint(context, floatingActionButtonTint)
             }
         } catch(e: IllegalArgumentException) {
@@ -131,7 +131,7 @@ object ColorHelper {
     }
 
     @ColorInt
-    fun colorDependingOnBackground(
+    fun colorDependingOnWallpaper(
         @ColorInt colorInt: Int,
         @ColorInt dark: Int,
         @ColorInt light: Int,

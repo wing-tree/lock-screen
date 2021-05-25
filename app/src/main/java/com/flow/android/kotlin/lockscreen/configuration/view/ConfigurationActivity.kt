@@ -1,10 +1,8 @@
 package com.flow.android.kotlin.lockscreen.configuration.view
 
-import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.calendar.CalendarHelper
@@ -13,8 +11,11 @@ import com.flow.android.kotlin.lockscreen.configuration.adapter.AdapterItem
 import com.flow.android.kotlin.lockscreen.configuration.adapter.CheckBoxAdapter
 import com.flow.android.kotlin.lockscreen.configuration.adapter.CheckBoxItem
 import com.flow.android.kotlin.lockscreen.configuration.adapter.ConfigurationAdapter
+import com.flow.android.kotlin.lockscreen.configuration.calendar.view.CalendarConfigurationFragment
+import com.flow.android.kotlin.lockscreen.configuration.display.view.DisplayConfigurationFragment
+import com.flow.android.kotlin.lockscreen.configuration.lockscreen.view.LockScreenConfigurationFragment
 import com.flow.android.kotlin.lockscreen.databinding.ActivityConfigurationBinding
-import com.flow.android.kotlin.lockscreen.lockscreen.LockScreenService
+import com.flow.android.kotlin.lockscreen.util.BLANK
 
 class ConfigurationActivity: AppCompatActivity() {
     private var _viewBinding: ActivityConfigurationBinding? = null
@@ -25,53 +26,31 @@ class ConfigurationActivity: AppCompatActivity() {
     private val checkBoxAdapter = CheckBoxAdapter(arrayListOf())
     //private val viewModel: MainViewModel by activityViewModels() // todo. 그냥 preferences에서 받아올 것. 액트 종료시, 맞춰 업뎃.
 
-    private object Id {
-        const val DisplayAfterUnlocking = 2249L
-    }
-
     private val configurationAdapter: ConfigurationAdapter by lazy {
         ConfigurationAdapter(arrayListOf(
-                AdapterItem.SwitchItem(
-                        drawable = getDrawable(R.drawable.ic_round_lock_24),
-                        isChecked = ConfigurationPreferences.getShowOnLockScreen(this),
-                        onCheckedChange = { isChecked ->
-                            ConfigurationPreferences.putShowOnLockScreen(this, isChecked)
-
-                            if (isChecked) {
-                                configurationAdapter.showItem(Id.DisplayAfterUnlocking)
-
-                                val intent = Intent(this, LockScreenService::class.java)
-
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                                    startForegroundService(intent)
-                                else
-                                    startService(intent)
-                            } else {
-                                configurationAdapter.hideItem(Id.DisplayAfterUnlocking)
-                                sendBroadcast(Intent(LockScreenService.Action.StopSelf))
-                            }
-                        },
-                        title = getString(R.string.show_on_lock_screen)
-                ),
-                AdapterItem.SwitchItem(
+                AdapterItem.Item(
                         drawable = null,
-                        id = Id.DisplayAfterUnlocking,
-                        isChecked = ConfigurationPreferences.getDisplayAfterUnlocking(this),
-                        onCheckedChange = { isChecked ->
-                            ConfigurationPreferences.putDisplayAfterUnlocking(this, isChecked)
+                        description = BLANK,
+                        onClick = { _, _ ->
+                            addFragment(CalendarConfigurationFragment())
                         },
-                        title = getString(R.string.display_after_unlocking)
+                        title = getString(R.string.calendar)
                 ),
-                AdapterItem.SubtitleItem (
-                        subtitle = getString(R.string.calendar)
-                ),
-                AdapterItem.ListItem(
-                        adapter = checkBoxAdapter,
-                        drawable = ContextCompat.getDrawable(this, R.drawable.ic_round_today_24),
-                        onClick = { listItemBinding, listItem ->
-
+                AdapterItem.Item(
+                        drawable = null,
+                        description = getString(R.string.configuration_activity_002),
+                        onClick = { _, _ ->
+                            addFragment(DisplayConfigurationFragment())
                         },
-                        title = getString(R.string.calendar),
+                        title = getString(R.string.configuration_activity_001)
+                ),
+                AdapterItem.Item(
+                        drawable = null,
+                        description = getString(R.string.configuration_activity_000),
+                        onClick = { _, _ ->
+                            addFragment(LockScreenConfigurationFragment())
+                        },
+                        title = getString(R.string.configuration_activity_003)
                 )
         ))
     }
@@ -101,5 +80,18 @@ class ConfigurationActivity: AppCompatActivity() {
         }
 
         checkBoxAdapter.addAll(checkBoxItems)
+    }
+
+    private fun addFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction()
+                .addToBackStack(null)
+                .setCustomAnimations(
+                        R.anim.slide_in_right,
+                        R.anim.slide_out_left,
+                        R.anim.slide_in_left,
+                        R.anim.slide_out_right
+                )
+                .add(R.id.fragment_container_view, fragment, fragment.tag)
+                .commit()
     }
 }

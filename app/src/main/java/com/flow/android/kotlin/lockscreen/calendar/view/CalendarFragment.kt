@@ -12,6 +12,7 @@ import com.flow.android.kotlin.lockscreen.base.BaseFragment
 import com.flow.android.kotlin.lockscreen.calendar.CalendarHelper
 import com.flow.android.kotlin.lockscreen.databinding.FragmentCalendarBinding
 import com.flow.android.kotlin.lockscreen.calendar.adapter.EventsAdapter
+import com.flow.android.kotlin.lockscreen.calendar.contract.CalendarContract
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -24,8 +25,15 @@ class CalendarFragment: BaseFragment<FragmentCalendarBinding>() {
         return FragmentCalendarBinding.inflate(inflater, container, false)
     }
 
+    private val activityResultLauncher = registerForActivityResult(CalendarContract()) { result ->
+        when(result) {
+            CalendarHelper.RequestCode.EditEvent -> { viewModel.callRefreshEvents() }
+            CalendarHelper.RequestCode.InsertEvent -> { viewModel.callRefreshEvents() }
+        }
+    }
+
     private val eventsAdapter = EventsAdapter(arrayListOf()) {
-        CalendarHelper.editEvent(requireActivity(), it)
+        CalendarHelper.editEvent(activityResultLauncher, it)
     }
 
     private val itemCount = 7
@@ -94,11 +102,34 @@ class CalendarFragment: BaseFragment<FragmentCalendarBinding>() {
             viewBinding.imageViewForward.setColorFilter(it.onViewPagerColor, PorterDuff.Mode.SRC_IN)
             viewBinding.textViewDate.setTextColor(it.onViewPagerColor)
         })
+
+        viewModel.refreshEvents.observe(viewLifecycleOwner, {
+            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                val uncheckedCalendarIds = ConfigurationPreferences.getUncheckedCalendarIds(requireContext())
+
+                eventsAdapter.clear()
+
+                for (i in 0..itemCount) {
+                    CalendarHelper.events(
+                            viewModel.contentResolver(),
+                            viewModel.calendarDisplays()!!.filter {
+                                uncheckedCalendarIds.contains(it.id.toString()).not()
+                            }, i
+                    ).also { events ->
+                        events.let { eventsAdapter.add(it, false) }
+                    }
+                }
+
+                withContext(Dispatchers.Main) {
+                    eventsAdapter.notifyDataSetChanged()
+                }
+            }
+        })
     }
 
     private fun initializeView() {
         viewBinding.appCompatImageView.setOnClickListener {
-            CalendarHelper.insertEvent(requireActivity())
+            CalendarHelper.insertEvent(activityResultLauncher)
         }
 
         viewBinding.viewPager2.adapter = eventsAdapter

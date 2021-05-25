@@ -22,6 +22,15 @@
         <item name="materialButtonStyle">@style/MaterialButton</item>
     </style>
 
+    <style name="Theme.ConfigurationActivity" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:windowAnimationStyle">@style/WindowAnimation.ConfigurationActivity</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowDisablePreview">true</item>
+        <item name="android:windowIsTranslucent">false</item>
+
+        <item name="materialButtonStyle">@style/MaterialButton</item>
+    </style>
+
     <style name="TextAppearance.Tab" parent="TextAppearance.Design.Tab">
         <item name="android:textSize">@dimen/text_size_medium</item>
         <item name="android:textStyle">bold</item>
@@ -35,6 +44,16 @@
     <style name="WindowAnimation.DialogFragment">
         <item name="android:windowEnterAnimation">@anim/short_fade_in</item>
         <item name="android:windowExitAnimation">@anim/short_fade_out</item>
+    </style>
+
+    <style name="WindowAnimation.ConfigurationActivity">
+        <item name="android:windowEnterAnimation">@android:anim/slide_in_left</item>
+        <item name="android:windowExitAnimation">@android:anim/slide_out_right</item>
+    </style>
+
+    <style name="WindowAnimation.DialogFragment.Null">
+        <item name="android:windowEnterAnimation">@null</item>
+        <item name="android:windowExitAnimation">@null</item>
     </style>
 
     <style name="MaterialButton" parent="Widget.MaterialComponents.Button">

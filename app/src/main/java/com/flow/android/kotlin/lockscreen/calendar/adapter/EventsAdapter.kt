@@ -10,9 +10,15 @@ import com.flow.android.kotlin.lockscreen.databinding.EventsItemBinding
 class EventsAdapter(private val eventsList: ArrayList<List<Event>>, private val onItemClick: (item: Event) -> Unit): RecyclerView.Adapter<EventsAdapter.ViewHolder>() {
     private var inflater: LayoutInflater? = null
 
-    fun add(list: List<Event>) {
+    fun add(list: List<Event>, notifyItemInserted: Boolean = true) {
         eventsList.add(list)
-        notifyItemInserted(itemCount.dec())
+
+        if (notifyItemInserted)
+            notifyItemInserted(itemCount.dec())
+    }
+
+    fun clear() {
+        eventsList.clear()
     }
 
     class ViewHolder private constructor(

@@ -2,6 +2,7 @@ package com.flow.android.kotlin.lockscreen.shortcut.view
 
 import android.app.KeyguardManager
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.PorterDuff
 import android.os.Build
 import android.os.Bundle
@@ -13,7 +14,10 @@ import com.flow.android.kotlin.lockscreen.base.BaseFragment
 import com.flow.android.kotlin.lockscreen.databinding.FragmentFavoriteAppsBinding
 import com.flow.android.kotlin.lockscreen.devicecredential.DeviceCredentialHelper
 import com.flow.android.kotlin.lockscreen.devicecredential.RequireDeviceCredential
-import com.flow.android.kotlin.lockscreen.shortcut.adapter.ShortcutAdapter
+import com.flow.android.kotlin.lockscreen.shortcut.adapter.AppAdapter
+import com.flow.android.kotlin.lockscreen.shortcut.adapter.DisplayShortcutAdapter
+import com.flow.android.kotlin.lockscreen.shortcut.entity.App
+import com.flow.android.kotlin.lockscreen.shortcut.entity.DisplayShortcut
 import com.flow.android.kotlin.lockscreen.util.BLANK
 import timber.log.Timber
 
@@ -22,11 +26,13 @@ class ShortcutsFragment: BaseFragment<FragmentFavoriteAppsBinding>(), RequireDev
         return FragmentFavoriteAppsBinding.inflate(inflater, container, false)
     }
 
-    private val appAdapter = ShortcutAdapter { app ->
+    private val packageManager by lazy { requireContext().packageManager }
+
+    private val displayShortcutAdapter = DisplayShortcutAdapter {
         if (DeviceCredentialHelper.requireUnlock(requireContext())) {
-            confirmDeviceCredential(Value(true, app.packageName))
+            confirmDeviceCredential(Value(true, it.packageName))
         } else {
-            launchApplication(app.packageName)
+            launchApplication(it.packageName)
         }
     }
 
@@ -40,7 +46,7 @@ class ShortcutsFragment: BaseFragment<FragmentFavoriteAppsBinding>(), RequireDev
         viewBinding.recyclerView.apply {
             setHasFixedSize(true)
             layoutManager = GridLayoutManager(requireContext(), 4)
-            adapter = appAdapter
+            adapter = displayShortcutAdapter
         }
 
         initializeLiveData()
@@ -63,8 +69,24 @@ class ShortcutsFragment: BaseFragment<FragmentFavoriteAppsBinding>(), RequireDev
     }
 
     private fun initializeLiveData() {
-        viewModel.favoriteApps.observe(viewLifecycleOwner, {
-            appAdapter.submit(it)
+        viewModel.shortcuts.observe(viewLifecycleOwner, {
+            val displayShortcuts = arrayListOf<DisplayShortcut>()
+
+            for (shortcut in it) {
+                try {
+                    val packageName = shortcut.packageName
+                    val info = packageManager.getApplicationInfo(packageName, 0)
+                    val icon = packageManager.getApplicationIcon(info)
+                    val label = packageManager.getApplicationLabel(info).toString()
+
+                    displayShortcuts.add(DisplayShortcut(icon, label, packageName, shortcut))
+                } catch (e: PackageManager.NameNotFoundException) {
+                    Timber.e(e)
+                    viewModel.deleteShortcut(shortcut) {  }
+                }
+            }
+
+            displayShortcutAdapter.submitList(displayShortcuts)
         })
 
         viewModel.colorDependingOnBackground.observe(viewLifecycleOwner, {
@@ -81,7 +103,10 @@ class ShortcutsFragment: BaseFragment<FragmentFavoriteAppsBinding>(), RequireDev
             Timber.e(ignored)
         }
 
-        intent?.let { startActivity(it) }
+        intent?.let {
+            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            startActivity(it)
+        }
     }
 
     override fun confirmDeviceCredential(value: Value) {

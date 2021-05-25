@@ -36,7 +36,8 @@
 
         <activity android:name=".configuration.view.ConfigurationActivity"
             android:excludeFromRecents="true"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.ConfigurationActivity" />
 
         <service android:name=".lockscreen.LockScreenService" />
 

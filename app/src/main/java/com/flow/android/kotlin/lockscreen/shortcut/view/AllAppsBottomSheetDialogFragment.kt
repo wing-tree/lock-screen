@@ -11,10 +11,10 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.flow.android.kotlin.lockscreen.databinding.FragmentAllAppsBottomSheetDialogBinding
-import com.flow.android.kotlin.lockscreen.shortcut.adapter.ShortcutAdapter
+import com.flow.android.kotlin.lockscreen.shortcut.adapter.AppAdapter
 import com.flow.android.kotlin.lockscreen.shortcut.entity.App
 import com.flow.android.kotlin.lockscreen.main.viewmodel.MainViewModel
-import com.flow.android.kotlin.lockscreen.preferences.PackageNamePreferences
+import com.flow.android.kotlin.lockscreen.persistence.entity.Shortcut
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,7 +23,7 @@ import timber.log.Timber
 
 class AllAppsBottomSheetDialogFragment: BottomSheetDialogFragment() {
     private val viewModel: MainViewModel by activityViewModels()
-    private val appAdapter = ShortcutAdapter { viewModel.addFavoriteApp(it) { app ->
+    private val appAdapter = AppAdapter { viewModel.addShortcut(it) { app ->
         removeApp(app)
     } }
     private val batchSize = 8
@@ -55,8 +55,8 @@ class AllAppsBottomSheetDialogFragment: BottomSheetDialogFragment() {
 
     private suspend fun addApps() {
         withContext(Dispatchers.IO) {
-            val addedPackageNames = PackageNamePreferences.getPackageNames(requireContext())
             val apps = arrayListOf<App>()
+            val packageNames = viewModel.shortcuts()?.map { it.packageName } ?: emptyList()
             var count = 0
 
             try {
@@ -71,7 +71,10 @@ class AllAppsBottomSheetDialogFragment: BottomSheetDialogFragment() {
                     val label = resolveInfo.loadLabel(packageManager).toString()
                     val packageName = resolveInfo.activityInfo.packageName
 
-                    if (addedPackageNames.contains(packageName))
+                    if (isDetached)
+                        return@withContext
+
+                    if (packageNames.contains(packageName))
                         continue
                     else if (packageName == requireContext().packageName)
                         continue
@@ -95,6 +98,8 @@ class AllAppsBottomSheetDialogFragment: BottomSheetDialogFragment() {
                         ++count
                 }
             } catch (e: PackageManager.NameNotFoundException) {
+                Timber.e(e)
+            } catch (e: IllegalStateException) {
                 Timber.e(e)
             }
 
