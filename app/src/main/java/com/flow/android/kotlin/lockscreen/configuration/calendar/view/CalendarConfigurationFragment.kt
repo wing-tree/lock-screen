@@ -16,7 +16,7 @@ class CalendarConfigurationFragment: ConfigurationFragment() {
     override fun createConfigurationAdapter(): ConfigurationAdapter {
         val context = requireContext()
         val uncheckedCalendarIds = ConfigurationPreferences.getUncheckedCalendarIds(context)
-        val checkBoxItems = CalendarHelper.calendarDisplays(viewModel.contentResolver()).map {
+        val calendarDisplays = CalendarHelper.calendarDisplays(viewModel.contentResolver()).map {
             CheckBoxItem(
                     isChecked = uncheckedCalendarIds.contains(it.id.toString()).not(),
                     text = it.name,
@@ -29,12 +29,9 @@ class CalendarConfigurationFragment: ConfigurationFragment() {
             )
         }
 
-        checkBoxAdapter.addAll(checkBoxItems)
+        checkBoxAdapter.addAll(calendarDisplays)
 
         return ConfigurationAdapter(arrayListOf(
-                AdapterItem.SubtitleItem (
-                        subtitle = getString(R.string.calendar)
-                ),
                 AdapterItem.ListItem(
                         adapter = checkBoxAdapter,
                         drawable = ContextCompat.getDrawable(context, R.drawable.ic_round_today_24),

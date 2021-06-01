@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.flow.android.kotlin.lockscreen.databinding.ShortcutBinding
 import com.flow.android.kotlin.lockscreen.shortcut.entity.DisplayShortcut
+import java.util.*
 
 class DisplayShortcutAdapter(private val onItemClick: (displayShortcut: DisplayShortcut) -> Unit): RecyclerView.Adapter<DisplayShortcutAdapter.ViewHolder>() {
     private var layoutInflater: LayoutInflater? = null
@@ -58,4 +59,20 @@ class DisplayShortcutAdapter(private val onItemClick: (displayShortcut: DisplayS
     }
 
     override fun getItemCount(): Int = asyncListDiffer.currentList.count()
+
+    fun onMove(from: Int, to: Int) {
+        val currentList = asyncListDiffer.currentList.toList()
+
+        if (currentList.count() <= from || currentList.count() <= to)
+            return
+
+        val priority = asyncListDiffer.currentList[from].shortcut?.priority ?: System.currentTimeMillis()
+        currentList[from].shortcut?.priority = currentList[to].shortcut?.priority ?: System.currentTimeMillis()
+        currentList[to].shortcut?.priority = priority
+        Collections.swap(currentList, from, to)
+
+        submitList(currentList)
+    }
+
+    fun shortcuts() = asyncListDiffer.currentList.map { it.shortcut }
 }

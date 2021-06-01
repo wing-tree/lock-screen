@@ -10,13 +10,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.ItemTouchHelper
 import com.flow.android.kotlin.lockscreen.base.BaseFragment
 import com.flow.android.kotlin.lockscreen.databinding.FragmentFavoriteAppsBinding
 import com.flow.android.kotlin.lockscreen.devicecredential.DeviceCredentialHelper
 import com.flow.android.kotlin.lockscreen.devicecredential.RequireDeviceCredential
-import com.flow.android.kotlin.lockscreen.shortcut.adapter.AppAdapter
 import com.flow.android.kotlin.lockscreen.shortcut.adapter.DisplayShortcutAdapter
-import com.flow.android.kotlin.lockscreen.shortcut.entity.App
+import com.flow.android.kotlin.lockscreen.shortcut.adapter.ItemTouchCallback
 import com.flow.android.kotlin.lockscreen.shortcut.entity.DisplayShortcut
 import com.flow.android.kotlin.lockscreen.util.BLANK
 import timber.log.Timber
@@ -27,7 +27,6 @@ class ShortcutsFragment: BaseFragment<FragmentFavoriteAppsBinding>(), RequireDev
     }
 
     private val packageManager by lazy { requireContext().packageManager }
-
     private val displayShortcutAdapter = DisplayShortcutAdapter {
         if (DeviceCredentialHelper.requireUnlock(requireContext())) {
             confirmDeviceCredential(Value(true, it.packageName))
@@ -35,6 +34,7 @@ class ShortcutsFragment: BaseFragment<FragmentFavoriteAppsBinding>(), RequireDev
             launchApplication(it.packageName)
         }
     }
+    private val itemTouchHelper = ItemTouchHelper(ItemTouchCallback(displayShortcutAdapter))
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,6 +49,7 @@ class ShortcutsFragment: BaseFragment<FragmentFavoriteAppsBinding>(), RequireDev
             adapter = displayShortcutAdapter
         }
 
+        itemTouchHelper.attachToRecyclerView(viewBinding.recyclerView)
         initializeLiveData()
 
         return view
@@ -66,6 +67,12 @@ class ShortcutsFragment: BaseFragment<FragmentFavoriteAppsBinding>(), RequireDev
                 }
             }
         }
+    }
+
+    override fun onPause() {
+        viewModel.updateShortcuts(displayShortcutAdapter.shortcuts().filterNotNull())
+
+        super.onPause()
     }
 
     private fun initializeLiveData() {
@@ -115,14 +122,6 @@ class ShortcutsFragment: BaseFragment<FragmentFavoriteAppsBinding>(), RequireDev
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             DeviceCredentialHelper.confirmDeviceCredential(requireActivity(), object : KeyguardManager.KeyguardDismissCallback() {
-                override fun onDismissCancelled() {
-                    super.onDismissCancelled()
-                }
-
-                override fun onDismissError() {
-                    super.onDismissError()
-                }
-
                 override fun onDismissSucceeded() {
                     super.onDismissSucceeded()
 

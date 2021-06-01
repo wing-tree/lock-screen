@@ -5,11 +5,13 @@ import androidx.annotation.MainThread
 import com.flow.android.kotlin.lockscreen.persistence.database.AppDatabase
 import com.flow.android.kotlin.lockscreen.memo.entity.Memo
 import com.flow.android.kotlin.lockscreen.persistence.entity.Shortcut
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.*
 import timber.log.Timber
+import java.util.*
 
 class Repository(context: Context) {
     private val appDatabase = AppDatabase.getInstance(context)
@@ -42,7 +44,7 @@ class Repository(context: Context) {
     }
 
     suspend fun updateMemos(list: List<Memo>) {
-        memoDao.updateList(list)
+        memoDao.updateAll(list)
     }
 
     fun clearCompositeDisposable() {
@@ -50,6 +52,22 @@ class Repository(context: Context) {
     }
 
     fun getAllMemos() = memoDao.getAll()
+
+    fun getTodayMemos(): List<Memo> {
+        val start = Calendar.getInstance()
+        val end = Calendar.getInstance()
+
+        start.set(Calendar.HOUR_OF_DAY, 0)
+        start.set(Calendar.MINUTE, 0)
+        start.set(Calendar.SECOND, 0)
+
+        end.set(Calendar.HOUR_OF_DAY, 0)
+        end.set(Calendar.MINUTE, 0)
+        end.set(Calendar.SECOND, 0)
+        end.add(Calendar.DATE, 1)
+
+        return memoDao.getAll(start.timeInMillis, end.timeInMillis)
+    }
 
     fun deleteShortcut(shortcut: Shortcut, @MainThread onDeleted: (shortcut: Shortcut) -> Unit) {
         compositeDisposable.add(shortcutDao.delete(shortcut)
@@ -67,12 +85,8 @@ class Repository(context: Context) {
         )
     }
 
-    fun updateShortcut(shortcut: Shortcut, @MainThread onUpdated: (shortcut: Shortcut) -> Unit) {
-        compositeDisposable.add(shortcutDao.update(shortcut)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ onUpdated(shortcut) }, { Timber.e(it) })
-        )
+    suspend fun updateShortcuts(shortcuts: List<Shortcut>) {
+        shortcutDao.updateAll(shortcuts)
     }
 
     fun getAllShortcuts() = shortcutDao.getAll()

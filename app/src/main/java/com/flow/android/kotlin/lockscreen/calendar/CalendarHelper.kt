@@ -64,13 +64,10 @@ object CalendarHelper {
             const val CALENDAR_ID = 5
             const val END = 6
             const val EVENT_ID = 7
-            @Suppress("SpellCheckingInspection")
             const val RRULE = 8
             const val TITLE = 9
         }
     }
-
-    const val ExtraName = "com.flow.android.kotlin.lockscreen.calendar.CalendarHelper.ExtraName"
 
     object RequestCode {
         const val EditEvent = 2056
@@ -108,7 +105,7 @@ object CalendarHelper {
     }
 
     @Suppress("SpellCheckingInspection")
-    fun instances(contentResolver: ContentResolver, selection: String, DTSTART: Calendar, DTEND: Calendar): ArrayList<Event>? {
+    private fun instances(contentResolver: ContentResolver, selection: String, DTSTART: Calendar, DTEND: Calendar): ArrayList<Event>? {
         val events = arrayListOf<Event>()
 
         val builder: Uri.Builder = CalendarContract.Instances.CONTENT_URI.buildUpon()
@@ -168,10 +165,16 @@ object CalendarHelper {
 
         cursor.close()
 
+        events.sortWith(Comparator { o1, o2 ->
+            return@Comparator when {
+                o1.begin > o2.begin -> 1
+                else -> -1
+            }
+        })
+
         return events
     }
 
-    @SuppressLint("Recycle")
     fun events(contentResolver: ContentResolver, calendarDisplays: List<CalendarDisplay>, amount: Int): ArrayList<Event> {
 
         val events = arrayListOf<Event>()

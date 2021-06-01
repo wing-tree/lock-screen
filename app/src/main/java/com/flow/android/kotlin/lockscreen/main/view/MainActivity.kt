@@ -26,6 +26,7 @@ import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -36,6 +37,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.calendar.CalendarHelper
+import com.flow.android.kotlin.lockscreen.calendar.contract.CalendarContract
 import com.flow.android.kotlin.lockscreen.color.ColorDependingOnBackground
 import com.flow.android.kotlin.lockscreen.color.ColorHelper
 import com.flow.android.kotlin.lockscreen.configuration.view.ConfigurationActivity
@@ -282,7 +284,9 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
 
         viewBinding.imageViewSettings.setOnClickListener {
             Intent(this, ConfigurationActivity::class.java).also {
-                startActivity(it)
+                it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+
+                configurationActivityResultLauncher.launch(it)
             }
         }
 
@@ -353,6 +357,23 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
 
     private fun animateUnselectedTab(tab: TabLayout.Tab) {
         tab.view.scale(1.0F)
+    }
+
+    private val configurationActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val configurationChanged = result.data?.getIntExtra(
+                    ConfigurationActivity.ConfigurationChanged.Key, -1
+            ) ?: return@registerForActivityResult
+
+            if (configurationChanged == -1)
+                return@registerForActivityResult
+
+            when(configurationChanged) {
+                ConfigurationActivity.ConfigurationChanged.Calendar -> {
+                    viewModel.callRefreshEvents()
+                }
+            }
+        }
     }
 
     private fun setWallpaper() {

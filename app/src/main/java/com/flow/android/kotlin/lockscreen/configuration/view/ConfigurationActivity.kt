@@ -1,5 +1,6 @@
 package com.flow.android.kotlin.lockscreen.configuration.view
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -16,6 +17,7 @@ import com.flow.android.kotlin.lockscreen.configuration.display.view.DisplayConf
 import com.flow.android.kotlin.lockscreen.configuration.lockscreen.view.LockScreenConfigurationFragment
 import com.flow.android.kotlin.lockscreen.databinding.ActivityConfigurationBinding
 import com.flow.android.kotlin.lockscreen.util.BLANK
+import java.security.Key
 
 class ConfigurationActivity: AppCompatActivity() {
     private var _viewBinding: ActivityConfigurationBinding? = null
@@ -25,6 +27,13 @@ class ConfigurationActivity: AppCompatActivity() {
     private val activity = this
     private val checkBoxAdapter = CheckBoxAdapter(arrayListOf())
     //private val viewModel: MainViewModel by activityViewModels() // todo. 그냥 preferences에서 받아올 것. 액트 종료시, 맞춰 업뎃.
+
+    object ConfigurationChanged {
+        const val Key = "com.flow.android.kotlin.lockscreen.configuration.view" +
+                ".ConfigurationActivity.ConfigurationChanged.Key"
+
+        const val Calendar = 211
+    }
 
     private val configurationAdapter: ConfigurationAdapter by lazy {
         ConfigurationAdapter(arrayListOf(
@@ -80,6 +89,21 @@ class ConfigurationActivity: AppCompatActivity() {
         }
 
         checkBoxAdapter.addAll(checkBoxItems)
+    }
+
+    override fun onBackPressed() {
+        if (supportFragmentManager.fragments.isNotEmpty()) {
+            super.onBackPressed()
+
+            return
+        }
+
+        val intent = Intent().apply {
+            putExtra(ConfigurationChanged.Key, ConfigurationChanged.Calendar)
+        }
+
+        setResult(RESULT_OK, intent)
+        finish()
     }
 
     private fun addFragment(fragment: Fragment) {

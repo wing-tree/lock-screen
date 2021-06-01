@@ -20,6 +20,9 @@ import com.flow.android.kotlin.lockscreen.databinding.HomeBinding
 import com.flow.android.kotlin.lockscreen.main.view.MainActivity
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
 import com.flow.android.kotlin.lockscreen.util.toPx
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import java.util.concurrent.locks.Lock
 import kotlin.Exception
@@ -47,6 +50,12 @@ class LockScreenService : Service() {
     }
 
     private var isHomeVisible = false
+
+    private val notificationManager: NotificationManager by lazy {
+        getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    }
+
+    private var disposable: Disposable? = null
 
     private val broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -101,10 +110,6 @@ class LockScreenService : Service() {
         }
     }
 
-    private val notificationManager: NotificationManager by lazy {
-        getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-    }
-
     override fun onCreate() {
         super.onCreate()
 
@@ -124,33 +129,12 @@ class LockScreenService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val importance = NotificationManager.IMPORTANCE_MIN
-            val notificationChannel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, importance)
-
-            notificationChannel.description = CHANNEL_DESCRIPTION
-            notificationChannel.setShowBadge(false)
-            
-            notificationManager.createNotificationChannel(notificationChannel)
-        }
-
-        val pendingIntent = PendingIntent.getActivity(
-                this,
-                0,
-                Intent(this, MainActivity::class.java),
-                PendingIntent.FLAG_UPDATE_CURRENT
-        )
-
-        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_round_lock_open_24)
-                .setContentTitle(getString(R.string.app_name))
-                .setContentText(getString(R.string.notification_content_text))
-                .setContentIntent(pendingIntent)
-                .setPriority(NotificationCompat.PRIORITY_MIN)
-
-        val notification: Notification = builder.build()
-
-        startForeground(1, notification)
+        disposable = NotificationBuilder.single(this, notificationManager)
+                .observeOn(Schedulers.io())
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe { it ->
+                    startForeground(1, it.build())
+                }
 
         return START_STICKY
     }
@@ -166,6 +150,8 @@ class LockScreenService : Service() {
         } catch (e: IllegalArgumentException) {
             Timber.e(e)
             //stopSelf()
+        } finally {
+            disposable?.dispose()
         }
 
         isHomeVisible = false
@@ -238,12 +224,5 @@ class LockScreenService : Service() {
             return resources.getDimensionPixelSize(identifier)
 
         return 25.toPx
-    }
-
-    @Suppress("SpellCheckingInspection")
-    companion object {
-        private const val CHANNEL_NAME = "com.flow.android.kotlin.lockscreen.lock_screen.channel_name"
-        private const val CHANNEL_DESCRIPTION = "com.flow.android.kotlin.lockscreen.lock_screen.channel_description" // todo change real des.
-        private const val CHANNEL_ID = "com.flow.android.kotlin.lockscreen.lock_screen.channel_id"
     }
 }

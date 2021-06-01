@@ -109,6 +109,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun updateShortcuts(shortcuts: List<Shortcut>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateShortcuts(shortcuts)
+        }
+    }
+
     fun deleteMemo(memo: Memo) {
         repository.deleteMemo(memo) {
             notifyMemoChanged(MemoChanged(it, MemoChangedState.Deleted))
