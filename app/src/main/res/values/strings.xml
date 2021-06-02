@@ -5,7 +5,8 @@
 
     <string name="format_date_000">EEE, MMMM d</string>
     <string name="format_date_001">MMMM d</string>
-    <string name="format_time" translatable="false">h:mm</string>
+    <string name="format_time_00" translatable="false">h:mm</string>
+    <string name="format_time_01" translatable="false">h:mm a</string>
 
     <string name="notification_content_text">This is a notification for stable execution.</string>
 
@@ -40,6 +41,10 @@
     <!-- LockScreenConfigurationFragment -->
     <string name="lock_screen_configuration_fragment_000">Lock setting</string>
     <string name="lock_screen_configuration_fragment_001">Lock type</string>
+
+    <!-- NotificationBuilder -->
+    <string name="notification_builder_000">Calendar</string>
+    <string name="notification_builder_001">Memo</string>
 
     <!-- Settings -->
     <string name="calendar">Calendar</string>

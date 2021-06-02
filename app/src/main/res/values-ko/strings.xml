@@ -41,6 +41,10 @@
     <string name="lock_screen_configuration_fragment_000">잠금 설정</string>
     <string name="lock_screen_configuration_fragment_001">잠금 방식</string>
 
+    <!-- NotificationBuilder -->
+    <string name="notification_builder_000">캘린더</string>
+    <string name="notification_builder_001">메모</string>
+
     <!-- Settings -->
     <string name="calendar">캘린더</string>
     <string name="display_after_unlocking">잠금 해제 후 표시</string>

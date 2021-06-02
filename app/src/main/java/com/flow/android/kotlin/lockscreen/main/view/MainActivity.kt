@@ -37,9 +37,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.calendar.CalendarHelper
-import com.flow.android.kotlin.lockscreen.calendar.contract.CalendarContract
 import com.flow.android.kotlin.lockscreen.color.ColorDependingOnBackground
-import com.flow.android.kotlin.lockscreen.color.ColorHelper
+import com.flow.android.kotlin.lockscreen.color.Color
 import com.flow.android.kotlin.lockscreen.configuration.view.ConfigurationActivity
 import com.flow.android.kotlin.lockscreen.databinding.ActivityMainBinding
 import com.flow.android.kotlin.lockscreen.home.homewatcher.HomePressedListener
@@ -406,7 +405,7 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
                 val colorDependingOnBackground: ColorDependingOnBackground
 
                 withContext(Dispatchers.IO) {
-                    colorDependingOnBackground = ColorHelper.colorDependingOnWallpaper(
+                    colorDependingOnBackground = Color.colorDependingOnWallpaper(
                             this@MainActivity,
                             wallpaper,
                             screenWith

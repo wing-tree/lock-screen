@@ -12,7 +12,7 @@ import com.flow.android.kotlin.lockscreen.util.toPx
 import timber.log.Timber
 import kotlin.math.pow
 
-object ColorHelper {
+object Color {
     fun colorDependingOnWallpaper(context: Context, wallpaper: Bitmap, screenWidth: Int): ColorDependingOnBackground {
         @ColorInt
         val dark: Int = ContextCompat.getColor(context, R.color.dark)

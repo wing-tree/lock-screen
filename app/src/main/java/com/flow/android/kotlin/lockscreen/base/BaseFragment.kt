@@ -9,7 +9,6 @@ import androidx.annotation.CallSuper
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.viewbinding.ViewBinding
-import com.flow.android.kotlin.lockscreen.color.ColorHelper
 import com.flow.android.kotlin.lockscreen.main.viewmodel.MainViewModel
 
 abstract class BaseFragment<VB: ViewBinding>: Fragment() {

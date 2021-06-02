@@ -10,7 +10,7 @@ import com.flow.android.kotlin.lockscreen.calendar.CalendarDisplay
 import com.flow.android.kotlin.lockscreen.calendar.CalendarHelper
 import com.flow.android.kotlin.lockscreen.calendar.Event
 import com.flow.android.kotlin.lockscreen.color.ColorDependingOnBackground
-import com.flow.android.kotlin.lockscreen.shortcut.entity.App
+import com.flow.android.kotlin.lockscreen.shortcut.datamodel.App
 import com.flow.android.kotlin.lockscreen.memo.entity.Memo
 import com.flow.android.kotlin.lockscreen.persistence.entity.Shortcut
 import com.flow.android.kotlin.lockscreen.repository.Repository

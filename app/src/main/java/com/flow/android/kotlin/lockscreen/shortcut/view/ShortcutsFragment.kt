@@ -17,7 +17,7 @@ import com.flow.android.kotlin.lockscreen.devicecredential.DeviceCredentialHelpe
 import com.flow.android.kotlin.lockscreen.devicecredential.RequireDeviceCredential
 import com.flow.android.kotlin.lockscreen.shortcut.adapter.DisplayShortcutAdapter
 import com.flow.android.kotlin.lockscreen.shortcut.adapter.ItemTouchCallback
-import com.flow.android.kotlin.lockscreen.shortcut.entity.DisplayShortcut
+import com.flow.android.kotlin.lockscreen.shortcut.datamodel.DisplayShortcut
 import com.flow.android.kotlin.lockscreen.util.BLANK
 import timber.log.Timber
 

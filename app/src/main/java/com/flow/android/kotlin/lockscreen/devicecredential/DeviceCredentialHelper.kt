@@ -1,18 +1,11 @@
 package com.flow.android.kotlin.lockscreen.devicecredential
 
-import android.annotation.TargetApi
 import android.app.Activity
 import android.app.KeyguardManager
-import android.content.ContentResolver
 import android.content.Context
 import android.content.Context.KEYGUARD_SERVICE
-import android.hardware.biometrics.BiometricManager.Authenticators.BIOMETRIC_STRONG
-import android.hardware.biometrics.BiometricManager.Authenticators.DEVICE_CREDENTIAL
-import android.hardware.biometrics.BiometricPrompt
 import android.os.Build
-import android.os.CancellationSignal
 import android.provider.Settings
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import com.flow.android.kotlin.lockscreen.R

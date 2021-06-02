@@ -8,7 +8,7 @@ import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.flow.android.kotlin.lockscreen.R
-import com.flow.android.kotlin.lockscreen.color.ColorHelper
+import com.flow.android.kotlin.lockscreen.color.Color
 import com.flow.android.kotlin.lockscreen.databinding.ColorBinding
 import com.flow.android.kotlin.lockscreen.util.*
 
@@ -54,7 +54,7 @@ class ColorAdapter(private val items: IntArray, private val onColorSelected: (co
             val light = ContextCompat.getColor(holder.binding.root.context, R.color.light)
 
             holder.binding.imageView.setColorFilter(
-                ColorHelper.colorDependingOnWallpaper(color, dark, light),
+                Color.colorDependingOnWallpaper(color, dark, light),
                 PorterDuff.Mode.SRC_ATOP
             )
 

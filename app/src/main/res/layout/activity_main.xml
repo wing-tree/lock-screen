@@ -28,7 +28,7 @@
             android:layout_height="56dp"
             android:layout_marginStart="@dimen/spacing_large"
             android:layout_marginTop="@dimen/spacing_medium"
-            android:format12Hour="@string/format_time"
+            android:format12Hour="@string/format_time_00"
             android:gravity="center_vertical"
             android:textSize="40dp"
             app:layout_constraintStart_toStartOf="parent"

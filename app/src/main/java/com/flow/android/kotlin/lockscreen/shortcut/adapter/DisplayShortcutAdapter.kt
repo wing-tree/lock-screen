@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.flow.android.kotlin.lockscreen.databinding.ShortcutBinding
-import com.flow.android.kotlin.lockscreen.shortcut.entity.DisplayShortcut
+import com.flow.android.kotlin.lockscreen.shortcut.datamodel.DisplayShortcut
 import java.util.*
 
 class DisplayShortcutAdapter(private val onItemClick: (displayShortcut: DisplayShortcut) -> Unit): RecyclerView.Adapter<DisplayShortcutAdapter.ViewHolder>() {
