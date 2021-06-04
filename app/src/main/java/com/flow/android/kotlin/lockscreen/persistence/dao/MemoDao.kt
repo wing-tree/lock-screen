@@ -1,7 +1,7 @@
 package com.flow.android.kotlin.lockscreen.persistence.dao
 
 import androidx.room.*
-import com.flow.android.kotlin.lockscreen.memo.entity.Memo
+import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import io.reactivex.Completable
 import io.reactivex.Flowable
 

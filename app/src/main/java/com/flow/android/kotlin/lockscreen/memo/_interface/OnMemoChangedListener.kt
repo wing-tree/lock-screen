@@ -1,6 +1,6 @@
 package com.flow.android.kotlin.lockscreen.memo._interface
 
-import com.flow.android.kotlin.lockscreen.memo.entity.Memo
+import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 
 interface OnMemoChangedListener {
     fun onMemoDeleted(memo: Memo)

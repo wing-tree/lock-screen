@@ -10,7 +10,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.databinding.MemoBinding
-import com.flow.android.kotlin.lockscreen.memo.entity.Memo
+import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*

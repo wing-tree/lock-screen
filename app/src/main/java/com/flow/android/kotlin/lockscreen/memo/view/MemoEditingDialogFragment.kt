@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -22,7 +21,7 @@ import com.flow.android.kotlin.lockscreen.base.BaseDialogFragment
 import com.flow.android.kotlin.lockscreen.color.widget.ColorPickerLayout
 import com.flow.android.kotlin.lockscreen.databinding.FragmentMemoEditingDialogBinding
 import com.flow.android.kotlin.lockscreen.datepicker.DatePickerDialogFragment
-import com.flow.android.kotlin.lockscreen.memo.entity.Memo
+import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.memo._interface.OnMemoChangedListener
 import com.flow.android.kotlin.lockscreen.util.*
 import java.text.SimpleDateFormat

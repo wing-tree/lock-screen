@@ -10,10 +10,10 @@ import com.flow.android.kotlin.lockscreen.calendar.CalendarDisplay
 import com.flow.android.kotlin.lockscreen.calendar.CalendarHelper
 import com.flow.android.kotlin.lockscreen.calendar.Event
 import com.flow.android.kotlin.lockscreen.color.ColorDependingOnBackground
-import com.flow.android.kotlin.lockscreen.shortcut.datamodel.App
-import com.flow.android.kotlin.lockscreen.memo.entity.Memo
+import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.persistence.entity.Shortcut
 import com.flow.android.kotlin.lockscreen.repository.Repository
+import com.flow.android.kotlin.lockscreen.shortcut.datamodel.*
 import com.flow.android.kotlin.lockscreen.util.SingleLiveEvent
 import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.Dispatchers
@@ -97,21 +97,21 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _calendarDisplays.value = value
     }
 
-    fun addShortcut(app: App, onInserted: (app: App) -> Unit) {
-        repository.insertShortcut(Shortcut(app.packageName, System.currentTimeMillis())) {
-            onInserted(app)
+    fun addShortcut(item: ShortcutDataModel, onInserted: (ShortcutDataModel) -> Unit) {
+        repository.insertShortcut(item.toEntity()) {
+            onInserted(item)
         }
     }
 
-    fun deleteShortcut(shortcut: Shortcut, onDeleted: (Shortcut) -> Unit) {
-        repository.deleteShortcut(shortcut) {
-            onDeleted(it)
+    fun deleteShortcut(item: Shortcut, onDeleted: (Shortcut) -> Unit) {
+        repository.deleteShortcut(item) {
+            onDeleted(item)
         }
     }
 
-    fun updateShortcuts(shortcuts: List<Shortcut>) {
+    fun updateShortcuts(shortcuts: List<ShortcutDataModel>) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.updateShortcuts(shortcuts)
+            repository.updateShortcuts(shortcuts.map { it.toEntity() })
         }
     }
 
@@ -142,8 +142,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
 @Parcelize
 data class MemoChanged(
-    val memo: Memo,
-    val state: Int
+        val memo: Memo,
+        val state: Int
 ) : Parcelable
 
 object MemoChangedState {

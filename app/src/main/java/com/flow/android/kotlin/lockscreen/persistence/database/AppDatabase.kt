@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.flow.android.kotlin.lockscreen.persistence.dao.MemoDao
-import com.flow.android.kotlin.lockscreen.memo.entity.Memo
+import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.persistence.dao.ShortcutDao
 import com.flow.android.kotlin.lockscreen.persistence.entity.Shortcut
 

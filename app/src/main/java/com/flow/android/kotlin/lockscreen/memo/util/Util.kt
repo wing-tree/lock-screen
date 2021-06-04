@@ -3,7 +3,7 @@ package com.flow.android.kotlin.lockscreen.memo.util
 import android.content.Context
 import android.content.Intent
 import com.flow.android.kotlin.lockscreen.R
-import com.flow.android.kotlin.lockscreen.memo.entity.Memo
+import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.util.toDateString
 import java.text.SimpleDateFormat
 import java.util.*

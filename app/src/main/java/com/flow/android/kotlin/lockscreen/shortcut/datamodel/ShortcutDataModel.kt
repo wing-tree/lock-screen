@@ -3,9 +3,12 @@ package com.flow.android.kotlin.lockscreen.shortcut.datamodel
 import android.graphics.drawable.Drawable
 import com.flow.android.kotlin.lockscreen.persistence.entity.Shortcut
 
-data class DisplayShortcut (
+data class ShortcutDataModel (
     val icon: Drawable,
     val label: String,
     val packageName: String,
-    val shortcut: Shortcut? = null
-)
+    var priority: Long,
+    var showInNotification: Boolean = false
+) {
+    fun toEntity() = Shortcut(packageName, priority, showInNotification)
+}

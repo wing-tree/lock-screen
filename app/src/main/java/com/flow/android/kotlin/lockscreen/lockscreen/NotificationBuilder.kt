@@ -11,22 +11,18 @@ import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.calendar.CalendarHelper
 import com.flow.android.kotlin.lockscreen.calendar.Event
 import com.flow.android.kotlin.lockscreen.main.view.MainActivity
-import com.flow.android.kotlin.lockscreen.memo.entity.Memo
+import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
 import com.flow.android.kotlin.lockscreen.repository.Repository
 import com.flow.android.kotlin.lockscreen.util.BLANK
 import com.flow.android.kotlin.lockscreen.util.toDateString
-import io.reactivex.Scheduler
 import io.reactivex.Single
-import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.TimeUnit
 import kotlin.Comparator
-import kotlin.coroutines.CoroutineContext
 
 object NotificationBuilder {
     fun single(context: Context, notificationManager: NotificationManager): Single<NotificationCompat.Builder> {
@@ -115,8 +111,6 @@ object NotificationBuilder {
 
             val endHourOfDay = gregorianCalendar.get(GregorianCalendar.HOUR_OF_DAY)
             val endMinute = gregorianCalendar.get(GregorianCalendar.MINUTE) + endHourOfDay * 60
-
-            println("aaaaaaaa: $beginHourOfDay,, $beginMinute,, cur: $currentTimeMinute")
 
             if (beginMinute - 10 <= currentTimeMinute && currentTimeMinute <= endMinute + 60) {
                 return event

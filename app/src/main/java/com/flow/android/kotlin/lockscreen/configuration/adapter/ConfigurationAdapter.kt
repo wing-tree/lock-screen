@@ -78,6 +78,11 @@ class ConfigurationAdapter(private val arrayList: ArrayList<AdapterItem>): Recyc
             viewBinding.root.expand(200)
         }
 
+        fun updateDescription(description: String) {
+            if (viewBinding is ItemBinding)
+                viewBinding.textDescription.text = description
+        }
+
         companion object {
             fun from(layoutInflater: LayoutInflater, parent: ViewGroup, viewType: Int): ViewHolder {
                 val viewBinding = when(viewType) {
@@ -141,6 +146,19 @@ class ConfigurationAdapter(private val arrayList: ArrayList<AdapterItem>): Recyc
         viewHolder?.let {
             if (it is ViewHolder) {
                 it.show()
+            }
+        }
+    }
+
+    fun updateDescription(id: Long, description: String) {
+        val item = arrayList.find { it.id == id } ?: return
+        val index = arrayList.indexOf(item)
+
+        if (item is AdapterItem.Item) {
+            val viewHolder = recyclerView?.findViewHolderForAdapterPosition(index)
+
+            if (viewHolder is ViewHolder) {
+                viewHolder.updateDescription(description)
             }
         }
     }

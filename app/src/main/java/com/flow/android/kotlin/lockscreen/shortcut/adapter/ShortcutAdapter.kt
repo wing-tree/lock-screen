@@ -7,30 +7,44 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.flow.android.kotlin.lockscreen.databinding.ShortcutBinding
-import com.flow.android.kotlin.lockscreen.shortcut.datamodel.DisplayShortcut
+import com.flow.android.kotlin.lockscreen.shortcut.datamodel.ShortcutDataModel
 import java.util.*
 
-class DisplayShortcutAdapter(private val onItemClick: (displayShortcut: DisplayShortcut) -> Unit): RecyclerView.Adapter<DisplayShortcutAdapter.ViewHolder>() {
+class ShortcutAdapter(private val onItemClick: (item: ShortcutDataModel) -> Unit): RecyclerView.Adapter<ShortcutAdapter.ViewHolder>() {
     private var layoutInflater: LayoutInflater? = null
 
-    private val diffCallback = object : DiffUtil.ItemCallback<DisplayShortcut>() {
-        override fun areItemsTheSame(oldItem: DisplayShortcut, newItem: DisplayShortcut): Boolean {
+    private val diffCallback = object : DiffUtil.ItemCallback<ShortcutDataModel>() {
+        override fun areItemsTheSame(oldItem: ShortcutDataModel, newItem: ShortcutDataModel): Boolean {
             return oldItem.packageName == newItem.packageName
         }
 
-        override fun areContentsTheSame(oldItem: DisplayShortcut, newItem: DisplayShortcut): Boolean {
+        override fun areContentsTheSame(oldItem: ShortcutDataModel, newItem: ShortcutDataModel): Boolean {
             return oldItem == newItem
         }
     }
 
+    fun addAll(list: List<ShortcutDataModel>) {
+        val currentList = asyncListDiffer.currentList.toMutableList()
+
+        currentList.addAll(list)
+        submitList(currentList)
+    }
+
+    fun remove(item: ShortcutDataModel) {
+        val currentList = asyncListDiffer.currentList.toMutableList()
+
+        currentList.remove(item)
+        submitList(currentList)
+    }
+
     private val asyncListDiffer = AsyncListDiffer(this, diffCallback)
 
-    fun submitList(list: List<DisplayShortcut>) {
+    fun submitList(list: List<ShortcutDataModel>) {
         asyncListDiffer.submitList(list)
     }
 
     inner class ViewHolder(private val binding: ShortcutBinding): RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: DisplayShortcut) {
+        fun bind(item: ShortcutDataModel) {
             Glide.with(binding.root.context).load(item.icon).into(binding.imageView)
             binding.textView.text = item.label
 
@@ -66,13 +80,13 @@ class DisplayShortcutAdapter(private val onItemClick: (displayShortcut: DisplayS
         if (currentList.count() <= from || currentList.count() <= to)
             return
 
-        val priority = asyncListDiffer.currentList[from].shortcut?.priority ?: System.currentTimeMillis()
-        currentList[from].shortcut?.priority = currentList[to].shortcut?.priority ?: System.currentTimeMillis()
-        currentList[to].shortcut?.priority = priority
+        val priority = asyncListDiffer.currentList[from]?.priority ?: System.currentTimeMillis()
+        currentList[from]?.priority = currentList[to]?.priority ?: System.currentTimeMillis()
+        currentList[to]?.priority = priority
         Collections.swap(currentList, from, to)
 
         submitList(currentList)
     }
 
-    fun shortcuts() = asyncListDiffer.currentList.map { it.shortcut }
+    fun currentList(): List<ShortcutDataModel> = asyncListDiffer.currentList
 }

@@ -3,13 +3,11 @@ package com.flow.android.kotlin.lockscreen.repository
 import android.content.Context
 import androidx.annotation.MainThread
 import com.flow.android.kotlin.lockscreen.persistence.database.AppDatabase
-import com.flow.android.kotlin.lockscreen.memo.entity.Memo
+import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.persistence.entity.Shortcut
-import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.*
 import timber.log.Timber
 import java.util.*
 

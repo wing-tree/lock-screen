@@ -12,29 +12,29 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.flow.android.kotlin.lockscreen.base.BaseFragment
-import com.flow.android.kotlin.lockscreen.databinding.FragmentFavoriteAppsBinding
+import com.flow.android.kotlin.lockscreen.databinding.FragmentShortcutBinding
 import com.flow.android.kotlin.lockscreen.devicecredential.DeviceCredentialHelper
 import com.flow.android.kotlin.lockscreen.devicecredential.RequireDeviceCredential
-import com.flow.android.kotlin.lockscreen.shortcut.adapter.DisplayShortcutAdapter
+import com.flow.android.kotlin.lockscreen.shortcut.adapter.ShortcutAdapter
 import com.flow.android.kotlin.lockscreen.shortcut.adapter.ItemTouchCallback
-import com.flow.android.kotlin.lockscreen.shortcut.datamodel.DisplayShortcut
+import com.flow.android.kotlin.lockscreen.shortcut.datamodel.ShortcutDataModel
 import com.flow.android.kotlin.lockscreen.util.BLANK
 import timber.log.Timber
 
-class ShortcutsFragment: BaseFragment<FragmentFavoriteAppsBinding>(), RequireDeviceCredential<ShortcutsFragment.Value> {
-    override fun inflate(inflater: LayoutInflater, container: ViewGroup?): FragmentFavoriteAppsBinding {
-        return FragmentFavoriteAppsBinding.inflate(inflater, container, false)
+class ShortcutFragment: BaseFragment<FragmentShortcutBinding>(), RequireDeviceCredential<ShortcutFragment.Value> {
+    override fun inflate(inflater: LayoutInflater, container: ViewGroup?): FragmentShortcutBinding {
+        return FragmentShortcutBinding.inflate(inflater, container, false)
     }
 
     private val packageManager by lazy { requireContext().packageManager }
-    private val displayShortcutAdapter = DisplayShortcutAdapter {
+    private val shortcutDataModelAdapter = ShortcutAdapter {
         if (DeviceCredentialHelper.requireUnlock(requireContext())) {
             confirmDeviceCredential(Value(true, it.packageName))
         } else {
             launchApplication(it.packageName)
         }
     }
-    private val itemTouchHelper = ItemTouchHelper(ItemTouchCallback(displayShortcutAdapter))
+    private val itemTouchHelper = ItemTouchHelper(ItemTouchCallback(shortcutDataModelAdapter))
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,7 +46,7 @@ class ShortcutsFragment: BaseFragment<FragmentFavoriteAppsBinding>(), RequireDev
         viewBinding.recyclerView.apply {
             setHasFixedSize(true)
             layoutManager = GridLayoutManager(requireContext(), 4)
-            adapter = displayShortcutAdapter
+            adapter = shortcutDataModelAdapter
         }
 
         itemTouchHelper.attachToRecyclerView(viewBinding.recyclerView)
@@ -62,7 +62,7 @@ class ShortcutsFragment: BaseFragment<FragmentFavoriteAppsBinding>(), RequireDev
             if (DeviceCredentialHelper.requireUnlock(requireContext())) {
                 confirmDeviceCredential(Value(false))
             } else {
-                AllAppsBottomSheetDialogFragment().also {
+                AllShortcutBottomSheetDialogFragment().also {
                     it.show(requireActivity().supportFragmentManager, it.tag)
                 }
             }
@@ -70,14 +70,14 @@ class ShortcutsFragment: BaseFragment<FragmentFavoriteAppsBinding>(), RequireDev
     }
 
     override fun onPause() {
-        viewModel.updateShortcuts(displayShortcutAdapter.shortcuts().filterNotNull())
+        viewModel.updateShortcuts(shortcutDataModelAdapter.currentList().filterNotNull())
 
         super.onPause()
     }
 
     private fun initializeLiveData() {
         viewModel.shortcuts.observe(viewLifecycleOwner, {
-            val displayShortcuts = arrayListOf<DisplayShortcut>()
+            val shortcuts = arrayListOf<ShortcutDataModel>()
 
             for (shortcut in it) {
                 try {
@@ -86,14 +86,14 @@ class ShortcutsFragment: BaseFragment<FragmentFavoriteAppsBinding>(), RequireDev
                     val icon = packageManager.getApplicationIcon(info)
                     val label = packageManager.getApplicationLabel(info).toString()
 
-                    displayShortcuts.add(DisplayShortcut(icon, label, packageName, shortcut))
+                    shortcuts.add(ShortcutDataModel(icon, label, packageName, shortcut.priority, shortcut.showInNotification))
                 } catch (e: PackageManager.NameNotFoundException) {
                     Timber.e(e)
                     viewModel.deleteShortcut(shortcut) {  }
                 }
             }
 
-            displayShortcutAdapter.submitList(displayShortcuts)
+            shortcutDataModelAdapter.submitList(shortcuts)
         })
 
         viewModel.colorDependingOnBackground.observe(viewLifecycleOwner, {
@@ -128,7 +128,7 @@ class ShortcutsFragment: BaseFragment<FragmentFavoriteAppsBinding>(), RequireDev
                     if (shortcutClicked)
                         launchApplication(packageName)
                     else {
-                        AllAppsBottomSheetDialogFragment().also {
+                        AllShortcutBottomSheetDialogFragment().also {
                             it.show(requireActivity().supportFragmentManager, it.tag)
                         }
                     }

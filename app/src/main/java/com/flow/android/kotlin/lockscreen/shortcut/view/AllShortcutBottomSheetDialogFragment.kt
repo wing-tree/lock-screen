@@ -10,30 +10,30 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
-import com.flow.android.kotlin.lockscreen.databinding.FragmentAllAppsBottomSheetDialogBinding
-import com.flow.android.kotlin.lockscreen.shortcut.adapter.AppAdapter
-import com.flow.android.kotlin.lockscreen.shortcut.datamodel.App
+import com.flow.android.kotlin.lockscreen.databinding.FragmentAllShortcutBottomSheetDialogBinding
 import com.flow.android.kotlin.lockscreen.main.viewmodel.MainViewModel
+import com.flow.android.kotlin.lockscreen.shortcut.adapter.ShortcutAdapter
+import com.flow.android.kotlin.lockscreen.shortcut.datamodel.ShortcutDataModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-class AllAppsBottomSheetDialogFragment: BottomSheetDialogFragment() {
+class AllShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
     private val viewModel: MainViewModel by activityViewModels()
-    private val appAdapter = AppAdapter { viewModel.addShortcut(it) { app ->
-        removeApp(app)
+    private val shortcutAdapter = ShortcutAdapter { viewModel.addShortcut(it) { app ->
+        removeShortcut(app)
     } }
     private val batchSize = 8
-    private var viewBinding: FragmentAllAppsBottomSheetDialogBinding? = null
+    private var viewBinding: FragmentAllShortcutBottomSheetDialogBinding? = null
 
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-        viewBinding = FragmentAllAppsBottomSheetDialogBinding.inflate(
+        viewBinding = FragmentAllShortcutBottomSheetDialogBinding.inflate(
                 inflater,
                 container,
                 false
@@ -42,19 +42,19 @@ class AllAppsBottomSheetDialogFragment: BottomSheetDialogFragment() {
         viewBinding?.recyclerView?.apply {
             setHasFixedSize(true)
             layoutManager = GridLayoutManager(requireContext(), 4)
-            adapter = appAdapter
+            adapter = shortcutAdapter
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            addApps()
+            addShortcuts()
         }
 
         return viewBinding?.root
     }
 
-    private suspend fun addApps() {
+    private suspend fun addShortcuts() {
         withContext(Dispatchers.IO) {
-            val apps = arrayListOf<App>()
+            val shortcuts = arrayListOf<ShortcutDataModel>()
             val packageNames = viewModel.shortcuts()?.map { it.packageName } ?: emptyList()
             var count = 0
 
@@ -78,18 +78,19 @@ class AllAppsBottomSheetDialogFragment: BottomSheetDialogFragment() {
                     else if (packageName == requireContext().packageName)
                         continue
 
-                    apps.add(
-                            App(
+                    shortcuts.add(
+                            ShortcutDataModel(
                                     icon = icon,
                                     label = label,
-                                    packageName = packageName
+                                    packageName = packageName,
+                                    priority = 0L
                             )
                     )
 
                     if (count >= batchSize) {
                         withContext(Dispatchers.Main) {
-                            appAdapter.addAll(apps)
-                            apps.clear()
+                            shortcutAdapter.addAll(shortcuts)
+                            shortcuts.clear()
                         }
 
                         count = 0
@@ -103,12 +104,12 @@ class AllAppsBottomSheetDialogFragment: BottomSheetDialogFragment() {
             }
 
             withContext(Dispatchers.Main) {
-                appAdapter.addAll(apps.toList())
+                shortcutAdapter.addAll(shortcuts)
             }
         }
     }
 
-    private fun removeApp(app: App) {
-        appAdapter.remove(app)
+    private fun removeShortcut(item: ShortcutDataModel) {
+        shortcutAdapter.remove(item)
     }
 }

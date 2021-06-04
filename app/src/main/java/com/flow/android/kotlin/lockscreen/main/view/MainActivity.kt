@@ -5,6 +5,7 @@ import android.annotation.TargetApi
 import android.app.KeyguardManager
 import android.app.WallpaperManager
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -12,10 +13,7 @@ import android.graphics.PorterDuff
 import android.graphics.Rect
 import android.graphics.drawable.RippleDrawable
 import android.net.Uri
-import android.os.Build
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+import android.os.*
 import android.provider.MediaStore
 import android.provider.Settings
 import android.util.DisplayMetrics
@@ -31,14 +29,16 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.calendar.CalendarHelper
+import com.flow.android.kotlin.lockscreen.color.ColorCalculator
+import com.flow.android.kotlin.lockscreen.color.ColorCalculator.setColorGradient
 import com.flow.android.kotlin.lockscreen.color.ColorDependingOnBackground
-import com.flow.android.kotlin.lockscreen.color.Color
 import com.flow.android.kotlin.lockscreen.configuration.view.ConfigurationActivity
 import com.flow.android.kotlin.lockscreen.databinding.ActivityMainBinding
 import com.flow.android.kotlin.lockscreen.home.homewatcher.HomePressedListener
@@ -47,13 +47,14 @@ import com.flow.android.kotlin.lockscreen.lockscreen.LockScreenService
 import com.flow.android.kotlin.lockscreen.main.adapter.FragmentStateAdapter
 import com.flow.android.kotlin.lockscreen.main.torch.Torch
 import com.flow.android.kotlin.lockscreen.main.viewmodel.MainViewModel
-import com.flow.android.kotlin.lockscreen.memo.entity.Memo
 import com.flow.android.kotlin.lockscreen.memo._interface.OnMemoChangedListener
 import com.flow.android.kotlin.lockscreen.permission._interface.OnPermissionAllowClickListener
 import com.flow.android.kotlin.lockscreen.permission.view.PermissionRationaleDialogFragment
+import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
 import com.flow.android.kotlin.lockscreen.util.fadeIn
 import com.flow.android.kotlin.lockscreen.util.scale
+import com.flow.android.kotlin.lockscreen.wallpaper.WallpaperLoader
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.karumi.dexter.Dexter
@@ -67,7 +68,12 @@ import com.karumi.dexter.listener.single.PermissionListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
+import java.io.File
 import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.*
+
 
 class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAllowClickListener {
     private val duration = 200L
@@ -83,6 +89,8 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
     private var _viewBinding: ActivityMainBinding? = null
     private val viewBinding: ActivityMainBinding
         get() = _viewBinding!!
+
+    private val wallpaperLoader by lazy { WallpaperLoader(this) }
 
     private val homeWatcher = HomeWatcher(this).apply {
         setOnHomePressedListener(object : HomePressedListener {
@@ -238,7 +246,9 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
     private fun initializeLiveData() {
         viewModel.colorDependingOnBackground.observe(this, {
             viewBinding.textClockDate.setTextColor(it.dateTimeTextColor)
+            viewBinding.textClockDate.setColorGradient(it.dateTimeTextColor, ColorCalculator.lightenColor(it.dateTimeDominantColor, 0.32F))
             viewBinding.textClockTime.setTextColor(it.dateTimeTextColor)
+            viewBinding.textClockTime.setColorGradient(it.dateTimeTextColor, ColorCalculator.lightenColor(it.dateTimeDominantColor, 0.32F))
             viewBinding.imageViewSettings.setColorFilter(it.iconTint, PorterDuff.Mode.SRC_IN)
             viewBinding.imageViewHighlight.setColorFilter(it.iconTint, PorterDuff.Mode.SRC_IN)
             viewBinding.imageViewCamera.setColorFilter(it.iconTint, PorterDuff.Mode.SRC_IN)
@@ -263,8 +273,35 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
                 .withPermission(Manifest.permission.CAMERA)
                 .withListener(object : PermissionListener {
                     override fun onPermissionGranted(response: PermissionGrantedResponse) {
-                        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { intent ->
-                            startActivity(intent)
+                        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also {
+                            //startActivity(intent) 무미건조한 카메라 기능
+
+                            // 시스템 카메라.
+                            // 검색.
+
+                            val file = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
+                                    .format(Date()).toString() + ".jpg")
+                            val uri = FileProvider.getUriForFile(this@MainActivity,"com.flow.android.kotlin.lockscreen.fileprovider" , file)
+
+                            findCameraAppPackageName()?.let {
+                                val intent = Intent().apply {
+                                    action = MediaStore.ACTION_IMAGE_CAPTURE
+                                    putExtra(MediaStore.EXTRA_OUTPUT, uri)
+                                    setPackage(it)
+                                }
+
+                                startActivity(intent) // gallery not showing
+                            } ?: run {
+                                // 커스텀 카메라 실행. 권한 요청 여기서 필요.
+                            }
+
+//                            val mIntent = Intent()
+//                            mIntent.setPackage("com.google.android.camera") // 이게 아닐가능성도 있네.
+//                            val f = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "IMG_" + SimpleDateFormat("yyyyMMdd_HHmmss").format(Date()).toString() + ".jpg")
+//                            mIntent.action = MediaStore.ACTION_IMAGE_CAPTURE
+//                            val uri = FileProvider.getUriForFile(this@MainActivity,"com.flow.android.kotlin.lockscreen.fileprovider" , f)
+//                            mIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
+//                            startActivity(mIntent)
                         }
                     }
 
@@ -398,14 +435,14 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
             displayMetrics.widthPixels
         }
 
-        wallpaper()?.let { wallpaper ->
+        wallpaperLoader.wallpaper()?.let { wallpaper ->
             viewBinding.root.background = wallpaper.toDrawable(resources)
 
             lifecycleScope.launch {
                 val colorDependingOnBackground: ColorDependingOnBackground
 
                 withContext(Dispatchers.IO) {
-                    colorDependingOnBackground = Color.colorDependingOnWallpaper(
+                    colorDependingOnBackground = ColorCalculator.colorDependingOnWallpaper(
                             this@MainActivity,
                             wallpaper,
                             screenWith
@@ -415,34 +452,6 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
                 viewModel.setColorDependingOnBackground(colorDependingOnBackground)
             }
         }
-    }
-
-    private fun wallpaper(): Bitmap? {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-            val wallpaperManager = WallpaperManager.getInstance(this)
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                val wallpaperFile = wallpaperManager.getWallpaperFile(WallpaperManager.FLAG_LOCK) ?: wallpaperManager.getWallpaperFile(
-                        WallpaperManager.FLAG_SYSTEM
-                )
-
-                wallpaperFile?.let {
-                    val bitmap = BitmapFactory.decodeFileDescriptor(wallpaperFile.fileDescriptor)
-
-                    try {
-                        wallpaperFile.close()
-                    } catch (e: IOException) {
-                        e.printStackTrace()
-                    }
-
-                    return bitmap
-                }
-            }
-
-            return wallpaperManager.drawable.toBitmap()
-        }
-
-        return null
     }
 
     private fun checkManageOverlayPermission() {
@@ -509,11 +518,11 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
         if (ConfigurationPreferences.getFirstRun(this)) {
             viewModel.insertMemo(
                     Memo(
-                        content = getString(R.string.memo_fragment_000),
-                        color = ContextCompat.getColor(this, R.color.unselected),
-                        id = -20210513L,
-                        modifiedTime = System.currentTimeMillis(),
-                        priority = System.currentTimeMillis()
+                            content = getString(R.string.memo_fragment_000),
+                            color = ContextCompat.getColor(this, R.color.unselected),
+                            id = -20210513L,
+                            modifiedTime = System.currentTimeMillis(),
+                            priority = System.currentTimeMillis()
                     )
             )
 
@@ -555,5 +564,37 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
         checkPermission()
         //Toast.makeText(this, "what the fuck.", Toast.LENGTH_SHORT).show()
         //checkManageOverlayPermission()
+    }
+
+    private fun findCameraAppPackageName(): String? {
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        val packageManager = this.packageManager
+        val resolveInfoList = packageManager.queryIntentActivities(intent, 0)
+
+        println("ZIOXIAL: ${resolveInfoList.map { it.activityInfo.packageName }}")
+
+        if (resolveInfoList.isEmpty())
+            return null
+
+        for (resolveInfo in resolveInfoList) {
+            if (isSystemApp(resolveInfo.activityInfo.packageName))
+                return resolveInfo.activityInfo.packageName
+        }
+
+        return resolveInfoList[0].activityInfo.packageName
+    }
+
+    private fun isSystemApp(packageName: String): Boolean {
+        val applicationInfo = try {
+            this.packageManager.getApplicationInfo(packageName, 0)
+        } catch (e: PackageManager.NameNotFoundException) {
+            Timber.e(e)
+
+            return false
+        }
+
+        val mask = ApplicationInfo.FLAG_SYSTEM or ApplicationInfo.FLAG_UPDATED_SYSTEM_APP
+
+        return applicationInfo.flags and mask != 0
     }
 }

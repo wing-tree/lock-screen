@@ -2,27 +2,23 @@ package com.flow.android.kotlin.lockscreen.memo.view
 
 import android.content.*
 import android.content.res.ColorStateList
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.provider.CalendarContract
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.base.BaseDialogFragment
 import com.flow.android.kotlin.lockscreen.databinding.FragmentMemoDetailDialogBinding
 import com.flow.android.kotlin.lockscreen.memo._interface.OnMemoChangedListener
-import com.flow.android.kotlin.lockscreen.memo.entity.Memo
+import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.memo.util.share
 import com.flow.android.kotlin.lockscreen.util.show
 import com.flow.android.kotlin.lockscreen.util.toDateString
 import com.flow.android.kotlin.lockscreen.util.view.ConfirmationDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.dialog.MaterialDialogs
 import java.text.SimpleDateFormat
 import java.util.*
 
