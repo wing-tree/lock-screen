@@ -18,6 +18,9 @@
     <!-- home -->
     <string name="home_001">It cannot be unlocked with the home key.</string>
 
+    <!-- shortcut -->
+    <string name="shortcut_000">Remove from screen</string>
+
     <!-- ConfigurationActivity -->
     <string name="configuration_activity_000">Lock setting, Lock type</string>
     <string name="configuration_activity_001">Display</string>
@@ -30,13 +33,7 @@
 
     <!-- DisplayConfigurationFragment -->
     <string name="display_configuration_fragment_000">Dark mode</string>
-    <string name="display_configuration_fragment_001">Lock screen text color</string>
-
-    <string-array name="display_configuration_fragment_002">
-        <item>Black</item>
-        <item>White</item>
-        <item>Depending on the wallpaper</item>
-    </string-array>
+    <string name="display_configuration_fragment_001">Font size</string>
 
     <!-- LockScreenConfigurationFragment -->
     <string name="lock_screen_configuration_fragment_000">Lock setting</string>

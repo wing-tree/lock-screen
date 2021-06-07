@@ -8,8 +8,8 @@ import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.flow.android.kotlin.lockscreen.R
-import com.flow.android.kotlin.lockscreen.base.BaseFragment
-import com.flow.android.kotlin.lockscreen.calendar.CalendarHelper
+import com.flow.android.kotlin.lockscreen.base.BaseMainFragment
+import com.flow.android.kotlin.lockscreen.calendar.CalendarLoader
 import com.flow.android.kotlin.lockscreen.databinding.FragmentCalendarBinding
 import com.flow.android.kotlin.lockscreen.calendar.adapter.EventsAdapter
 import com.flow.android.kotlin.lockscreen.calendar.contract.CalendarContract
@@ -20,20 +20,20 @@ import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 
-class CalendarFragment: BaseFragment<FragmentCalendarBinding>() {
+class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
     override fun inflate(inflater: LayoutInflater, container: ViewGroup?): FragmentCalendarBinding {
         return FragmentCalendarBinding.inflate(inflater, container, false)
     }
 
     private val activityResultLauncher = registerForActivityResult(CalendarContract()) { result ->
         when(result) {
-            CalendarHelper.RequestCode.EditEvent -> { viewModel.callRefreshEvents() }
-            CalendarHelper.RequestCode.InsertEvent -> { viewModel.callRefreshEvents() }
+            CalendarLoader.RequestCode.EditEvent -> { viewModel.callRefreshEvents() }
+            CalendarLoader.RequestCode.InsertEvent -> { viewModel.callRefreshEvents() }
         }
     }
 
     private val eventsAdapter = EventsAdapter(arrayListOf()) {
-        CalendarHelper.editEvent(activityResultLauncher, it)
+        CalendarLoader.editEvent(activityResultLauncher, it)
     }
 
     private val itemCount = 7
@@ -82,7 +82,7 @@ class CalendarFragment: BaseFragment<FragmentCalendarBinding>() {
 
             viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
                 for (i in 0..itemCount) {
-                    CalendarHelper.events(
+                    CalendarLoader.events(
                             viewModel.contentResolver(),
                             calendarDisplays.filter {
                                 uncheckedCalendarIds.contains(it.id.toString()).not()
@@ -96,13 +96,6 @@ class CalendarFragment: BaseFragment<FragmentCalendarBinding>() {
             }
         })
 
-        viewModel.colorDependingOnBackground.observe(viewLifecycleOwner, {
-            viewBinding.appCompatImageView.setColorFilter(it.onViewPagerColor, PorterDuff.Mode.SRC_IN)
-            viewBinding.imageViewBack.setColorFilter(it.onViewPagerColor, PorterDuff.Mode.SRC_IN)
-            viewBinding.imageViewForward.setColorFilter(it.onViewPagerColor, PorterDuff.Mode.SRC_IN)
-            viewBinding.textViewDate.setTextColor(it.onViewPagerColor)
-        })
-
         viewModel.refreshEvents.observe(viewLifecycleOwner, {
             viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
                 val uncheckedCalendarIds = ConfigurationPreferences.getUncheckedCalendarIds(requireContext())
@@ -110,11 +103,11 @@ class CalendarFragment: BaseFragment<FragmentCalendarBinding>() {
                 eventsAdapter.clear()
 
                 for (i in 0..itemCount) {
-                    CalendarHelper.events(
+                    CalendarLoader.events(
                             viewModel.contentResolver(),
-                            viewModel.calendarDisplays()!!.filter {
+                            viewModel.calendarDisplays()?.filter {
                                 uncheckedCalendarIds.contains(it.id.toString()).not()
-                            }, i
+                            } ?: emptyList(), i
                     ).also { events ->
                         events.let { eventsAdapter.add(it, false) }
                     }
@@ -129,7 +122,7 @@ class CalendarFragment: BaseFragment<FragmentCalendarBinding>() {
 
     private fun initializeView() {
         viewBinding.appCompatImageView.setOnClickListener {
-            CalendarHelper.insertEvent(activityResultLauncher)
+            CalendarLoader.insertEvent(activityResultLauncher)
         }
 
         viewBinding.viewPager2.adapter = eventsAdapter

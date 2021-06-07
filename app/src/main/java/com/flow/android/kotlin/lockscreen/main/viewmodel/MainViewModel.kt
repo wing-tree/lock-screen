@@ -6,14 +6,14 @@ import android.graphics.Color
 import android.os.Parcelable
 import androidx.annotation.ColorInt
 import androidx.lifecycle.*
-import com.flow.android.kotlin.lockscreen.calendar.CalendarDisplay
-import com.flow.android.kotlin.lockscreen.calendar.CalendarHelper
+import com.flow.android.kotlin.lockscreen.calendar.CalendarModel
+import com.flow.android.kotlin.lockscreen.calendar.CalendarLoader
 import com.flow.android.kotlin.lockscreen.calendar.Event
-import com.flow.android.kotlin.lockscreen.color.ColorDependingOnBackground
+import com.flow.android.kotlin.lockscreen.configuration.viewmodel.ConfigurationChange
 import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.persistence.entity.Shortcut
 import com.flow.android.kotlin.lockscreen.repository.Repository
-import com.flow.android.kotlin.lockscreen.shortcut.datamodel.*
+import com.flow.android.kotlin.lockscreen.shortcut.model.*
 import com.flow.android.kotlin.lockscreen.util.SingleLiveEvent
 import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.Dispatchers
@@ -34,8 +34,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         super.onCleared()
     }
 
-    private val _calendarDisplays = MutableLiveData<List<CalendarDisplay>>()
-    val calendarDisplays: LiveData<List<CalendarDisplay>>
+    private val _calendarDisplays = MutableLiveData<List<CalendarModel>>()
+    val calendarDisplays: LiveData<List<CalendarModel>>
         get() = _calendarDisplays
 
     val memos = repository.getAllMemos()
@@ -56,20 +56,32 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _refreshEvents.call()
     }
 
+    private val _refreshMemos = SingleLiveEvent<ConfigurationChange>()
+    val refreshMemos: SingleLiveEvent<ConfigurationChange>
+        get() = _refreshMemos
+
+    private fun callRefreshMemos(configurationChange: ConfigurationChange? = null) {
+        configurationChange?.let {
+            _refreshMemos.value = it
+        } ?: run {
+            _refreshMemos.call()
+        }
+    }
+
+    fun refresh(configurationChange: ConfigurationChange) {
+        if (configurationChange.calendarChanged)
+            callRefreshEvents()
+
+        if (configurationChange.fondSizeChanged)
+            callRefreshMemos()
+    }
+
     private val _memoChanged = MutableLiveData<MemoChanged>()
     val memoChanged: LiveData<MemoChanged>
         get() = _memoChanged
 
     private fun notifyMemoChanged(value: MemoChanged) {
         _memoChanged.value = value
-    }
-
-    private val _colorDependingOnBackground = MutableLiveData<ColorDependingOnBackground>()
-    val colorDependingOnBackground: LiveData<ColorDependingOnBackground>
-        get() = _colorDependingOnBackground
-
-    fun setColorDependingOnBackground(value: ColorDependingOnBackground) {
-        _colorDependingOnBackground.value = value
     }
 
     fun submitEvents(events: List<Event>) {
@@ -79,7 +91,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun postCalendarDisplays() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                _calendarDisplays.postValue(CalendarHelper.calendarDisplays(contentResolver))
+                _calendarDisplays.postValue(CalendarLoader.calendarDisplays(contentResolver))
             }
         }
     }
@@ -87,7 +99,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun postEvents() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                _events.postValue(CalendarHelper.events(contentResolver, CalendarHelper.calendarDisplays(contentResolver), 0))
+                _events.postValue(CalendarLoader.events(contentResolver, CalendarLoader.calendarDisplays(contentResolver), 0))
             }
         }
     }
@@ -97,7 +109,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _calendarDisplays.value = value
     }
 
-    fun addShortcut(item: ShortcutDataModel, onInserted: (ShortcutDataModel) -> Unit) {
+    fun addShortcut(item: ShortcutModel, onInserted: (ShortcutModel) -> Unit) {
         repository.insertShortcut(item.toEntity()) {
             onInserted(item)
         }
@@ -109,7 +121,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun updateShortcuts(shortcuts: List<ShortcutDataModel>) {
+    fun updateShortcuts(shortcuts: List<ShortcutModel>) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.updateShortcuts(shortcuts.map { it.toEntity() })
         }

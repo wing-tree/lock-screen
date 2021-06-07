@@ -1,9 +1,9 @@
-package com.flow.android.kotlin.lockscreen.shortcut.datamodel
+package com.flow.android.kotlin.lockscreen.shortcut.model
 
 import android.graphics.drawable.Drawable
 import com.flow.android.kotlin.lockscreen.persistence.entity.Shortcut
 
-data class ShortcutDataModel (
+data class ShortcutModel (
     val icon: Drawable,
     val label: String,
     val packageName: String,

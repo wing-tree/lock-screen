@@ -1,10 +1,7 @@
 package com.flow.android.kotlin.lockscreen.calendar
 
-import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.ContentResolver
 import android.content.ContentUris
-import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.provider.CalendarContract
@@ -16,7 +13,7 @@ import androidx.core.database.getStringOrNull
 import com.flow.android.kotlin.lockscreen.util.BLANK
 import java.util.*
 
-object CalendarHelper {
+object CalendarLoader {
     private object Calendars {
         val projection: Array<String> = arrayOf(
                 CalendarContract.Calendars._ID,
@@ -74,8 +71,8 @@ object CalendarHelper {
         const val InsertEvent = 2057
     }
 
-    fun calendarDisplays(contentResolver: ContentResolver): List<CalendarDisplay> {
-        val calendarDisplays = mutableListOf<CalendarDisplay>()
+    fun calendarDisplays(contentResolver: ContentResolver): List<CalendarModel> {
+        val calendarDisplays = mutableListOf<CalendarModel>()
         val contentUri = CalendarContract.Calendars.CONTENT_URI
         val cursor = contentResolver.query(
                 contentUri,
@@ -96,7 +93,7 @@ object CalendarHelper {
             // val isPrimary = cursor.getString(Calendars.Index.IS_PRIMARY)
 
             // if (isPrimary == "1")
-            calendarDisplays.add(CalendarDisplay(_id, calendarDisplayName))
+            calendarDisplays.add(CalendarModel(_id, calendarDisplayName))
         }
 
         cursor.close()
@@ -175,7 +172,7 @@ object CalendarHelper {
         return events
     }
 
-    fun events(contentResolver: ContentResolver, calendarDisplays: List<CalendarDisplay>, amount: Int): ArrayList<Event> {
+    fun events(contentResolver: ContentResolver, calendarModels: List<CalendarModel>, amount: Int): ArrayList<Event> {
 
         val events = arrayListOf<Event>()
 
@@ -197,7 +194,7 @@ object CalendarHelper {
         DTEND.set(Calendar.SECOND, 0)
         DTEND.add(Calendar.DATE, 1)
 
-        val string = calendarDisplays.map { it.id }.joinToString(separator = ", ") { "\"$it\"" }
+        val string = calendarModels.map { it.id }.joinToString(separator = ", ") { "\"$it\"" }
         val selection = "(${CalendarContract.Instances.CALENDAR_ID} IN ($string))"
 
         instances(contentResolver, selection, DTSTART, DTEND)?.let { instances ->
@@ -216,7 +213,7 @@ object CalendarHelper {
     }
 }
 
-data class CalendarDisplay(
+data class CalendarModel(
         val id: Long,
         val name: String
 )

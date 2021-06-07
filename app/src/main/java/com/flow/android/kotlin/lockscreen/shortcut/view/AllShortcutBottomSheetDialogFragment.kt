@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.flow.android.kotlin.lockscreen.databinding.FragmentAllShortcutBottomSheetDialogBinding
 import com.flow.android.kotlin.lockscreen.main.viewmodel.MainViewModel
 import com.flow.android.kotlin.lockscreen.shortcut.adapter.ShortcutAdapter
-import com.flow.android.kotlin.lockscreen.shortcut.datamodel.ShortcutDataModel
+import com.flow.android.kotlin.lockscreen.shortcut.model.ShortcutModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,9 +22,12 @@ import timber.log.Timber
 
 class AllShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
     private val viewModel: MainViewModel by activityViewModels()
-    private val shortcutAdapter = ShortcutAdapter { viewModel.addShortcut(it) { app ->
+    private val shortcutAdapter = ShortcutAdapter ({ viewModel.addShortcut(it) { app ->
         removeShortcut(app)
-    } }
+    } }) { _, _ ->
+        false
+    }
+
     private val batchSize = 8
     private var viewBinding: FragmentAllShortcutBottomSheetDialogBinding? = null
 
@@ -54,7 +57,7 @@ class AllShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
 
     private suspend fun addShortcuts() {
         withContext(Dispatchers.IO) {
-            val shortcuts = arrayListOf<ShortcutDataModel>()
+            val shortcuts = arrayListOf<ShortcutModel>()
             val packageNames = viewModel.shortcuts()?.map { it.packageName } ?: emptyList()
             var count = 0
 
@@ -79,7 +82,7 @@ class AllShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
                         continue
 
                     shortcuts.add(
-                            ShortcutDataModel(
+                            ShortcutModel(
                                     icon = icon,
                                     label = label,
                                     packageName = packageName,
@@ -109,7 +112,7 @@ class AllShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
         }
     }
 
-    private fun removeShortcut(item: ShortcutDataModel) {
+    private fun removeShortcut(item: ShortcutModel) {
         shortcutAdapter.remove(item)
     }
 }

@@ -3,37 +3,40 @@ package com.flow.android.kotlin.lockscreen.shortcut.view
 import android.app.KeyguardManager
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.PorterDuff
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
-import com.flow.android.kotlin.lockscreen.base.BaseFragment
+import com.flow.android.kotlin.lockscreen.R
+import com.flow.android.kotlin.lockscreen.base.BaseMainFragment
 import com.flow.android.kotlin.lockscreen.databinding.FragmentShortcutBinding
 import com.flow.android.kotlin.lockscreen.devicecredential.DeviceCredentialHelper
 import com.flow.android.kotlin.lockscreen.devicecredential.RequireDeviceCredential
 import com.flow.android.kotlin.lockscreen.shortcut.adapter.ShortcutAdapter
 import com.flow.android.kotlin.lockscreen.shortcut.adapter.ItemTouchCallback
-import com.flow.android.kotlin.lockscreen.shortcut.datamodel.ShortcutDataModel
+import com.flow.android.kotlin.lockscreen.shortcut.model.ShortcutModel
 import com.flow.android.kotlin.lockscreen.util.BLANK
 import timber.log.Timber
 
-class ShortcutFragment: BaseFragment<FragmentShortcutBinding>(), RequireDeviceCredential<ShortcutFragment.Value> {
+class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDeviceCredential<ShortcutFragment.Value> {
     override fun inflate(inflater: LayoutInflater, container: ViewGroup?): FragmentShortcutBinding {
         return FragmentShortcutBinding.inflate(inflater, container, false)
     }
 
     private val packageManager by lazy { requireContext().packageManager }
-    private val shortcutDataModelAdapter = ShortcutAdapter {
-        if (DeviceCredentialHelper.requireUnlock(requireContext())) {
+    private val shortcutDataModelAdapter = ShortcutAdapter({
+        if (DeviceCredentialHelper.requireUnlock(requireContext()))
             confirmDeviceCredential(Value(true, it.packageName))
-        } else {
+        else
             launchApplication(it.packageName)
-        }
+    }) { view, item ->
+        showPopupMenu(view, item)
     }
+
     private val itemTouchHelper = ItemTouchHelper(ItemTouchCallback(shortcutDataModelAdapter))
 
     override fun onCreateView(
@@ -70,14 +73,14 @@ class ShortcutFragment: BaseFragment<FragmentShortcutBinding>(), RequireDeviceCr
     }
 
     override fun onPause() {
-        viewModel.updateShortcuts(shortcutDataModelAdapter.currentList().filterNotNull())
+        viewModel.updateShortcuts(shortcutDataModelAdapter.currentList())
 
         super.onPause()
     }
 
     private fun initializeLiveData() {
         viewModel.shortcuts.observe(viewLifecycleOwner, {
-            val shortcuts = arrayListOf<ShortcutDataModel>()
+            val shortcuts = arrayListOf<ShortcutModel>()
 
             for (shortcut in it) {
                 try {
@@ -86,7 +89,7 @@ class ShortcutFragment: BaseFragment<FragmentShortcutBinding>(), RequireDeviceCr
                     val icon = packageManager.getApplicationIcon(info)
                     val label = packageManager.getApplicationLabel(info).toString()
 
-                    shortcuts.add(ShortcutDataModel(icon, label, packageName, shortcut.priority, shortcut.showInNotification))
+                    shortcuts.add(ShortcutModel(icon, label, packageName, shortcut.priority, shortcut.showInNotification))
                 } catch (e: PackageManager.NameNotFoundException) {
                     Timber.e(e)
                     viewModel.deleteShortcut(shortcut) {  }
@@ -94,10 +97,6 @@ class ShortcutFragment: BaseFragment<FragmentShortcutBinding>(), RequireDeviceCr
             }
 
             shortcutDataModelAdapter.submitList(shortcuts)
-        })
-
-        viewModel.colorDependingOnBackground.observe(viewLifecycleOwner, {
-            viewBinding.appCompatImageView.setColorFilter(it.onViewPagerColor, PorterDuff.Mode.SRC_IN)
         })
     }
 
@@ -133,7 +132,6 @@ class ShortcutFragment: BaseFragment<FragmentShortcutBinding>(), RequireDeviceCr
                         }
                     }
                 }
-
             })
         } else {
             DeviceCredentialHelper.confirmDeviceCredential(this)
@@ -144,8 +142,25 @@ class ShortcutFragment: BaseFragment<FragmentShortcutBinding>(), RequireDeviceCr
         super.onActivityResult(requestCode, resultCode, data)
 
         when(requestCode) {
-            DeviceCredentialHelper.RequestCode.ConfirmDeviceCredential -> showToast("fucking man")
+            DeviceCredentialHelper.RequestCode.ConfirmDeviceCredential -> showToast("fucking man") // todo check.
         }
+    }
+
+    private fun showPopupMenu(view: View, shortcut: ShortcutModel): Boolean {
+        val popupMenu = PopupMenu(requireContext(), view)
+        popupMenu.inflate(R.menu.shortcut)
+        popupMenu.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.delete -> {
+                    viewModel.deleteShortcut(shortcut.toEntity(), { showToast("removed!.") })
+                    true
+                }
+                else -> false
+            }
+        }
+
+        popupMenu.show()
+        return true
     }
 
     data class Value(val shortcutClicked : Boolean, val packageName: String = BLANK)

@@ -32,6 +32,9 @@ class ColorPickerLayout : LinearLayout {
     }
 
     private val colors = resources.getIntArray(R.array.colors)
+    private val colorAdapter = ColorAdapter(colors) {
+        onColorSelectedListener?.onColorSelected(it)
+    }
 
     private lateinit var recyclerView: RecyclerView
 
@@ -42,12 +45,13 @@ class ColorPickerLayout : LinearLayout {
         recyclerView.apply {
             this.layoutParams = layoutParams
             layoutManager = LinearLayoutManager(context).apply { orientation = LinearLayoutManager.HORIZONTAL }
-            adapter = ColorAdapter(colors) {
-                onColorSelectedListener?.onColorSelected(it)
-            }
+            adapter = colorAdapter
         }
 
         addView(recyclerView)
     }
 
+    fun select(color: Int) {
+        colorAdapter.performClick(color)
+    }
 }

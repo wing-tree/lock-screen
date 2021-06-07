@@ -1,7 +1,5 @@
 package com.flow.android.kotlin.lockscreen.configuration.display.view
 
-import android.Manifest.permission.READ_EXTERNAL_STORAGE
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
@@ -12,34 +10,23 @@ import com.flow.android.kotlin.lockscreen.configuration.adapter.ConfigurationAda
 import com.flow.android.kotlin.lockscreen.databinding.ItemBinding
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import io.reactivex.Observable
-import io.reactivex.Single
-import io.reactivex.disposables.Disposable
-import io.reactivex.subjects.PublishSubject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class DisplayConfigurationFragment : ConfigurationFragment() {
-    private val activityResultLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-        publishSubject.onNext(isGranted)
-    }
+    private val duration = 300L
+    private val fontSizes by lazy { resources.getIntArray(R.array.font_size) }
 
-    private val publishSubject = PublishSubject.create<Boolean>()
-    private var disposable: Disposable? = null
+    private val oldFontSize by lazy { ConfigurationPreferences.getFontSize(requireContext()) }
+    private var newFontSize = -1F
 
-    override fun onResume() {
-        super.onResume()
+    override fun onPause() {
+        if (newFontSize != oldFontSize)
+            viewModel.fondSizeChanged = true
 
-        disposable = publishSubject.subscribe { isGranted ->
-            if (isGranted) {
-                ConfigurationPreferences.putLockScreenTextColor(requireContext(), LockScreenTextColor.DependingOnWallpaper)
-                configurationAdapter.updateDescription(LOCK_SCREEN_TEXT_COLOR_ID, lockScreenTextColors[2])
-            } else {
-                showToast("denied.")
-            }
-        }
+        super.onPause()
     }
 
     override fun createConfigurationAdapter(): ConfigurationAdapter {
@@ -67,44 +54,19 @@ class DisplayConfigurationFragment : ConfigurationFragment() {
                         title = getString(R.string.display_configuration_fragment_000)
                 ),
                 AdapterItem.Item(
-                        id = LOCK_SCREEN_TEXT_COLOR_ID,
-                        drawable = ContextCompat.getDrawable(context, R.drawable.ic_round_format_color_text_24),
-                        description = lockScreenTextColors[ConfigurationPreferences.getLockScreenTextColor(requireContext())],
+                        drawable = ContextCompat.getDrawable(context, R.drawable.ic_round_format_size_24),
+                        description = "${oldFontSize.toInt()}sp",
                         onClick = { itemBinding: ItemBinding, _ ->
-                            MaterialAlertDialogBuilder(requireContext()).setItems(lockScreenTextColors) { _, i ->
-                                when (i) {
-                                    0 -> {
-                                        ConfigurationPreferences.putLockScreenTextColor(requireContext(), LockScreenTextColor.Black)
-                                        itemBinding.textDescription.text = lockScreenTextColors[0]
-                                    }
-                                    1 -> {
-                                        ConfigurationPreferences.putLockScreenTextColor(requireContext(), LockScreenTextColor.White)
-                                        itemBinding.textDescription.text = lockScreenTextColors[1]
-                                    }
-                                    2 -> {
-                                        activityResultLauncher.launch(READ_EXTERNAL_STORAGE)
-                                    }
-                                }
+                            MaterialAlertDialogBuilder(requireContext()).setItems(fontSizes.map { "${it}sp" }.toTypedArray()) { _, i ->
+                                val text = "${fontSizes[i]}sp"
+
+                                ConfigurationPreferences.putFontSize(requireContext(), fontSizes[i].toFloat())
+                                itemBinding.textDescription.text = text
+                                newFontSize = fontSizes[i].toFloat()
                             }.show()
                         },
                         title = getString(R.string.display_configuration_fragment_001)
                 ),
         ))
-    }
-
-    private val duration = 300L
-
-    object LockScreenTextColor {
-        const val Black = 0
-        const val White = 1
-        const val DependingOnWallpaper = 2
-    }
-
-    private val lockScreenTextColors by lazy {
-        requireContext().resources.getStringArray(R.array.display_configuration_fragment_002)
-    }
-
-    companion object {
-        private const val LOCK_SCREEN_TEXT_COLOR_ID = 2055L
     }
 }

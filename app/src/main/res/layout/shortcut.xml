@@ -30,6 +30,7 @@
             android:ellipsize="end"
             android:gravity="center_horizontal"
             android:maxLines="2"
+            android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/image_view"

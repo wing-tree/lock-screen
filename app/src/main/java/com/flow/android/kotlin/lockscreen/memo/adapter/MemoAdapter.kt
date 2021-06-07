@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Paint
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.ViewGroup
@@ -11,10 +12,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.databinding.MemoBinding
 import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
+import com.flow.android.kotlin.lockscreen.util.DEFAULT_FONT_SIZE
 import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
-
 
 class MemoAdapter(
         private val items: ArrayList<Memo>,
@@ -24,9 +25,17 @@ class MemoAdapter(
     private var inflater: LayoutInflater? = null
     private var simpleDateFormat: SimpleDateFormat? = null
 
+    private var fontSize = DEFAULT_FONT_SIZE
+
+    fun setFontSize(fontSize: Float) {
+        this.fontSize = fontSize
+    }
+
     inner class ViewHolder(private val binding: MemoBinding) : RecyclerView.ViewHolder(binding.root) {
         @SuppressLint("ClickableViewAccessibility")
         fun bind(item: Memo) {
+            binding.textViewContent.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize)
+
             binding.viewMemoColor.backgroundTintList = ColorStateList.valueOf(item.color)
             binding.textViewContent.text = item.content
             binding.textViewDate.text = item.modifiedTime.format(binding.root.context)

@@ -229,6 +229,10 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
             }
         })
 
+        viewBinding.colorPickerLayout.post {
+            viewBinding.colorPickerLayout.select(selectedColor)
+        }
+
         viewBinding.materialButtonClose.setOnClickListener {
             dismiss()
         }
@@ -251,6 +255,8 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
 
             dismiss()
         }
+
+
     }
 
     private fun enableMaterialButtonSave() {

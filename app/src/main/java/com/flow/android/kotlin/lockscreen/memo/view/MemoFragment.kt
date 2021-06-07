@@ -1,37 +1,41 @@
 package com.flow.android.kotlin.lockscreen.memo.view
 
-import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.flow.android.kotlin.lockscreen.base.BaseFragment
+import com.flow.android.kotlin.lockscreen.base.BaseMainFragment
 import com.flow.android.kotlin.lockscreen.databinding.FragmentMemoBinding
 import com.flow.android.kotlin.lockscreen.main.viewmodel.MemoChangedState
 import com.flow.android.kotlin.lockscreen.memo.adapter.ItemTouchCallback
 import com.flow.android.kotlin.lockscreen.memo.adapter.MemoAdapter
+import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
-class MemoFragment: BaseFragment<FragmentMemoBinding>() {
+class MemoFragment: BaseMainFragment<FragmentMemoBinding>() {
     override fun inflate(inflater: LayoutInflater, container: ViewGroup?): FragmentMemoBinding {
         return FragmentMemoBinding.inflate(inflater, container, false)
     }
 
     private val compositeDisposable = CompositeDisposable()
-    private val memoAdapter: MemoAdapter = MemoAdapter (arrayListOf(), { memo ->
-        MemoDetailDialogFragment.getInstance(memo.deepCopy()).also {
-            it.show(requireActivity().supportFragmentManager, it.tag)
+    private val memoAdapter: MemoAdapter by lazy {
+        MemoAdapter(arrayListOf(), { memo ->
+            MemoDetailDialogFragment.getInstance(memo.deepCopy()).also {
+                it.show(requireActivity().supportFragmentManager, it.tag)
+            }
+        }, {
+            itemTouchHelper.startDrag(it)
+        }).apply {
+            setFontSize(ConfigurationPreferences.getFontSize(requireContext()))
         }
-    }, {
-        itemTouchHelper.startDrag(it)
-    })
+    }
 
-    private val itemTouchHelper = ItemTouchHelper(ItemTouchCallback(memoAdapter))
+    private val itemTouchHelper by lazy { ItemTouchHelper(ItemTouchCallback(memoAdapter)) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,6 +53,7 @@ class MemoFragment: BaseFragment<FragmentMemoBinding>() {
         viewBinding.recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = memoAdapter
+            scheduleLayoutAnimation()
         }
 
         itemTouchHelper.attachToRecyclerView(viewBinding.recyclerView)
@@ -59,7 +64,6 @@ class MemoFragment: BaseFragment<FragmentMemoBinding>() {
 
     override fun onPause() {
         viewModel.updateMemos(memoAdapter.items())
-
         super.onPause()
     }
 
@@ -85,8 +89,9 @@ class MemoFragment: BaseFragment<FragmentMemoBinding>() {
             }
         })
 
-        viewModel.colorDependingOnBackground.observe(viewLifecycleOwner, {
-            viewBinding.appCompatImageView.setColorFilter(it.onViewPagerColor, PorterDuff.Mode.SRC_IN)
+        viewModel.refreshMemos.observe(viewLifecycleOwner, {
+            memoAdapter.setFontSize(ConfigurationPreferences.getFontSize(requireContext()))
+            memoAdapter.notifyDataSetChanged()
         })
     }
 }

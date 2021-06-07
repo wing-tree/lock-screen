@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
-    android:shadowRadius="4.0"
-    android:shadowDx="4.0"
-    android:shadowDy="4.0"
-    android:shadowColor="#000000" />
+    android:shadowColor="@color/shadow"
+    android:shadowDx="@dimen/shadow_dx"
+    android:shadowDy="@dimen/shadow_dy"
+    android:shadowRadius="@dimen/shadow_radius"
+    android:textColor="@color/white"/>

@@ -33,6 +33,7 @@ class EventsAdapter(private val eventsList: ArrayList<List<Event>>, private val 
                 }.apply {
                     submitList(item)
                 }
+                scheduleLayoutAnimation()
             }
         }
 

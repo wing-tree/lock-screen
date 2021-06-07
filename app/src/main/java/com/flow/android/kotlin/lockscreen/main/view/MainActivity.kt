@@ -3,43 +3,30 @@ package com.flow.android.kotlin.lockscreen.main.view
 import android.Manifest
 import android.annotation.TargetApi
 import android.app.KeyguardManager
-import android.app.WallpaperManager
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.PorterDuff
-import android.graphics.Rect
 import android.graphics.drawable.RippleDrawable
 import android.net.Uri
 import android.os.*
 import android.provider.MediaStore
 import android.provider.Settings
-import android.util.DisplayMetrics
-import android.util.Size
 import android.view.View
 import android.view.View.GONE
-import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.core.graphics.drawable.toBitmap
-import androidx.core.graphics.drawable.toDrawable
-import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.flow.android.kotlin.lockscreen.R
-import com.flow.android.kotlin.lockscreen.calendar.CalendarHelper
-import com.flow.android.kotlin.lockscreen.color.ColorCalculator
-import com.flow.android.kotlin.lockscreen.color.ColorCalculator.setColorGradient
-import com.flow.android.kotlin.lockscreen.color.ColorDependingOnBackground
+import com.flow.android.kotlin.lockscreen.calendar.CalendarLoader
 import com.flow.android.kotlin.lockscreen.configuration.view.ConfigurationActivity
+import com.flow.android.kotlin.lockscreen.configuration.viewmodel.ConfigurationChange
 import com.flow.android.kotlin.lockscreen.databinding.ActivityMainBinding
 import com.flow.android.kotlin.lockscreen.home.homewatcher.HomePressedListener
 import com.flow.android.kotlin.lockscreen.home.homewatcher.HomeWatcher
@@ -54,7 +41,6 @@ import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
 import com.flow.android.kotlin.lockscreen.util.fadeIn
 import com.flow.android.kotlin.lockscreen.util.scale
-import com.flow.android.kotlin.lockscreen.wallpaper.WallpaperLoader
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.karumi.dexter.Dexter
@@ -65,15 +51,10 @@ import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.karumi.dexter.listener.single.PermissionListener
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
-import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
-
 
 class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAllowClickListener {
     private val duration = 200L
@@ -89,8 +70,6 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
     private var _viewBinding: ActivityMainBinding? = null
     private val viewBinding: ActivityMainBinding
         get() = _viewBinding!!
-
-    private val wallpaperLoader by lazy { WallpaperLoader(this) }
 
     private val homeWatcher = HomeWatcher(this).apply {
         setOnHomePressedListener(object : HomePressedListener {
@@ -168,16 +147,13 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
                 }
             } else {
                 startService()
-                setWallpaper()
                 viewModel.postCalendarDisplays()
             }
         } else {
             startService()
-            setWallpaper()
             viewModel.postCalendarDisplays()
         }
 
-        initializeLiveData()
         initializeView()
         firstRun()
     }
@@ -219,7 +195,7 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
         if (resultCode == RESULT_OK) {
             @Suppress("SpellCheckingInspection")
             when(requestCode) {
-                CalendarHelper.RequestCode.EditEvent -> {
+                CalendarLoader.RequestCode.EditEvent -> {
                     data ?: return
 
                     viewModel.callRefreshEvents()
@@ -230,7 +206,7 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
 //                        }
 //                    }
                 }
-                CalendarHelper.RequestCode.InsertEvent -> {
+                CalendarLoader.RequestCode.InsertEvent -> {
                     data ?: return
 
                     viewModel.calendarDisplays()?.let { calendarDisplays ->
@@ -241,26 +217,6 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
                 }
             }
         }
-    }
-
-    private fun initializeLiveData() {
-        viewModel.colorDependingOnBackground.observe(this, {
-            viewBinding.textClockDate.setTextColor(it.dateTimeTextColor)
-            viewBinding.textClockDate.setColorGradient(it.dateTimeTextColor, ColorCalculator.lightenColor(it.dateTimeDominantColor, 0.32F))
-            viewBinding.textClockTime.setTextColor(it.dateTimeTextColor)
-            viewBinding.textClockTime.setColorGradient(it.dateTimeTextColor, ColorCalculator.lightenColor(it.dateTimeDominantColor, 0.32F))
-            viewBinding.imageViewSettings.setColorFilter(it.iconTint, PorterDuff.Mode.SRC_IN)
-            viewBinding.imageViewHighlight.setColorFilter(it.iconTint, PorterDuff.Mode.SRC_IN)
-            viewBinding.imageViewCamera.setColorFilter(it.iconTint, PorterDuff.Mode.SRC_IN)
-
-            for (i in 0 until viewBinding.centerAlignedTabLayout.tabCount) {
-                val tab = viewBinding.centerAlignedTabLayout.getTabAt(i) ?: continue
-
-                tab.customView?.findViewById<TextView>(R.id.text_view)?.setTextColor(it.tabTextColor)
-            }
-
-            viewBinding.floatingActionButton.setColorFilter(it.floatingActionButtonTint, PorterDuff.Mode.SRC_IN)
-        })
     }
 
     private fun initializeView() {
@@ -281,7 +237,7 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
 
                             val file = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
                                     .format(Date()).toString() + ".jpg")
-                            val uri = FileProvider.getUriForFile(this@MainActivity,"com.flow.android.kotlin.lockscreen.fileprovider" , file)
+                            val uri = FileProvider.getUriForFile(this@MainActivity, "com.flow.android.kotlin.lockscreen.fileprovider", file)
 
                             findCameraAppPackageName()?.let {
                                 val intent = Intent().apply {
@@ -320,7 +276,7 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
 
         viewBinding.imageViewSettings.setOnClickListener {
             Intent(this, ConfigurationActivity::class.java).also {
-                it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                it.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT)
 
                 configurationActivityResultLauncher.launch(it)
             }
@@ -397,60 +353,11 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
 
     private val configurationActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
-            val configurationChanged = result.data?.getIntExtra(
-                    ConfigurationActivity.ConfigurationChanged.Key, -1
+            val configurationChange = result.data?.getParcelableExtra<ConfigurationChange>(
+                    ConfigurationActivity.Name.ConfigurationChange
             ) ?: return@registerForActivityResult
 
-            if (configurationChanged == -1)
-                return@registerForActivityResult
-
-            when(configurationChanged) {
-                ConfigurationActivity.ConfigurationChanged.Calendar -> {
-                    viewModel.callRefreshEvents()
-                }
-            }
-        }
-    }
-
-    private fun setWallpaper() {
-        val screenWith = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val currentWindowMetrics = windowManager.currentWindowMetrics
-            val insets = currentWindowMetrics.windowInsets.getInsetsIgnoringVisibility(
-                    WindowInsets.Type.navigationBars()
-                            or WindowInsets.Type.displayCutout()
-            )
-
-            val bounds: Rect = currentWindowMetrics.bounds
-            val size = Size(
-                    bounds.width() - insets.left + insets.right,
-                    bounds.height() - insets.bottom + insets.top
-            )
-
-            size.width
-        } else {
-            val displayMetrics = DisplayMetrics()
-
-            @Suppress("DEPRECATION")
-            windowManager.defaultDisplay.getMetrics(displayMetrics)
-            displayMetrics.widthPixels
-        }
-
-        wallpaperLoader.wallpaper()?.let { wallpaper ->
-            viewBinding.root.background = wallpaper.toDrawable(resources)
-
-            lifecycleScope.launch {
-                val colorDependingOnBackground: ColorDependingOnBackground
-
-                withContext(Dispatchers.IO) {
-                    colorDependingOnBackground = ColorCalculator.colorDependingOnWallpaper(
-                            this@MainActivity,
-                            wallpaper,
-                            screenWith
-                    )
-                }
-
-                viewModel.setColorDependingOnBackground(colorDependingOnBackground)
-            }
+            viewModel.refresh(configurationChange)
         }
     }
 
@@ -480,24 +387,18 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
     private fun checkPermission() {
         Dexter.withContext(this)
                 .withPermissions(
-                        Manifest.permission.READ_CALENDAR,
-                        Manifest.permission.READ_EXTERNAL_STORAGE
+                        Manifest.permission.READ_CALENDAR
                 ).withListener(object : MultiplePermissionsListener {
                     override fun onPermissionsChecked(report: MultiplePermissionsReport) {
                         for (grantedPermissionResponse in report.grantedPermissionResponses) {
                             when (grantedPermissionResponse.permissionName) {
                                 Manifest.permission.READ_CALENDAR -> viewModel.postCalendarDisplays()
-                                Manifest.permission.READ_EXTERNAL_STORAGE -> setWallpaper()
                             }
                         }
 
                         for (deniedPermissionResponse in report.deniedPermissionResponses) {
                             when (deniedPermissionResponse.permissionName) {
-                                Manifest.permission.READ_CALENDAR -> {/* 캘린더 프래그먼트에 권한 허용해야한다고 보이기. */
-                                }
-                                Manifest.permission.READ_EXTERNAL_STORAGE -> {
-                                    // 기본벽지로 로드 후, 토스트, 설정탭에서 설정할수 잇습니다.
-                                    // 투명에 화이트 테마로 해야할듯.
+                                Manifest.permission.READ_CALENDAR -> {/* todo 캘린더 프래그먼트에 권한 허용해야한다고 보이기. */
                                 }
                             }
                         }

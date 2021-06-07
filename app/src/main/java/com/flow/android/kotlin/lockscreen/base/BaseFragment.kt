@@ -16,8 +16,6 @@ abstract class BaseFragment<VB: ViewBinding>: Fragment() {
     protected val viewBinding: VB
         get() = _viewBinding!!
 
-    protected val viewModel by activityViewModels<MainViewModel>()
-
     abstract fun inflate(inflater: LayoutInflater, container: ViewGroup?): VB
 
     @CallSuper

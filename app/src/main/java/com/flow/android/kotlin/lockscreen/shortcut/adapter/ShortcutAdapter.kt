@@ -1,36 +1,40 @@
 package com.flow.android.kotlin.lockscreen.shortcut.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.flow.android.kotlin.lockscreen.databinding.ShortcutBinding
-import com.flow.android.kotlin.lockscreen.shortcut.datamodel.ShortcutDataModel
+import com.flow.android.kotlin.lockscreen.shortcut.model.ShortcutModel
 import java.util.*
 
-class ShortcutAdapter(private val onItemClick: (item: ShortcutDataModel) -> Unit): RecyclerView.Adapter<ShortcutAdapter.ViewHolder>() {
+class ShortcutAdapter(
+        private val onItemClick: (item: ShortcutModel) -> Unit,
+        private val onItemLongClick: (view: View, item: ShortcutModel) -> Boolean,
+): RecyclerView.Adapter<ShortcutAdapter.ViewHolder>() {
     private var layoutInflater: LayoutInflater? = null
 
-    private val diffCallback = object : DiffUtil.ItemCallback<ShortcutDataModel>() {
-        override fun areItemsTheSame(oldItem: ShortcutDataModel, newItem: ShortcutDataModel): Boolean {
+    private val diffCallback = object : DiffUtil.ItemCallback<ShortcutModel>() {
+        override fun areItemsTheSame(oldItem: ShortcutModel, newItem: ShortcutModel): Boolean {
             return oldItem.packageName == newItem.packageName
         }
 
-        override fun areContentsTheSame(oldItem: ShortcutDataModel, newItem: ShortcutDataModel): Boolean {
+        override fun areContentsTheSame(oldItem: ShortcutModel, newItem: ShortcutModel): Boolean {
             return oldItem == newItem
         }
     }
 
-    fun addAll(list: List<ShortcutDataModel>) {
+    fun addAll(list: List<ShortcutModel>) {
         val currentList = asyncListDiffer.currentList.toMutableList()
 
         currentList.addAll(list)
         submitList(currentList)
     }
 
-    fun remove(item: ShortcutDataModel) {
+    fun remove(item: ShortcutModel) {
         val currentList = asyncListDiffer.currentList.toMutableList()
 
         currentList.remove(item)
@@ -39,17 +43,21 @@ class ShortcutAdapter(private val onItemClick: (item: ShortcutDataModel) -> Unit
 
     private val asyncListDiffer = AsyncListDiffer(this, diffCallback)
 
-    fun submitList(list: List<ShortcutDataModel>) {
+    fun submitList(list: List<ShortcutModel>) {
         asyncListDiffer.submitList(list)
     }
 
     inner class ViewHolder(private val binding: ShortcutBinding): RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: ShortcutDataModel) {
+        fun bind(item: ShortcutModel) {
             Glide.with(binding.root.context).load(item.icon).into(binding.imageView)
             binding.textView.text = item.label
 
             binding.root.setOnClickListener {
                 onItemClick(item)
+            }
+
+            binding.root.setOnLongClickListener {
+                onItemLongClick(it, item)
             }
         }
     }
@@ -67,9 +75,9 @@ class ShortcutAdapter(private val onItemClick: (item: ShortcutDataModel) -> Unit
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val app = asyncListDiffer.currentList[position]
+        val item = asyncListDiffer.currentList[position]
 
-        holder.bind(app)
+        holder.bind(item)
     }
 
     override fun getItemCount(): Int = asyncListDiffer.currentList.count()
@@ -88,5 +96,5 @@ class ShortcutAdapter(private val onItemClick: (item: ShortcutDataModel) -> Unit
         submitList(currentList)
     }
 
-    fun currentList(): List<ShortcutDataModel> = asyncListDiffer.currentList
+    fun currentList(): List<ShortcutModel> = asyncListDiffer.currentList
 }

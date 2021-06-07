@@ -15,7 +15,7 @@ import com.flow.android.kotlin.lockscreen.util.*
 class ColorAdapter(private val items: IntArray, private val onColorSelected: (color: Int) -> Unit) : RecyclerView.Adapter<ColorAdapter.ViewHolder>() {
     class ViewHolder(val binding: ColorBinding) : RecyclerView.ViewHolder(binding.root)
 
-    private val duration = 50
+    private val duration = 20
     private var colorSelectedPosition = -1
     private var inflater: LayoutInflater? = null
     private var recyclerView: RecyclerView? = null
@@ -54,7 +54,7 @@ class ColorAdapter(private val items: IntArray, private val onColorSelected: (co
             val light = ContextCompat.getColor(holder.binding.root.context, R.color.light)
 
             holder.binding.imageView.setColorFilter(
-                ColorCalculator.onBackgroundColor(color, dark, light),
+                ColorCalculator.onBackgroundColor(color, dark, light, false),
                 PorterDuff.Mode.SRC_ATOP
             )
 
@@ -66,4 +66,17 @@ class ColorAdapter(private val items: IntArray, private val onColorSelected: (co
     }
 
     override fun getItemCount(): Int = items.count()
+
+    fun performClick(color: Int) {
+        val position = items.indexOf(color)
+
+        if (position == -1)
+            return
+
+        val viewHolder = recyclerView?.findViewHolderForAdapterPosition(position)
+
+        if (viewHolder is ViewHolder) {
+            viewHolder.binding.frameLayout.performClick()
+        }
+    }
 }

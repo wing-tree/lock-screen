@@ -2,11 +2,12 @@ package com.flow.android.kotlin.lockscreen.configuration.view
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.flow.android.kotlin.lockscreen.R
-import com.flow.android.kotlin.lockscreen.calendar.CalendarHelper
+import com.flow.android.kotlin.lockscreen.calendar.CalendarLoader
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
 import com.flow.android.kotlin.lockscreen.configuration.adapter.AdapterItem
 import com.flow.android.kotlin.lockscreen.configuration.adapter.CheckBoxAdapter
@@ -15,25 +16,19 @@ import com.flow.android.kotlin.lockscreen.configuration.adapter.ConfigurationAda
 import com.flow.android.kotlin.lockscreen.configuration.calendar.view.CalendarConfigurationFragment
 import com.flow.android.kotlin.lockscreen.configuration.display.view.DisplayConfigurationFragment
 import com.flow.android.kotlin.lockscreen.configuration.lockscreen.view.LockScreenConfigurationFragment
+import com.flow.android.kotlin.lockscreen.configuration.viewmodel.ConfigurationViewModel
 import com.flow.android.kotlin.lockscreen.databinding.ActivityConfigurationBinding
 import com.flow.android.kotlin.lockscreen.util.BLANK
-import java.security.Key
 
 class ConfigurationActivity: AppCompatActivity() {
     private var _viewBinding: ActivityConfigurationBinding? = null
     private val viewBinding: ActivityConfigurationBinding
         get() = _viewBinding!!
 
+    private val viewModel: ConfigurationViewModel by viewModels()
+
     private val activity = this
     private val checkBoxAdapter = CheckBoxAdapter(arrayListOf())
-    //private val viewModel: MainViewModel by activityViewModels() // todo. 그냥 preferences에서 받아올 것. 액트 종료시, 맞춰 업뎃.
-
-    object ConfigurationChanged {
-        const val Key = "com.flow.android.kotlin.lockscreen.configuration.view" +
-                ".ConfigurationActivity.ConfigurationChanged.Key"
-
-        const val Calendar = 211
-    }
 
     private val configurationAdapter: ConfigurationAdapter by lazy {
         ConfigurationAdapter(arrayListOf(
@@ -64,6 +59,11 @@ class ConfigurationActivity: AppCompatActivity() {
         ))
     }
 
+    object Name {
+        const val ConfigurationChange = "com.flow.android.kotlin.lockscreen.configuration.view" +
+                "ConfigurationActivity.Name.ConfigurationChange"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _viewBinding = ActivityConfigurationBinding.inflate(layoutInflater)
@@ -75,7 +75,7 @@ class ConfigurationActivity: AppCompatActivity() {
         }
 
         val uncheckedCalendarIds = ConfigurationPreferences.getUncheckedCalendarIds(this)
-        val checkBoxItems = CalendarHelper.calendarDisplays(contentResolver).map {
+        val checkBoxItems = CalendarLoader.calendarDisplays(contentResolver).map {
             CheckBoxItem(
                     isChecked = uncheckedCalendarIds.contains(it.id.toString()).not(),
                     text = it.name,
@@ -99,7 +99,7 @@ class ConfigurationActivity: AppCompatActivity() {
         }
 
         val intent = Intent().apply {
-            putExtra(ConfigurationChanged.Key, ConfigurationChanged.Calendar)
+            putExtra(Name.ConfigurationChange, viewModel.configurationChanged)
         }
 
         setResult(RESULT_OK, intent)

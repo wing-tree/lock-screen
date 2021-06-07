@@ -29,9 +29,9 @@ class EventAdapter(private val onItemClick: (item: Event) -> Unit): ListAdapter<
             val begin = "${item.begin.format()} - "
 
             viewBinding.textViewBegin.text = begin
-            viewBinding.viewCalendarColor.backgroundTintList = ColorStateList.valueOf(item.calendarColor)
             viewBinding.textViewTitle.text = item.title
             viewBinding.textViewEnd.text = item.end.format()
+            viewBinding.viewCalendarColor.backgroundTintList = ColorStateList.valueOf(item.calendarColor)
 
             viewBinding.root.setOnClickListener {
                 onItemClick(item)
@@ -41,7 +41,7 @@ class EventAdapter(private val onItemClick: (item: Event) -> Unit): ListAdapter<
         private fun Long.format() = simpleDateFormat.format(this)
     }
 
-    private fun from(parent: ViewGroup, onItemClick: (item: Event) -> Unit): ViewHolder {
+    private fun from(parent: ViewGroup): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val viewBinding = EventItemBinding.inflate(inflater, parent, false)
 
@@ -49,7 +49,7 @@ class EventAdapter(private val onItemClick: (item: Event) -> Unit): ListAdapter<
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return from(parent, onItemClick)
+        return from(parent)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {

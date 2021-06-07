@@ -51,6 +51,7 @@
     <color name="deep_orange_400">#ff7043</color>
 
     <integer-array name="colors">
+        <item>@color/white</item>
         <item>@color/red_400</item>
         <item>@color/pink_400</item>
         <item>@color/purple_400</item>
@@ -76,4 +77,6 @@
 
     <color name="button_text_disabled">@color/disabled</color>
     <color name="button_text_enabled">@color/high_emphasis</color>
+
+    <color name="shadow">@color/black</color>
 </resources>

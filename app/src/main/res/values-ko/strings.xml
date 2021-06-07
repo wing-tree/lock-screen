@@ -17,6 +17,9 @@
     <!-- home -->
     <string name="home_001">홈 키로 잠금 해제 할 수 없습니다.</string>
 
+    <!-- shortcut -->
+    <string name="shortcut_000">화면에서 삭제</string>
+
     <!-- ConfigurationActivity -->
     <string name="configuration_activity_000">잠금 설정, 잠금 방식</string>
     <string name="configuration_activity_001">디스플레이</string>
@@ -29,13 +32,7 @@
 
     <!-- DisplayConfigurationFragment -->
     <string name="display_configuration_fragment_000">다크 모드</string>
-    <string name="display_configuration_fragment_001">잠금화면 글자 색상</string>
-
-    <string-array name="display_configuration_fragment_002">
-        <item>블랙</item>
-        <item>화이트</item>
-        <item>배경화면에 따라</item>
-    </string-array>
+    <string name="display_configuration_fragment_001">글꼴 크기</string>
 
     <!-- LockScreenConfigurationFragment -->
     <string name="lock_screen_configuration_fragment_000">잠금 설정</string>

@@ -1,6 +1,5 @@
 package com.flow.android.kotlin.lockscreen.color
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.LinearGradient
@@ -8,140 +7,27 @@ import android.graphics.Shader.TileMode
 import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.Size
-import androidx.core.content.ContextCompat
 import androidx.palette.graphics.Palette
-import com.flow.android.kotlin.lockscreen.R
-import com.flow.android.kotlin.lockscreen.preferences.ColorPreferences
-import com.flow.android.kotlin.lockscreen.util.toPx
 import timber.log.Timber
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
 
+@Suppress("unused")
 object ColorCalculator {
     fun TextView.setColorGradient(@ColorInt start: Int, @ColorInt end: Int) {
-        val linearGradient = LinearGradient(0F, 0F, 0F, paint.textSize, intArrayOf(start, end), floatArrayOf(0f, 1f), TileMode.CLAMP)
+        val linearGradient = LinearGradient(0F, 0F, 0F, paint.textSize, intArrayOf(start, end), floatArrayOf(0F, 1F), TileMode.CLAMP)
         this.paint.shader = linearGradient
     }
 
-    fun colorDependingOnWallpaper(context: Context, wallpaper: Bitmap, screenWidth: Int): ColorDependingOnBackground {
-        @ColorInt
-        val dark = ContextCompat.getColor(context, R.color.dark)
-        @ColorInt
-        val light = ContextCompat.getColor(context, R.color.light)
-
-        val dateTimeBottom = 168.toPx
-        val dateTimeLeft = 24.toPx
-        val dateTimeRight = screenWidth / 2
-        val dateTimeTop = 64.toPx
-        @ColorInt
-        var dateTimeDominantColor = ContextCompat.getColor(context, R.color.light)
-
-        val iconBottom = 72.toPx
-        val iconLeft = screenWidth / 2
-        val iconRight = screenWidth - 24.toPx
-        val iconTop = 48.toPx
-
-        val tabLayoutBottom = 224.toPx
-        val tabLayoutLeft = 24.toPx
-        val tabLayoutRight = screenWidth - 24.toPx
-        val tabLayoutTop = 168.toPx
-
-        val viewPagerBottom = 324.toPx
-        val viewPagerLeft = 24.toPx
-        val viewPagerRight = screenWidth - 24.toPx
-        val viewPagerTop = 224.toPx
-
-        val floatingActionButtonBottom = 380.toPx
-        val floatingActionButtonLeft = screenWidth / 2 - 28.toPx
-        val floatingActionButtonRight = screenWidth / 2 + 28.toPx
-        val floatingActionButtonTop = 324.toPx
-
-        var dateTimeTextColor = light
-        var iconTint = light
-        var tabTextColor = light
-        var onViewPagerColor = light
-        var floatingActionButtonTint = light
-
-        try {
-            val builder = Palette.Builder(wallpaper)
-
-            builder.setRegion(
-                    dateTimeLeft,
-                    dateTimeTop,
-                    dateTimeRight,
-                    dateTimeBottom
-            ).generate().also {
-                val dominantColor = it.getDominantColor(dark)
-
-                dateTimeDominantColor = dominantColor
-                dateTimeTextColor = onBackgroundColor(dominantColor, dark, light)
-                ColorPreferences.putIconTint(context, dateTimeTextColor)
-            }
-
-            builder.setRegion(
-                    iconLeft,
-                    iconTop,
-                    iconRight,
-                    iconBottom
-            ).generate().also {
-                val dominantColor = it.getDominantColor(dark)
-
-                iconTint = onBackgroundColor(dominantColor, dark, light)
-                ColorPreferences.putIconTint(context, iconTint)
-            }
-
-            builder.setRegion(
-                    tabLayoutLeft,
-                    tabLayoutTop,
-                    tabLayoutRight,
-                    tabLayoutBottom
-            ).generate().also {
-                val dominantColor = it.getDominantColor(dark)
-
-                tabTextColor = onBackgroundColor(dominantColor, dark, light)
-                ColorPreferences.putIconTint(context, tabTextColor)
-            }
-
-            builder.setRegion(
-                    viewPagerLeft,
-                    viewPagerTop,
-                    viewPagerRight,
-                    viewPagerBottom
-            ).generate().also {
-                val dominantColor = it.getDominantColor(dark)
-
-                onViewPagerColor = onBackgroundColor(dominantColor, dark, light)
-                ColorPreferences.putIconTint(context, onViewPagerColor)
-            }
-
-            builder.setRegion(
-                    floatingActionButtonLeft,
-                    floatingActionButtonTop,
-                    floatingActionButtonRight,
-                    floatingActionButtonBottom
-            ).generate().also {
-                val dominantColor = it.getDominantColor(dark)
-
-                floatingActionButtonTint = onBackgroundColor(dominantColor, dark, light)
-                ColorPreferences.putIconTint(context, floatingActionButtonTint)
-            }
+    @ColorInt
+    fun Bitmap.dominantColor(): Int {
+        return try {
+            Palette.Builder(this).generate().getDominantColor(Color.BLACK)
         } catch (e: IllegalArgumentException) {
             Timber.e(e)
-            dateTimeTextColor = ColorPreferences.getDateTimeTextColor(context)
-            iconTint = ColorPreferences.getIconTint(context)
-            tabTextColor = ColorPreferences.getTabTextColor(context)
-            onViewPagerColor = ColorPreferences.getOnViewPagerColor(context)
-            floatingActionButtonTint = ColorPreferences.getFloatingActionButtonTint(context)
-        } finally {
-            return ColorDependingOnBackground(
-                    dateTimeDominantColor = dateTimeDominantColor,
-                    dateTimeTextColor = dateTimeTextColor,
-                    iconTint = iconTint,
-                    tabTextColor = tabTextColor,
-                    onViewPagerColor = onViewPagerColor,
-                    floatingActionButtonTint = floatingActionButtonTint
-            )
+
+            Color.BLACK
         }
     }
 
@@ -253,39 +139,22 @@ object ColorCalculator {
     }
 
     @ColorInt
-    fun lightenColor(
-            @ColorInt color: Int,
-            value: Float
-    ): Int {
-        val hsl = colorToHSL(color)
-        hsl[2] += value
-        hsl[2] = max(0f, min(hsl[2], 1f))
-        return hslToColor(hsl)
+    fun Int.darken(value: Float): Int {
+        return colorToHSL(this).run {
+            this[2] -= value
+            this[2] = max(0f, min(this[2], 1F))
+
+            hslToColor(this)
+        }
     }
 
     @ColorInt
-    fun darkenColor(
-            @ColorInt color: Int,
-            value: Float
-    ): Int {
-        val hsl = colorToHSL(color)
-        hsl[2] -= value
-        hsl[2] = max(0f, min(hsl[2], 1f))
-        return hslToColor(hsl)
+    fun Int.lighten(value: Float): Int {
+        return colorToHSL(this).run {
+            this[2] += value
+            this[2] = max(0f, min(this[2], 1F))
+
+            hslToColor(this)
+        }
     }
 }
-
-data class ColorDependingOnBackground(
-        @ColorInt
-        val dateTimeDominantColor: Int,
-        @ColorInt
-        val dateTimeTextColor: Int,
-        @ColorInt
-        var iconTint: Int,
-        @ColorInt
-        var tabTextColor: Int,
-        @ColorInt
-        var onViewPagerColor: Int,
-        @ColorInt
-        var floatingActionButtonTint: Int
-)

@@ -3,7 +3,6 @@ package com.flow.android.kotlin.lockscreen.preferences
 import android.content.Context
 import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatDelegate
-import com.flow.android.kotlin.lockscreen.configuration.display.view.DisplayConfigurationFragment
 
 object ConfigurationPreferences {
 
@@ -17,11 +16,10 @@ object ConfigurationPreferences {
         const val DarkMode = "com.flow.android.kotlin.lockscreen.preferences.Key.DarkMode"
         const val DisplayAfterUnlocking = "com.flow.android.kotlin.lockscreen.preferences.key.display_after_unlocking"
         const val FirstRun = "com.flow.android.kotlin.lockscreen.preferences.key.first_run"
-        const val LockScreenTextColor = "com.flow.android.kotlin.lockscreen.preferences.Key.LockScreenTextColor"
-        const val LockScreenTextGradient = "com.flow.android.kotlin.lockscreen.preferences.Key.LockScreenTextGradient"
+        const val FontSize = "com.flow.android.kotlin.lockscreen.preferences.Key.FontSize"
         const val SelectedTabIndex = "com.flow.android.kotlin.lockscreen.preferences.key.selected_tab_index"
         const val ShowOnLockScreen = "com.flow.android.kotlin.lockscreen.preferences.key.show_on_lock_screen"
-        const val UncheckedCalendarIds = "com.flow.android.kotlin.lockscreen.preferences.key.unchecked_calendar_ids"
+        const val UncheckedCalendarIDs = "com.flow.android.kotlin.lockscreen.preferences.key.unchecked_calendar_ids"
     }
 
     fun getShowOnLockScreen(context: Context): Boolean {
@@ -46,12 +44,12 @@ object ConfigurationPreferences {
 
     fun getUncheckedCalendarIds(context: Context): Set<String> {
         val sharedPreferences = context.getSharedPreferences(Name.Configuration, Context.MODE_PRIVATE)
-        return sharedPreferences.getStringSet(Key.UncheckedCalendarIds, setOf()) ?: setOf()
+        return sharedPreferences.getStringSet(Key.UncheckedCalendarIDs, setOf()) ?: setOf()
     }
 
-    private fun putUncheckedCalendarIds(context: Context, uncheckedCalendarIds: Set<String>) {
+    private fun putUncheckedCalendarIds(context: Context, uncheckedCalendarIDs: Set<String>) {
         val sharedPreferences = context.getSharedPreferences(Name.Configuration, Context.MODE_PRIVATE)
-        sharedPreferences.edit().putStringSet(Key.UncheckedCalendarIds, uncheckedCalendarIds).apply()
+        sharedPreferences.edit().putStringSet(Key.UncheckedCalendarIDs, uncheckedCalendarIDs).apply()
     }
 
     fun addUncheckedCalendarId(context: Context, id: String) {
@@ -104,22 +102,14 @@ object ConfigurationPreferences {
                 .getBoolean(Key.DarkMode, defValue)
     }
 
-    fun putLockScreenTextColor(context: Context, lockScreenTextColor: Int) {
+    fun putFontSize(context: Context, fontSize: Float) {
         context.getSharedPreferences(Name.Configuration, Context.MODE_PRIVATE).apply {
-            edit().putInt(Key.LockScreenTextColor, lockScreenTextColor).apply()
+            edit().putFloat(Key.FontSize, fontSize).apply()
         }
     }
 
-    fun getLockScreenTextColor(context: Context): Int {
+    fun getFontSize(context: Context): Float {
         return context.getSharedPreferences(Name.Configuration, Context.MODE_PRIVATE)
-                .getInt(Key.LockScreenTextColor, DisplayConfigurationFragment.LockScreenTextColor.White)
-    }
-
-    object Calendar {
-        @Suppress("SpellCheckingInspection")
-        private object Name {
-            const val Calendar = "com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences" +
-                    ".Calendar.Name.Calendar"
-        }
+                .getFloat(Key.FontSize, 16F)
     }
 }
