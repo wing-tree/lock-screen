@@ -52,7 +52,7 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
             adapter = shortcutDataModelAdapter
         }
 
-        itemTouchHelper.attachToRecyclerView(viewBinding.recyclerView)
+        //itemTouchHelper.attachToRecyclerView(viewBinding.recyclerView) todo check.
         initializeLiveData()
 
         return view
