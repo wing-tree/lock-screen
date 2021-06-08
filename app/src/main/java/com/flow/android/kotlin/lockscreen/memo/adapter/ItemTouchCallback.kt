@@ -24,8 +24,6 @@ class ItemTouchCallback(private val adapter: MemoAdapter): ItemTouchHelper.Callb
         return true
     }
 
-
-
     override fun isLongPressDragEnabled(): Boolean = true
 
     override fun isItemViewSwipeEnabled(): Boolean = false

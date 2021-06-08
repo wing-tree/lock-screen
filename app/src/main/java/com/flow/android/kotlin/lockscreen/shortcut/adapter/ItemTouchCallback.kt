@@ -1,5 +1,6 @@
 package com.flow.android.kotlin.lockscreen.shortcut.adapter
 
+import android.graphics.Canvas
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import timber.log.Timber
@@ -20,7 +21,6 @@ class ItemTouchCallback(private val adapter: ShortcutAdapter): ItemTouchHelper.C
             viewHolder: RecyclerView.ViewHolder,
             target: RecyclerView.ViewHolder
     ): Boolean {
-        println("dddddddaaazzzzz")
         val from = viewHolder.adapterPosition
         val to = target.adapterPosition
 
@@ -30,7 +30,7 @@ class ItemTouchCallback(private val adapter: ShortcutAdapter): ItemTouchHelper.C
     }
 
     override fun onMoved(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, fromPos: Int, target: RecyclerView.ViewHolder, toPos: Int, x: Int, y: Int) {
-        //adapter.onMove(fromPos, toPos)
+        // adapter.onMove(fromPos, toPos)
     }
 
     override fun isLongPressDragEnabled(): Boolean = true
