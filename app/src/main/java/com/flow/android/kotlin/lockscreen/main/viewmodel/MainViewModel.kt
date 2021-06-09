@@ -2,6 +2,7 @@ package com.flow.android.kotlin.lockscreen.main.viewmodel
 
 import android.app.Application
 import android.content.ContentResolver
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Parcelable
 import androidx.annotation.ColorInt
@@ -19,27 +20,54 @@ import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val contentResolver = application.contentResolver
     private val repository = Repository(application)
-
-    private var _viewPagerRegionColor = Color.WHITE
-    val viewPagerRegionColor: Int
-        @ColorInt
-        get() = _viewPagerRegionColor
 
     override fun onCleared() {
         repository.clearCompositeDisposable()
         super.onCleared()
     }
 
+    private var _viewPagerRegionColor = Color.WHITE
+    val viewPagerRegionColor: Int
+        @ColorInt
+        get() = _viewPagerRegionColor
+
     private val _calendarDisplays = MutableLiveData<List<CalendarModel>>()
     val calendarDisplays: LiveData<List<CalendarModel>>
         get() = _calendarDisplays
 
     val memos = repository.getAllMemos()
-    val shortcuts = repository.getAllShortcuts()
+
+    private val _shortcuts = MutableLiveData<List<ShortcutModel>>()
+    val shortcuts: LiveData<List<ShortcutModel>>
+        get() = _shortcuts
+
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            val packageManager = application.packageManager
+            val shortcuts = arrayListOf<ShortcutModel>()
+
+            for (shortcut in repository.getAllShortcuts()) {
+                try {
+                    val packageName = shortcut.packageName
+                    val info = packageManager.getApplicationInfo(packageName, 0)
+                    val icon = packageManager.getApplicationIcon(info)
+                    val label = packageManager.getApplicationLabel(info).toString()
+
+                    shortcuts.add(ShortcutModel(icon, label, packageName, shortcut.priority, shortcut.showInNotification))
+                } catch (e: PackageManager.NameNotFoundException) {
+                    Timber.e(e)
+                    deleteShortcut(shortcut) {  }
+                }
+            }
+
+            _shortcuts.postValue(shortcuts)
+        }
+    }
 
     fun shortcuts() = shortcuts.value
 

@@ -57,7 +57,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAllowClickListener {
-    private val duration = 200L
+    private val duration = 400L
     private val localBroadcastManager: LocalBroadcastManager by lazy {
         LocalBroadcastManager.getInstance(this)
     }

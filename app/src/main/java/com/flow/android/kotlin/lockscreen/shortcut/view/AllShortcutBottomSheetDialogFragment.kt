@@ -11,6 +11,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.flow.android.kotlin.lockscreen.databinding.FragmentAllShortcutBottomSheetDialogBinding
+import com.flow.android.kotlin.lockscreen.devicecredential.DeviceCredentialHelper
 import com.flow.android.kotlin.lockscreen.main.viewmodel.MainViewModel
 import com.flow.android.kotlin.lockscreen.shortcut.adapter.ShortcutAdapter
 import com.flow.android.kotlin.lockscreen.shortcut.model.ShortcutModel
@@ -22,10 +23,22 @@ import timber.log.Timber
 
 class AllShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
     private val viewModel: MainViewModel by activityViewModels()
-    private val shortcutAdapter = ShortcutAdapter ({ viewModel.addShortcut(it) { app ->
-        removeShortcut(app)
-    } }) { _, _ ->
-        false
+
+    private val shortcutAdapter = ShortcutAdapter().apply {
+        setDraggable(false)
+        setListener(object : ShortcutAdapter.Listener {
+            override fun onItemClick(item: ShortcutModel) {
+                removeShortcut(item)
+            }
+
+            override fun onItemLongClick(view: View, item: ShortcutModel): Boolean {
+                return false
+            }
+
+            override fun onDragExited() {}
+
+            override fun onMoved(from: ShortcutModel, to: ShortcutModel) {}
+        })
     }
 
     private val batchSize = 8

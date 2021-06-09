@@ -87,5 +87,5 @@ class Repository(context: Context) {
         shortcutDao.updateAll(shortcuts)
     }
 
-    fun getAllShortcuts() = shortcutDao.getAll()
+    suspend fun getAllShortcuts() = shortcutDao.getAll()
 }

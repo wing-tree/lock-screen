@@ -28,16 +28,34 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
     }
 
     private val packageManager by lazy { requireContext().packageManager }
-    private val shortcutDataModelAdapter = ShortcutAdapter({
-        if (DeviceCredentialHelper.requireUnlock(requireContext()))
-            confirmDeviceCredential(Value(true, it.packageName))
-        else
-            launchApplication(it.packageName)
-    }) { view, item ->
-        showPopupMenu(view, item)
+
+    private val shortcutAdapter = ShortcutAdapter().apply {
+        setDraggable(true)
+        setListener(object : ShortcutAdapter.Listener {
+            override fun onItemClick(item: ShortcutModel) {
+                if (DeviceCredentialHelper.requireUnlock(requireContext()))
+                    confirmDeviceCredential(Value(true, item.packageName))
+                else
+                    launchApplication(item.packageName)
+            }
+
+            override fun onItemLongClick(view: View, item: ShortcutModel): Boolean {
+                return showPopupMenu(view, item)
+            }
+
+            override fun onDragExited() {
+                dismissPopupMenu()
+            }
+
+            override fun onMoved(from: ShortcutModel, to: ShortcutModel) {
+                viewModel.updateShortcuts(listOf(from, to))
+            }
+        })
     }
 
-    private val itemTouchHelper = ItemTouchHelper(ItemTouchCallback(shortcutDataModelAdapter))
+    private val itemTouchHelper = ItemTouchHelper(ItemTouchCallback(shortcutAdapter))
+
+    private var popupMenu: PopupMenu? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,7 +67,7 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
         viewBinding.recyclerView.apply {
             setHasFixedSize(true)
             layoutManager = GridLayoutManager(requireContext(), 4)
-            adapter = shortcutDataModelAdapter
+            adapter = shortcutAdapter
         }
 
         //itemTouchHelper.attachToRecyclerView(viewBinding.recyclerView) todo check.
@@ -73,30 +91,13 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
     }
 
     override fun onPause() {
-        viewModel.updateShortcuts(shortcutDataModelAdapter.currentList())
-
+        viewModel.updateShortcuts(shortcutAdapter.currentList())
         super.onPause()
     }
 
     private fun initializeLiveData() {
         viewModel.shortcuts.observe(viewLifecycleOwner, {
-            val shortcuts = arrayListOf<ShortcutModel>()
-
-            for (shortcut in it) {
-                try {
-                    val packageName = shortcut.packageName
-                    val info = packageManager.getApplicationInfo(packageName, 0)
-                    val icon = packageManager.getApplicationIcon(info)
-                    val label = packageManager.getApplicationLabel(info).toString()
-
-                    shortcuts.add(ShortcutModel(icon, label, packageName, shortcut.priority, shortcut.showInNotification))
-                } catch (e: PackageManager.NameNotFoundException) {
-                    Timber.e(e)
-                    viewModel.deleteShortcut(shortcut) {  }
-                }
-            }
-
-            shortcutDataModelAdapter.submitList(shortcuts)
+            shortcutAdapter.submitList(it)
         })
     }
 
@@ -147,20 +148,24 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
     }
 
     private fun showPopupMenu(view: View, shortcut: ShortcutModel): Boolean {
-        val popupMenu = PopupMenu(requireContext(), view)
-        popupMenu.inflate(R.menu.shortcut)
-        popupMenu.setOnMenuItemClickListener { item ->
+        popupMenu = PopupMenu(requireContext(), view)
+        popupMenu?.inflate(R.menu.shortcut)
+        popupMenu?.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.delete -> {
-                    viewModel.deleteShortcut(shortcut.toEntity(), { showToast("removed!.") })
+                    viewModel.deleteShortcut(shortcut.toEntity()) { showToast("removed!.") }
                     true
                 }
                 else -> false
             }
         }
 
-        popupMenu.show()
+        popupMenu?.show()
         return true
+    }
+
+    private fun dismissPopupMenu() {
+        popupMenu?.dismiss()
     }
 
     data class Value(val shortcutClicked : Boolean, val packageName: String = BLANK)

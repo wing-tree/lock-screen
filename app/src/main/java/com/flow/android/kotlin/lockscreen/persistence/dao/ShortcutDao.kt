@@ -15,9 +15,9 @@ interface ShortcutDao {
     fun insert(shortcut: Shortcut): Completable
 
     @Update
-    fun updateAll(list: List<Shortcut>)
+    suspend fun updateAll(list: List<Shortcut>)
 
     @Transaction
     @Query("SELECT * FROM shortcut ORDER BY priority DESC")
-    fun getAll(): LiveData<List<Shortcut>>
+    suspend fun getAll(): List<Shortcut>
 }
