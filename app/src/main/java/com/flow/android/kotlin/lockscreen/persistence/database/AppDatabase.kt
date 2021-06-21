@@ -1,24 +1,24 @@
 package com.flow.android.kotlin.lockscreen.persistence.database
 
 import android.content.Context
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
+import androidx.room.*
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.flow.android.kotlin.lockscreen.persistence.converter.Converters
 import com.flow.android.kotlin.lockscreen.persistence.dao.MemoDao
 import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.persistence.dao.ShortcutDao
 import com.flow.android.kotlin.lockscreen.persistence.entity.Shortcut
 
-@Database(entities = [Memo::class, Shortcut::class], version = 4, exportSchema = false)
+@Database(entities = [Memo::class, Shortcut::class], version = 5, exportSchema = false)
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun memoDao(): MemoDao
     abstract fun shortcutDao(): ShortcutDao
 
     companion object {
         const val name = "com.flow.android.kotlin.lockscreen.persistence.database" +
-                ".AppDatabase.name:1.0.0"
+                ".AppDatabase.name:1.0.1"
 
         @Volatile
         private var INSTANCE: AppDatabase? = null
@@ -48,6 +48,12 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE memo ADD COLUMN checklist TEXT NOT NULL DEFAULT '[]'")
+            }
+        }
+
         fun getInstance(context: Context): AppDatabase {
             synchronized(this) {
                 var instance = INSTANCE
@@ -58,7 +64,7 @@ abstract class AppDatabase : RoomDatabase() {
                             AppDatabase::class.java,
                             name
                     )
-                        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
                         .fallbackToDestructiveMigration()
                         .build()
 

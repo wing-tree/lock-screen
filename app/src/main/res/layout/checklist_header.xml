@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/extra_small_100"
+    app:cardBackgroundColor="@color/edit_text_background"
+    app:cardCornerRadius="@dimen/small_100"
+    app:cardElevation="0dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/edit_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_corners"
+            android:backgroundTint="@color/edit_text_background"
+            android:ems="10"
+            android:hint="@string/memo_editing_dialog_fragment_003"
+            android:importantForAutofill="no"
+            android:inputType="textMultiLine"
+            android:paddingBottom="@dimen/padding_small"
+            android:paddingEnd="@dimen/margin_double_extra_large"
+            android:paddingStart="@dimen/padding_normal"
+            android:paddingTop="@dimen/padding_small"
+            android:textSize="@dimen/text_size_medium_small"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/image_view"
+            android:layout_width="@dimen/width_normal"
+            android:layout_height="@dimen/height_normal"
+            android:layout_marginEnd="@dimen/margin_small"
+            android:layout_marginTop="@dimen/margin_small"
+            app:layout_constraintEnd_toEndOf="@+id/edit_text"
+            app:layout_constraintTop_toTopOf="@+id/edit_text"
+            app:srcCompat="@drawable/ic_round_add_circle_24" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

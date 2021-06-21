@@ -5,8 +5,9 @@
 
     <string name="format_date_000">EEE, MMMM d</string>
     <string name="format_date_001">MMMM d</string>
-    <string name="format_time_00" translatable="false">h:mm</string>
-    <string name="format_time_01" translatable="false">h:mm a</string>
+    <string name="format_time_000" translatable="false">a h:mm</string>
+    <string name="format_time_001" translatable="false">h:mm</string>
+    <string name="format_time_002" translatable="false">h:mm a</string>
 
     <string name="notification_content_text">This is a notification for stable execution.</string>
 
@@ -53,6 +54,7 @@
     <string name="main_activity_000">Calendar</string>
     <string name="main_activity_001">Favorite Apps</string>
     <string name="main_activity_002">Memo</string>
+    <string name="main_activity_003">Notifications</string>
 
     <!-- MemoDetailDialogFragment -->
     <string name="memo_detail_dialog_fragment_000">Close</string>
@@ -70,8 +72,8 @@
     <!-- MemoEditingDialogFragment -->
     <string name="memo_editing_dialog_fragment_000">Cancel</string>
     <string name="memo_editing_dialog_fragment_001">Save</string>
-    <string name="memo_editing_dialog_fragment_002">Enter your memos.</string>
-    <string name="memo_editing_dialog_fragment_003">Enter your details.</string>
+    <string name="memo_editing_dialog_fragment_002">Enter your memos</string>
+    <string name="memo_editing_dialog_fragment_003">Enter your checklist</string>
 
     <!-- MemoFragment -->
     <string name="memo_fragment_000">You may delay, but time will not. (Benjamin Franklin)</string>

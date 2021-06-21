@@ -24,7 +24,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="1dp"
-        android:layout_marginTop="@dimen/spacing_medium"
+        android:layout_marginTop="@dimen/margin_normal"
         android:background="@drawable/rounded_corner_bottom_left"
         android:insetTop="0dp"
         android:insetBottom="0dp"

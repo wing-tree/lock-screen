@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/margin_small"
+    android:outlineProvider="none"
+    app:cardBackgroundColor="@color/card_background"
+    app:cardElevation="@dimen/double_extra_small_100"
+    app:cardPreventCornerOverlap="false">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/linear_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_normal"
+            android:layout_marginTop="@dimen/margin_normal"
+            android:layout_marginEnd="@dimen/margin_normal"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toStartOf="@+id/image_view_large_icon"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/image_view_small_icon"
+                android:layout_width="@dimen/width_small"
+                android:layout_height="@dimen/height_small"
+                android:layout_marginEnd="@dimen/margin_small"
+                android:padding="1dp"
+                tools:ignore="ContentDescription"
+                tools:srcCompat="@drawable/ic_round_lock_open_24" />
+
+            <TextView
+                android:id="@+id/text_view_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/margin_small"
+                tools:text="Label" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/text_view_sub_text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/margin_small"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    tools:text="It is better to fail in originality than to succeed in imitation." />
+
+                <TextView
+                    android:id="@+id/text_view_post_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/margin_small"
+                    tools:text="오후 6:09" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="1dp"
+                    app:srcCompat="@drawable/ic_round_keyboard_arrow_down_24"
+                    tools:ignore="ContentDescription" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/text_view_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_small"
+            android:ellipsize="end"
+            android:maxLines="1"
+            app:layout_constraintEnd_toEndOf="@+id/linear_layout"
+            app:layout_constraintStart_toStartOf="@+id/linear_layout"
+            app:layout_constraintTop_toBottomOf="@+id/linear_layout"
+            tools:text="It is better to fail in originality than to succeed in imitation." />
+
+        <TextView
+            android:id="@+id/text_view_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_small"
+            app:layout_constraintEnd_toEndOf="@+id/text_view_title"
+            app:layout_constraintStart_toStartOf="@+id/linear_layout"
+            app:layout_constraintTop_toBottomOf="@+id/text_view_title"
+            tools:text="It is better to fail in originality than to succeed in imitation." />
+
+        <ImageView
+            android:id="@+id/image_view_badge"
+            android:layout_width="@dimen/width_small"
+            android:layout_height="@dimen/height_small"
+            android:layout_marginEnd="@dimen/margin_normal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/linear_layout"
+            tools:ignore="ContentDescription" />
+
+        <ImageView
+            android:id="@+id/image_view_large_icon"
+            android:layout_width="@dimen/width_large"
+            android:layout_height="@dimen/width_large"
+            android:layout_marginEnd="@dimen/margin_normal"
+            android:layout_marginTop="@dimen/margin_small"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linear_layout"
+            tools:ignore="ContentDescription" />
+
+        <LinearLayout
+            android:id="@+id/linear_layout_action"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/height_large"
+            android:layout_marginTop="@dimen/margin_small"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_view_text"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

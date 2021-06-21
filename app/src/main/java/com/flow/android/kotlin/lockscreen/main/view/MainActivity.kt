@@ -1,18 +1,20 @@
 package com.flow.android.kotlin.lockscreen.main.view
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.app.KeyguardManager
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
-import android.content.pm.ApplicationInfo
-import android.content.pm.PackageManager
+import android.content.ServiceConnection
+import android.graphics.Point
 import android.graphics.PorterDuff
-import android.graphics.drawable.RippleDrawable
 import android.net.Uri
 import android.os.*
 import android.provider.MediaStore
 import android.provider.Settings
-import android.view.View
+import android.view.MotionEvent
 import android.view.View.GONE
 import android.view.WindowManager
 import android.widget.ImageView
@@ -24,23 +26,28 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.flow.android.kotlin.lockscreen.R
+import com.flow.android.kotlin.lockscreen.application.ApplicationUtil
+import com.flow.android.kotlin.lockscreen.application.ApplicationUtil.getApplicationLabel
 import com.flow.android.kotlin.lockscreen.calendar.CalendarLoader
 import com.flow.android.kotlin.lockscreen.configuration.view.ConfigurationActivity
 import com.flow.android.kotlin.lockscreen.configuration.viewmodel.ConfigurationChange
 import com.flow.android.kotlin.lockscreen.databinding.ActivityMainBinding
 import com.flow.android.kotlin.lockscreen.home.homewatcher.HomePressedListener
 import com.flow.android.kotlin.lockscreen.home.homewatcher.HomeWatcher
-import com.flow.android.kotlin.lockscreen.lockscreen.LockScreenService
+import com.flow.android.kotlin.lockscreen.lockscreen.service.LockScreenService
 import com.flow.android.kotlin.lockscreen.main.adapter.FragmentStateAdapter
 import com.flow.android.kotlin.lockscreen.main.torch.Torch
+import com.flow.android.kotlin.lockscreen.main.view.MainActivity.OpenLock.endRange
+import com.flow.android.kotlin.lockscreen.main.view.MainActivity.OpenLock.outOfEndRange
 import com.flow.android.kotlin.lockscreen.main.viewmodel.MainViewModel
 import com.flow.android.kotlin.lockscreen.memo._interface.OnMemoChangedListener
+import com.flow.android.kotlin.lockscreen.notification.model.NotificationModel
+import com.flow.android.kotlin.lockscreen.notification.service.NotificationListener
 import com.flow.android.kotlin.lockscreen.permission._interface.OnPermissionAllowClickListener
 import com.flow.android.kotlin.lockscreen.permission.view.PermissionRationaleDialogFragment
 import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
-import com.flow.android.kotlin.lockscreen.util.fadeIn
-import com.flow.android.kotlin.lockscreen.util.scale
+import com.flow.android.kotlin.lockscreen.util.*
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.karumi.dexter.Dexter
@@ -53,11 +60,15 @@ import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.karumi.dexter.listener.single.PermissionListener
 import timber.log.Timber
 import java.io.File
+import java.lang.Math.pow
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.abs
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAllowClickListener {
-    private val duration = 400L
+    private val duration = 500L
     private val localBroadcastManager: LocalBroadcastManager by lazy {
         LocalBroadcastManager.getInstance(this)
     }
@@ -91,6 +102,29 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
         })
     }
 
+    private val notificationListenerConnection = object: ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            if (service is NotificationListener.NotificationListenerBinder) {
+                val notificationListener = service.getNotificationListener()
+                val activeNotifications = notificationListener.activeNotifications.mapNotNull {
+                    it?.let { sbn -> NotificationModel(
+                            getApplicationLabel(packageManager, sbn.packageName),
+                            sbn.notification,
+                            sbn.postTime
+                    ) }
+                }
+
+                viewModel.setNotifications(activeNotifications)
+            } else {
+                // call event for error. todo.
+            }
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            // todo show error.
+        }
+    }
+
     private val delayMillis = 1000L
     private val handler by lazy { Handler(mainLooper) }
     private val checkManageOverlayPermission: Runnable = object : Runnable {
@@ -110,6 +144,13 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
 
             handler.postDelayed(this, delayMillis)
         }
+    }
+
+    private object OpenLock {
+        var x = 0F
+        var y = 0F
+        const val endRange = 600F
+        var outOfEndRange = false
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -161,26 +202,27 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
     override fun onBackPressed() {
         if (onBackPressedDispatcher.hasEnabledCallbacks())
             onBackPressedDispatcher.onBackPressed()
-        else {
-            viewBinding.floatingActionButton.forceRippleAnimation()
-        }
+        else
+            viewBinding.frameLayoutRipple.forceRippleAnimation()
     }
 
     override fun onStart() {
         super.onStart()
+        bindNotificationListener()
         homeWatcher.startWatch()
     }
 
     override fun onPause() {
-        val index = viewBinding.centerAlignedTabLayout.selectedTabPosition
-
-        ConfigurationPreferences.putSelectedTabIndex(this, index)
+        with(viewBinding.centerAlignedTabLayout.selectedTabPosition) {
+            ConfigurationPreferences.putSelectedTabIndex(this@MainActivity, this)
+        }
 
         super.onPause()
     }
 
     override fun onStop() {
         homeWatcher.stopWatch()
+        unbindNotificationListener()
         super.onStop()
     }
 
@@ -219,9 +261,56 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
         }
     }
 
+    private fun bindNotificationListener() {
+        bindService(Intent(this, NotificationListener::class.java), notificationListenerConnection, Context.BIND_AUTO_CREATE)
+    }
+
+    private fun unbindNotificationListener() {
+        unbindService(notificationListenerConnection)
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
     private fun initializeView() {
-        viewBinding.floatingActionButton.setOnClickListener {
-            finish()
+        viewBinding.frameLayoutLockOpen.setOnTouchListener { v, event ->
+            when(event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    OpenLock.x = event.x
+                    OpenLock.y = event.y
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    viewBinding.frameLayoutRipple.showRipple()
+
+                    val distance = sqrt((OpenLock.x - event.x).pow(2) + (OpenLock.y - event.y).pow(2))
+                    var scale = abs(endRange - distance * 0.5F) / endRange
+
+                    when {
+                        scale >= 1F -> scale = 1F
+                        scale < 0.75F -> scale = 0.75F
+                    }
+
+                    val alpha: Float = (scale - 0.75F) * 4
+
+                    viewBinding.constraintLayout.alpha = alpha
+                    viewBinding.constraintLayout.scaleX = scale
+                    viewBinding.constraintLayout.scaleY = scale
+                    viewBinding.imageViewLockOpen.alpha = alpha
+                    viewBinding.imageViewLockOpen.scaleX = scale
+                    viewBinding.imageViewLockOpen.scaleY = scale
+
+                    outOfEndRange = distance * 1.25F > endRange * 0.75F
+                }
+                MotionEvent.ACTION_UP -> {
+                    if (outOfEndRange)
+                        finish()
+                    else {
+                        viewBinding.frameLayoutRipple.hideRipple()
+                        viewBinding.constraintLayout.scale(1F, 300L)
+                        viewBinding.imageViewLockOpen.scale(1F, 300L)
+                    }
+                }
+            }
+
+            true
         }
 
         viewBinding.imageViewCamera.setOnClickListener {
@@ -239,16 +328,20 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
                                     .format(Date()).toString() + ".jpg")
                             val uri = FileProvider.getUriForFile(this@MainActivity, "com.flow.android.kotlin.lockscreen.fileprovider", file)
 
-                            findCameraAppPackageName()?.let {
-                                val intent = Intent().apply {
-                                    action = MediaStore.ACTION_IMAGE_CAPTURE
-                                    putExtra(MediaStore.EXTRA_OUTPUT, uri)
-                                    setPackage(it)
+                            ApplicationUtil.findCameraAppPackageName(this@MainActivity)?.let {
+                                var intent: Intent? = null
+
+                                try {
+                                    intent = packageManager.getLaunchIntentForPackage(it)
+                                } catch (ignored: Exception) {
+                                    Timber.e(ignored)
+                                    // 카메라 없으니 꺼지렴.
                                 }
 
-                                startActivity(intent) // gallery not showing
+                                intent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                                startActivity(intent)
                             } ?: run {
-                                // 커스텀 카메라 실행. 권한 요청 여기서 필요.
+                                // 커스텀 카메라 실행. 권한 요청 여기서 필요. ㄴㄴ 그냥 꺼지라고 하셈.
                             }
 
 //                            val mIntent = Intent()
@@ -301,7 +394,8 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
         val tabTexts = arrayOf(
                 getString(R.string.main_activity_002),
                 getString(R.string.main_activity_000),
-                getString(R.string.main_activity_001)
+                getString(R.string.main_activity_001),
+                getString(R.string.main_activity_003)
         )
 
         viewBinding.viewPager2.adapter = FragmentStateAdapter(this)
@@ -312,7 +406,9 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
                     false
             )
 
-            tab.customView?.findViewById<TextView>(R.id.text_view)?.text = tabTexts[position]
+            val textView = tab.customView?.findViewById<TextView>(R.id.text_view) ?: return@TabLayoutMediator
+
+            textView.text = tabTexts[position]
         }.attach()
 
         viewBinding.centerAlignedTabLayout.addOnTabSelectedListener(object :
@@ -372,7 +468,13 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
                 handler.postDelayed(checkManageOverlayPermission, delayMillis)
             } else
                 startService()
-        }
+        } else
+            startService()
+    }
+
+    private fun checkNotificationListenerEnabled() {
+        val intent = Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")
+        startActivity(intent)
     }
 
     private fun startService() {
@@ -404,6 +506,7 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
                         }
 
                         checkManageOverlayPermission()
+                        checkNotificationListenerEnabled()
                     }
 
                     override fun onPermissionRationaleShouldBeShown(
@@ -431,19 +534,6 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
         }
     }
 
-    private fun View.forceRippleAnimation() {
-        if (background is RippleDrawable) {
-            val handler = Handler(Looper.getMainLooper())
-            val rippleDrawable = background
-
-            rippleDrawable.state = intArrayOf(
-                    android.R.attr.state_pressed,
-                    android.R.attr.state_enabled
-            )
-            handler.postDelayed({ rippleDrawable.state = intArrayOf() }, 200)
-        }
-    }
-
     override fun onMemoDeleted(memo: Memo) {
         viewModel.deleteMemo(memo)
     }
@@ -463,39 +553,6 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
 
     override fun onPermissionAllowClick() {
         checkPermission()
-        //Toast.makeText(this, "what the fuck.", Toast.LENGTH_SHORT).show()
         //checkManageOverlayPermission()
-    }
-
-    private fun findCameraAppPackageName(): String? {
-        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        val packageManager = this.packageManager
-        val resolveInfoList = packageManager.queryIntentActivities(intent, 0)
-
-        println("ZIOXIAL: ${resolveInfoList.map { it.activityInfo.packageName }}")
-
-        if (resolveInfoList.isEmpty())
-            return null
-
-        for (resolveInfo in resolveInfoList) {
-            if (isSystemApp(resolveInfo.activityInfo.packageName))
-                return resolveInfo.activityInfo.packageName
-        }
-
-        return resolveInfoList[0].activityInfo.packageName
-    }
-
-    private fun isSystemApp(packageName: String): Boolean {
-        val applicationInfo = try {
-            this.packageManager.getApplicationInfo(packageName, 0)
-        } catch (e: PackageManager.NameNotFoundException) {
-            Timber.e(e)
-
-            return false
-        }
-
-        val mask = ApplicationInfo.FLAG_SYSTEM or ApplicationInfo.FLAG_UPDATED_SYSTEM_APP
-
-        return applicationInfo.flags and mask != 0
     }
 }

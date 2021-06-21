@@ -1,5 +1,6 @@
-package com.flow.android.kotlin.lockscreen.lockscreen
+package com.flow.android.kotlin.lockscreen.lockscreen.service
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -9,11 +10,11 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.calendar.CalendarLoader
-import com.flow.android.kotlin.lockscreen.calendar.Event
+import com.flow.android.kotlin.lockscreen.calendar.model.EventModel
 import com.flow.android.kotlin.lockscreen.main.view.MainActivity
 import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
-import com.flow.android.kotlin.lockscreen.repository.Repository
+import com.flow.android.kotlin.lockscreen.repository.MemoRepository
 import com.flow.android.kotlin.lockscreen.util.BLANK
 import com.flow.android.kotlin.lockscreen.util.toDateString
 import io.reactivex.Single
@@ -53,7 +54,7 @@ object NotificationBuilder {
                 var contentText = context.getString(R.string.notification_content_text)
                 var subText = BLANK
 
-                val simpleDateFormat = SimpleDateFormat(context.getString(R.string.format_time_01), Locale.getDefault())
+                val simpleDateFormat = SimpleDateFormat(context.getString(R.string.format_time_002), Locale.getDefault())
 
                 eventForNotification?.let { event ->
                     contentTitle = context.getString(R.string.notification_builder_000)
@@ -71,6 +72,7 @@ object NotificationBuilder {
                 }
 
                 val builder = NotificationCompat.Builder(context, CHANNEL_ID)
+                    .setStyle(NotificationCompat.InboxStyle().addLine("str111").addLine("str222").setBigContentTitle("big content title").setSummaryText("am i summ."))
                         .setSmallIcon(R.drawable.ic_round_lock_open_24)
                         .setContentTitle(contentTitle)
                         .setContentText(contentText)
@@ -79,12 +81,26 @@ object NotificationBuilder {
                         .setShowWhen(false)
                         .setSubText(subText)
 
+                // todo remove..
+                /*Notification notif = new Notification.Builder(mContext)
+                *     .setContentTitle(&quot;5 New mails from &quot; + sender.toString())
+                *     .setContentText(subject)
+                *     .setSmallIcon(R.drawable.new_mail)
+                *     .setLargeIcon(aBitmap)
+                *     .setStyle(new Notification.InboxStyle()
+                *         .addLine(str1)
+                *         .addLine(str2)
+                *         .setContentTitle(&quot;&quot;)
+                *         .setSummaryText(&quot;+3 more&quot;))
+                *     .build();
+                 */
+
                 it.onSuccess(builder)
             }
         }
     }
 
-    private fun eventForNotification(context: Context): Event? {
+    private fun eventForNotification(context: Context): EventModel? {
         val contentResolver = context.contentResolver
 
         val gregorianCalendar = GregorianCalendar().apply {
@@ -105,14 +121,12 @@ object NotificationBuilder {
             gregorianCalendar.timeInMillis = event.begin
 
             val beginHourOfDay = gregorianCalendar.get(GregorianCalendar.HOUR_OF_DAY)
-            val beginMinute = gregorianCalendar.get(GregorianCalendar.MINUTE) + beginHourOfDay * 60
 
             gregorianCalendar.timeInMillis = event.end
 
             val endHourOfDay = gregorianCalendar.get(GregorianCalendar.HOUR_OF_DAY)
-            val endMinute = gregorianCalendar.get(GregorianCalendar.MINUTE) + endHourOfDay * 60
 
-            if (beginMinute - 10 <= currentTimeMinute && currentTimeMinute <= endMinute + 60) {
+            if (beginHourOfDay - 3 <= currentTimeMinute && currentTimeMinute <= endHourOfDay + 3) {
                 return event
             }
         }
@@ -121,7 +135,7 @@ object NotificationBuilder {
     }
 
     private fun todayMemos(context: Context): List<Memo> {
-        return Repository(context).getTodayMemos()
+        return MemoRepository(context).getTodayMemos()
     }
 
     private fun memoForNotification(memos: List<Memo>): Memo? {
@@ -130,7 +144,6 @@ object NotificationBuilder {
         }
 
         val currentTimeHourOfDay = gregorianCalendar.get(GregorianCalendar.HOUR_OF_DAY)
-        val currentTimeMinute = gregorianCalendar.get(GregorianCalendar.MINUTE) + currentTimeHourOfDay * 60
 
         memos.sortedWith(Comparator { o1, o2 ->
             return@Comparator when {
@@ -143,9 +156,8 @@ object NotificationBuilder {
             gregorianCalendar.timeInMillis = memo.alarmTime
 
             val alarmTimeHourOfDay = gregorianCalendar.get(GregorianCalendar.HOUR_OF_DAY)
-            val alarmTimeMinute = gregorianCalendar.get(GregorianCalendar.MINUTE) + alarmTimeHourOfDay * 60
 
-            if (alarmTimeMinute - 10 <= currentTimeMinute && currentTimeMinute <= alarmTimeMinute + 60)
+            if (alarmTimeHourOfDay - 3 <= currentTimeHourOfDay && currentTimeHourOfDay <= alarmTimeHourOfDay + 3)
                 return memo
         }
 

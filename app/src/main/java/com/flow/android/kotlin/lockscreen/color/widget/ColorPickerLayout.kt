@@ -52,6 +52,6 @@ class ColorPickerLayout : LinearLayout {
     }
 
     fun select(color: Int) {
-        colorAdapter.performClick(color)
+        colorAdapter.setInitiallySelectedColor(color)
     }
 }

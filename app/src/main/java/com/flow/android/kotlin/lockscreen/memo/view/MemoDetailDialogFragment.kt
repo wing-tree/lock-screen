@@ -8,13 +8,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.base.BaseDialogFragment
 import com.flow.android.kotlin.lockscreen.databinding.FragmentMemoDetailDialogBinding
+import com.flow.android.kotlin.lockscreen.main.viewmodel.MainViewModel
 import com.flow.android.kotlin.lockscreen.memo._interface.OnMemoChangedListener
+import com.flow.android.kotlin.lockscreen.memo.checklist.adapter.ChecklistAdapter
 import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.memo.util.share
+import com.flow.android.kotlin.lockscreen.persistence.entity.ChecklistItem
+import com.flow.android.kotlin.lockscreen.util.LinearLayoutManagerWrapper
 import com.flow.android.kotlin.lockscreen.util.show
 import com.flow.android.kotlin.lockscreen.util.toDateString
 import com.flow.android.kotlin.lockscreen.util.view.ConfirmationDialogFragment
@@ -26,6 +32,31 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
     override fun inflate(inflater: LayoutInflater, container: ViewGroup?): FragmentMemoDetailDialogBinding {
         return FragmentMemoDetailDialogBinding.inflate(inflater, container, false)
     }
+
+    private val viewModel by activityViewModels<MainViewModel>()
+    private var memo: Memo? = null
+
+    private val checklist = MutableLiveData<ArrayList<ChecklistItem>>()
+    private val checklistAdapter = ChecklistAdapter(object : ChecklistAdapter.Listener {
+        override fun onAddClick(content: String) {
+
+        }
+
+        override fun onMoreClick(item: ChecklistItem) {
+
+        }
+
+        override fun onItemCheckedChange(item: ChecklistItem, isChecked: Boolean) {
+            val checklistItem = memo?.checklist?.find { it.id == item.id } ?: return
+            val index = memo?.checklist?.indexOf(checklistItem) ?: return
+
+            memo?.checklist?.set(index, checklistItem.apply { done = isChecked })
+
+            memo?.let { viewModel.updateMemo(it) {
+                checklist.value?.set(index, checklistItem)
+            } }
+        }
+    }, isEditable = false)
 
     private val simpleDateFormat by lazy {
         SimpleDateFormat(getString(R.string.format_date_001), Locale.getDefault())
@@ -70,10 +101,11 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
     ): View? {
         val view = super.onCreateView(inflater, container, savedInstanceState)
 
-        val memo = arguments?.getParcelable<Memo>(KEY_MEMO)
+        memo = arguments?.getParcelable<Memo>(KEY_MEMO)
 
         memo?.let {
             initializeView(it)
+            registerObserver()
         } ?: run {
             // show error.
         }
@@ -94,9 +126,20 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
         viewBinding.textViewDate.text = memo.modifiedTime.toDateString(simpleDateFormat)
         viewBinding.textViewContent.text = memo.content
 
-        if (memo.detail.isNotBlank()) {
-            viewBinding.textViewDetail.show()
-            viewBinding.textViewDetail.text = memo.detail
+        // todo change to list..
+//        if (memo.detail.isNotBlank()) {
+//            viewBinding.textViewDetail.show()
+//            viewBinding.textViewDetail.text = memo.detail
+//        }
+
+        if (memo.checklist.isNotEmpty()) {
+            viewBinding.recyclerViewChecklist.show()
+            viewBinding.recyclerViewChecklist.apply {
+                adapter = checklistAdapter
+                layoutManager = LinearLayoutManagerWrapper(requireContext())
+            }
+
+            checklist.value = ArrayList(memo.checklist.toList())
         }
 
         viewBinding.imageViewDelete.setOnClickListener {
@@ -148,6 +191,12 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
         }
     }
 
+    private fun registerObserver() {
+        checklist.observe(viewLifecycleOwner, {
+            checklistAdapter.submitList(it)
+        })
+    }
+
     private fun insertToCalendar(memo: Memo) {
         val gregorianCalendar = GregorianCalendar.getInstance().apply {
             timeInMillis = memo.modifiedTime
@@ -173,7 +222,7 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
             .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, startMillis)
             .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endMillis)
             .putExtra(CalendarContract.Events.TITLE, memo.content)
-            .putExtra(CalendarContract.Events.DESCRIPTION, memo.detail)
+            .putExtra(CalendarContract.Events.DESCRIPTION, memo.checkListToString())
             .putExtra(
                 CalendarContract.Events.AVAILABILITY,
                 CalendarContract.Events.AVAILABILITY_BUSY

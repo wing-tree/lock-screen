@@ -4,7 +4,7 @@
     android:id="@+id/text_subtitle"
     android:layout_width="match_parent"
     android:layout_height="48dp"
-    android:paddingEnd="@dimen/spacing_medium"
-    android:paddingStart="@dimen/spacing_medium"
+    android:paddingEnd="@dimen/margin_normal"
+    android:paddingStart="@dimen/margin_normal"
     android:gravity="center_vertical"
     tools:text="Subtitle" />

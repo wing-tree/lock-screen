@@ -6,7 +6,7 @@
     android:background="@drawable/color_rounded_corners"
     android:layout_width="32dp"
     android:layout_height="32dp"
-    android:layout_marginEnd="@dimen/spacing_medium">
+    android:layout_marginEnd="@dimen/margin_normal">
 
     <ImageView
         android:id="@+id/image_view"

@@ -77,7 +77,7 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
     }
 
     private fun initializeLiveData() {
-        viewModel.calendarDisplays.observe(viewLifecycleOwner, { calendarDisplays ->
+        viewModel.calendars.observe(viewLifecycleOwner, { calendarDisplays ->
             val uncheckedCalendarIds = ConfigurationPreferences.getUncheckedCalendarIds(requireContext())
 
             viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {

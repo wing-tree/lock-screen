@@ -6,10 +6,11 @@ import android.graphics.Color
 import android.net.Uri
 import android.provider.CalendarContract
 import androidx.activity.result.ActivityResultLauncher
-import androidx.annotation.ColorInt
 import androidx.core.database.getIntOrNull
 import androidx.core.database.getLongOrNull
 import androidx.core.database.getStringOrNull
+import com.flow.android.kotlin.lockscreen.calendar.model.CalendarModel
+import com.flow.android.kotlin.lockscreen.calendar.model.EventModel
 import com.flow.android.kotlin.lockscreen.util.BLANK
 import java.util.*
 
@@ -47,7 +48,6 @@ object CalendarLoader {
                 CalendarContract.Instances.CALENDAR_ID,
                 CalendarContract.Instances.END,
                 CalendarContract.Instances.EVENT_ID,
-                CalendarContract.Instances.RRULE,
                 CalendarContract.Instances.TITLE
         )
 
@@ -61,8 +61,7 @@ object CalendarLoader {
             const val CALENDAR_ID = 5
             const val END = 6
             const val EVENT_ID = 7
-            const val RRULE = 8
-            const val TITLE = 9
+            const val TITLE = 8
         }
     }
 
@@ -102,8 +101,8 @@ object CalendarLoader {
     }
 
     @Suppress("SpellCheckingInspection")
-    private fun instances(contentResolver: ContentResolver, selection: String, DTSTART: Calendar, DTEND: Calendar): ArrayList<Event>? {
-        val events = arrayListOf<Event>()
+    private fun instances(contentResolver: ContentResolver, selection: String, DTSTART: Calendar, DTEND: Calendar): ArrayList<EventModel>? {
+        val events = arrayListOf<EventModel>()
 
         val builder: Uri.Builder = CalendarContract.Instances.CONTENT_URI.buildUpon()
         ContentUris.appendId(builder, DTSTART.timeInMillis)
@@ -129,7 +128,6 @@ object CalendarLoader {
             val calendarId = cursor.getLongOrNull(Instances.Index.CALENDAR_ID) ?: continue
             val end = cursor.getLongOrNull(Instances.Index.END) ?: 0L
             val eventId = cursor.getLongOrNull(Instances.Index.EVENT_ID) ?: continue
-            val rrule = cursor.getStringOrNull(Instances.Index.RRULE) ?: BLANK
             val title = cursor.getStringOrNull(Instances.Index.TITLE) ?: BLANK
 
             if (allDay == 1) {
@@ -147,7 +145,7 @@ object CalendarLoader {
                 }
             }
 
-            events.add(Event(
+            events.add(EventModel(
                     begin = begin,
                     calendarColor = calendarColor,
                     calendarDisplayName = calendarDisplayName,
@@ -155,7 +153,6 @@ object CalendarLoader {
                     end = end,
                     eventId = eventId,
                     id = _id,
-                    rrule = rrule,
                     title = title
             ))
         }
@@ -172,9 +169,9 @@ object CalendarLoader {
         return events
     }
 
-    fun events(contentResolver: ContentResolver, calendarModels: List<CalendarModel>, amount: Int): ArrayList<Event> {
+    fun events(contentResolver: ContentResolver, calendarModels: List<CalendarModel>, amount: Int): ArrayList<EventModel> {
 
-        val events = arrayListOf<Event>()
+        val events = arrayListOf<EventModel>()
 
         @Suppress("LocalVariableName", "SpellCheckingInspection")
         val DTSTART = Calendar.getInstance()
@@ -204,30 +201,11 @@ object CalendarLoader {
         return events
     }
 
-    fun editEvent(activityResultLauncher: ActivityResultLauncher<Event?>, event: Event) {
+    fun editEvent(activityResultLauncher: ActivityResultLauncher<EventModel?>, event: EventModel) {
         activityResultLauncher.launch(event)
     }
 
-    fun insertEvent(activityResultLauncher: ActivityResultLauncher<Event?>) {
+    fun insertEvent(activityResultLauncher: ActivityResultLauncher<EventModel?>) {
         activityResultLauncher.launch(null)
     }
 }
-
-data class CalendarModel(
-        val id: Long,
-        val name: String
-)
-
-data class Event(
-        val begin: Long,
-        @ColorInt
-        val calendarColor: Int,
-        val calendarDisplayName: String,
-        val calendarId: Long,
-        val end: Long,
-        val eventId: Long,
-        val id: Long,
-        @Suppress("SpellCheckingInspection")
-        val rrule: String,
-        val title: String
-)

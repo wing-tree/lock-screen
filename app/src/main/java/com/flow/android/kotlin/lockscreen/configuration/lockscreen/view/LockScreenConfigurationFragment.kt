@@ -7,7 +7,7 @@ import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.base.ConfigurationFragment
 import com.flow.android.kotlin.lockscreen.configuration.adapter.AdapterItem
 import com.flow.android.kotlin.lockscreen.configuration.adapter.ConfigurationAdapter
-import com.flow.android.kotlin.lockscreen.lockscreen.LockScreenService
+import com.flow.android.kotlin.lockscreen.lockscreen.service.LockScreenService
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
 
 class LockScreenConfigurationFragment : ConfigurationFragment() {

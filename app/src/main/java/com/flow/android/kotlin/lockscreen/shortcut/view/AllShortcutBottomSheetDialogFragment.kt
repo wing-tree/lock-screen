@@ -25,19 +25,16 @@ class AllShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
     private val viewModel: MainViewModel by activityViewModels()
 
     private val shortcutAdapter = ShortcutAdapter().apply {
-        setDraggable(false)
         setListener(object : ShortcutAdapter.Listener {
             override fun onItemClick(item: ShortcutModel) {
-                removeShortcut(item)
+                viewModel.addShortcut(item.apply {
+                    priority = System.currentTimeMillis()
+                }.toEntity()) {
+                    removeShortcut(item)
+                }
             }
 
-            override fun onItemLongClick(view: View, item: ShortcutModel): Boolean {
-                return false
-            }
-
-            override fun onDragExited() {}
-
-            override fun onMoved(from: ShortcutModel, to: ShortcutModel) {}
+            override fun onItemLongClick(view: View, item: ShortcutModel): Boolean = false
         })
     }
 
@@ -71,7 +68,7 @@ class AllShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
     private suspend fun addShortcuts() {
         withContext(Dispatchers.IO) {
             val shortcuts = arrayListOf<ShortcutModel>()
-            val packageNames = viewModel.shortcuts()?.map { it.packageName } ?: emptyList()
+            val packageNames = viewModel.shortcutValues.map { it.packageName }
             var count = 0
 
             try {

@@ -2,10 +2,44 @@ package com.flow.android.kotlin.lockscreen.util
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.graphics.drawable.RippleDrawable
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.Transformation
+import android.widget.FrameLayout
+
+fun FrameLayout.forceRippleAnimation() {
+    if (foreground is RippleDrawable) {
+        val handler = Handler(Looper.getMainLooper())
+        val rippleDrawable = foreground
+
+        rippleDrawable.state = intArrayOf(
+            android.R.attr.state_pressed,
+            android.R.attr.state_enabled
+        )
+        handler.postDelayed({ rippleDrawable.state = intArrayOf() }, 200)
+    }
+}
+
+fun FrameLayout.hideRipple() {
+    if (foreground is RippleDrawable) {
+        foreground.state = intArrayOf()
+    }
+}
+
+fun FrameLayout.showRipple() {
+    if (foreground is RippleDrawable) {
+        val rippleDrawable = foreground
+
+        rippleDrawable.state = intArrayOf(
+            android.R.attr.state_pressed,
+            android.R.attr.state_enabled
+        )
+    }
+}
 
 fun View.collapse(to: Int, duration: Number) {
     val measuredHeight: Int = this.measuredHeight
@@ -124,12 +158,13 @@ fun View.rotate(
             .start()
 }
 
-fun View.scale(scale: Float, duration: Number = 200) {
+fun View.scale(scale: Float, duration: Number = 200, alpha: Float = 1F) {
     this.animate()
-            .scaleX(scale)
-            .scaleY(scale)
-            .setDuration(duration.toLong())
-            .start()
+        .scaleX(scale)
+        .scaleY(scale)
+        .alpha(alpha)
+        .setDuration(duration.toLong())
+        .start()
 }
 
 fun View.translateToBottom(duration: Number, onAnimationEnd: (() -> Unit)? = null) {

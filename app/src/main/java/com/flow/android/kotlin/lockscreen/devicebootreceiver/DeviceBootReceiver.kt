@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import com.flow.android.kotlin.lockscreen.lockscreen.LockScreenService
+import com.flow.android.kotlin.lockscreen.lockscreen.service.LockScreenService
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
 
 class DeviceBootReceiver : BroadcastReceiver()  {

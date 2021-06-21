@@ -12,8 +12,8 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupWindow
 import androidx.core.os.bundleOf
-import androidx.core.view.isVisible
 import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.flow.android.kotlin.lockscreen.R
@@ -23,9 +23,12 @@ import com.flow.android.kotlin.lockscreen.databinding.FragmentMemoEditingDialogB
 import com.flow.android.kotlin.lockscreen.datepicker.DatePickerDialogFragment
 import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.memo._interface.OnMemoChangedListener
+import com.flow.android.kotlin.lockscreen.memo.checklist.adapter.ChecklistAdapter
+import com.flow.android.kotlin.lockscreen.persistence.entity.ChecklistItem
 import com.flow.android.kotlin.lockscreen.util.*
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBinding>() {
     override fun inflate(inflater: LayoutInflater, container: ViewGroup?): FragmentMemoEditingDialogBinding {
@@ -35,6 +38,26 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
     private val simpleDateFormat by lazy {
         SimpleDateFormat(getString(R.string.format_date_001), Locale.getDefault())
     }
+
+    private val checklistAdapter : ChecklistAdapter by lazy { ChecklistAdapter(object : ChecklistAdapter.Listener {
+        override fun onAddClick(content: String) {
+            if (content.isNotBlank()) {
+                val value = checklist.value ?: return
+                val size = value.size
+
+                value.add(size, ChecklistItem(size.toLong(), content, false))
+                checklist.value = value
+            }
+        }
+
+        override fun onMoreClick(item: ChecklistItem) {
+            val popupWindow = PopupWindow()
+        }
+
+        override fun onItemCheckedChange(item: ChecklistItem, isChecked: Boolean) {}
+    }, isEditable = true) }
+
+    private val checklist = MutableLiveData<ArrayList<ChecklistItem>>()
 
     private val localBroadcastManager by lazy { LocalBroadcastManager.getInstance(requireContext()) }
     private val localBroadcastReceiver = object : BroadcastReceiver() {
@@ -128,11 +151,21 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
         this.memo.observe(viewLifecycleOwner, {
             if (checkForChanges()) {
                 if (isContentBlank())
-                    disableMaterialButtonSave()
+                    disableSaveButton()
                 else
-                    enableMaterialButtonSave()
+                    enableSaveButton()
             } else
-                disableMaterialButtonSave()
+                disableSaveButton()
+        })
+
+        checklist.observe(viewLifecycleOwner, {
+            memo()?.let { memo ->
+                setMemo(memo.apply {
+                    this.checklist = it.toTypedArray()
+                })
+            }
+
+            checklistAdapter.submitList(it)
         })
 
         initializeView(memo)
@@ -160,10 +193,12 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
             viewBinding.textViewDate.text = it.modifiedTime.toDateString(simpleDateFormat)
             viewBinding.editTextContent.setText(it.content)
 
-            if (it.detail.isNotBlank()) {
-                viewBinding.editTextDetail.show()
-                viewBinding.editTextDetail.setText(it.detail)
+            viewBinding.recyclerViewChecklist.apply {
+                adapter = checklistAdapter
+                layoutManager = LinearLayoutManagerWrapper(requireContext())
             }
+
+            checklist.value = ArrayList(it.checklist.toList())
         } ?: run {
             viewBinding.textViewDate.text = currentTimeMillis.toDateString(simpleDateFormat)
         }
@@ -187,30 +222,13 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
             override fun afterTextChanged(s: Editable?) {}
         })
 
-        viewBinding.editTextDetail.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                memo().also {
-                    it?.detail = s.toString()
-                    setMemo(it)
-                }
-            }
-
-            override fun afterTextChanged(s: Editable?) {}
-        })
+        // recycler view item 마다 변화 감지.
 
         viewBinding.imageViewDetail.setOnClickListener {
-            if (viewBinding.editTextDetail.isVisible) {
-                viewBinding.editTextDetail.fadeOut(duration)
-                viewBinding.editTextContent.setBackgroundResource(R.drawable.rounded_corners)
-            } else {
-                viewBinding.editTextContent.setBackgroundResource(R.drawable.rounded_corners_top)
-                viewBinding.editTextDetail.visibility = View.INVISIBLE
-                viewBinding.editTextDetail.fadeIn(duration)
-            }
+            // todo show recyclerview.
         }
 
+        viewBinding.colorPickerLayout.select(selectedColor)
         viewBinding.colorPickerLayout.setOnColorSelectedListener(object :
             ColorPickerLayout.OnColorSelectedListener {
             override fun onColorSelected(color: Int) {
@@ -228,10 +246,6 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
                 }
             }
         })
-
-        viewBinding.colorPickerLayout.post {
-            viewBinding.colorPickerLayout.select(selectedColor)
-        }
 
         viewBinding.materialButtonClose.setOnClickListener {
             dismiss()
@@ -259,11 +273,11 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
 
     }
 
-    private fun enableMaterialButtonSave() {
+    private fun enableSaveButton() {
         viewBinding.materialButtonSave.isEnabled = true
     }
 
-    private fun disableMaterialButtonSave() {
+    private fun disableSaveButton() {
         viewBinding.materialButtonSave.isEnabled = false
     }
 
@@ -278,9 +292,9 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
 
     private fun createEmptyMemo(): Memo {
         return Memo(
+            checklist = arrayOf(),
             content = BLANK,
             color = selectedColor,
-            detail = BLANK,
             isDone = false,
             modifiedTime = currentTimeMillis,
             priority = currentTimeMillis

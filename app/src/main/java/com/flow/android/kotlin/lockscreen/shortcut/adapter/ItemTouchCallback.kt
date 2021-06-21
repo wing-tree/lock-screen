@@ -1,11 +1,13 @@
 package com.flow.android.kotlin.lockscreen.shortcut.adapter
 
 import android.graphics.Canvas
+import androidx.annotation.MainThread
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import timber.log.Timber
+import kotlin.math.abs
 
-class ItemTouchCallback(private val adapter: ShortcutAdapter): ItemTouchHelper.Callback() {
+class ItemTouchCallback(private val adapter: ShortcutAdapter, @MainThread private val onExited: () -> Unit): ItemTouchHelper.Callback() {
     override fun getMovementFlags(
             recyclerView: RecyclerView,
             viewHolder: RecyclerView.ViewHolder
@@ -14,6 +16,15 @@ class ItemTouchCallback(private val adapter: ShortcutAdapter): ItemTouchHelper.C
                  ItemTouchHelper.DOWN or ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT or ItemTouchHelper.UP,
                 0
         )
+    }
+
+    override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
+        super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+        val width = viewHolder.itemView.width
+        val height = viewHolder.itemView.height
+
+        if ((width + height) / 4 < abs(dX) + abs(dY))
+            onExited.invoke()
     }
 
     override fun onMove(
@@ -27,10 +38,6 @@ class ItemTouchCallback(private val adapter: ShortcutAdapter): ItemTouchHelper.C
         adapter.onMove(from, to)
 
         return true
-    }
-
-    override fun onMoved(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, fromPos: Int, target: RecyclerView.ViewHolder, toPos: Int, x: Int, y: Int) {
-        // adapter.onMove(fromPos, toPos)
     }
 
     override fun isLongPressDragEnabled(): Boolean = true

@@ -27,10 +27,7 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
         return FragmentShortcutBinding.inflate(inflater, container, false)
     }
 
-    private val packageManager by lazy { requireContext().packageManager }
-
     private val shortcutAdapter = ShortcutAdapter().apply {
-        setDraggable(true)
         setListener(object : ShortcutAdapter.Listener {
             override fun onItemClick(item: ShortcutModel) {
                 if (DeviceCredentialHelper.requireUnlock(requireContext()))
@@ -42,18 +39,12 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
             override fun onItemLongClick(view: View, item: ShortcutModel): Boolean {
                 return showPopupMenu(view, item)
             }
-
-            override fun onDragExited() {
-                dismissPopupMenu()
-            }
-
-            override fun onMoved(from: ShortcutModel, to: ShortcutModel) {
-                viewModel.updateShortcuts(listOf(from, to))
-            }
         })
     }
 
-    private val itemTouchHelper = ItemTouchHelper(ItemTouchCallback(shortcutAdapter))
+    private val itemTouchHelper = ItemTouchHelper(ItemTouchCallback(shortcutAdapter) {
+        popupMenu?.dismiss()
+    })
 
     private var popupMenu: PopupMenu? = null
 
@@ -70,8 +61,7 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
             adapter = shortcutAdapter
         }
 
-        //itemTouchHelper.attachToRecyclerView(viewBinding.recyclerView) todo check.
-        initializeLiveData()
+        itemTouchHelper.attachToRecyclerView(viewBinding.recyclerView)
 
         return view
     }
@@ -90,7 +80,13 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        initializeLiveData()
+    }
+
     override fun onPause() {
+        viewModel.shortcuts.removeObservers(this)
         viewModel.updateShortcuts(shortcutAdapter.currentList())
         super.onPause()
     }
@@ -162,10 +158,6 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
 
         popupMenu?.show()
         return true
-    }
-
-    private fun dismissPopupMenu() {
-        popupMenu?.dismiss()
     }
 
     data class Value(val shortcutClicked : Boolean, val packageName: String = BLANK)

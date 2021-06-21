@@ -26,7 +26,7 @@
     <color name="inactive">#99000000</color>
 
     <color name="edit_text_background">@color/ivory</color>
-    <color name="event_item_background">#61212121</color>
+    <color name="card_background">#61212121</color>
 
     <color name="dark">#DE212121</color>
     <color name="light">@color/white</color>
@@ -79,4 +79,6 @@
     <color name="button_text_enabled">@color/high_emphasis</color>
 
     <color name="shadow">@color/black</color>
+
+    <color name="text">@color/white</color>
 </resources>

@@ -7,8 +7,9 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Recycler
 import timber.log.Timber
 
+class LinearLayoutManagerWrapper(context: Context, orientation: Int = RecyclerView.VERTICAL, reverseLayout: Boolean = false) :
+    LinearLayoutManager(context, orientation, reverseLayout) {
 
-class LinearLayoutManagerWrapper(context: Context) : LinearLayoutManager(context) {
     override fun onLayoutChildren(recycler: Recycler, state: RecyclerView.State) {
         try {
             super.onLayoutChildren(recycler, state)

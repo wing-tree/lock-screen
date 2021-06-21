@@ -1,19 +1,24 @@
 package com.flow.android.kotlin.lockscreen.main.viewmodel
 
 import android.app.Application
+import android.app.Notification
 import android.content.ContentResolver
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Parcelable
 import androidx.annotation.ColorInt
+import androidx.annotation.MainThread
 import androidx.lifecycle.*
-import com.flow.android.kotlin.lockscreen.calendar.CalendarModel
 import com.flow.android.kotlin.lockscreen.calendar.CalendarLoader
-import com.flow.android.kotlin.lockscreen.calendar.Event
+import com.flow.android.kotlin.lockscreen.calendar.model.CalendarModel
+import com.flow.android.kotlin.lockscreen.calendar.model.EventModel
 import com.flow.android.kotlin.lockscreen.configuration.viewmodel.ConfigurationChange
+import com.flow.android.kotlin.lockscreen.notification.model.NotificationModel
+import com.flow.android.kotlin.lockscreen.persistence.entity.ChecklistItem
 import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.persistence.entity.Shortcut
-import com.flow.android.kotlin.lockscreen.repository.Repository
+import com.flow.android.kotlin.lockscreen.repository.MemoRepository
+import com.flow.android.kotlin.lockscreen.repository.ShortcutRepository
 import com.flow.android.kotlin.lockscreen.shortcut.model.*
 import com.flow.android.kotlin.lockscreen.util.SingleLiveEvent
 import kotlinx.android.parcel.Parcelize
@@ -24,10 +29,13 @@ import timber.log.Timber
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val contentResolver = application.contentResolver
-    private val repository = Repository(application)
+    private val packageManager = application.packageManager
+    private val memoRepository = MemoRepository(application)
+    private val shortcutRepository = ShortcutRepository(application)
 
     override fun onCleared() {
-        repository.clearCompositeDisposable()
+        memoRepository.clearCompositeDisposable()
+        shortcutRepository.clearCompositeDisposable()
         super.onCleared()
     }
 
@@ -36,45 +44,43 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         @ColorInt
         get() = _viewPagerRegionColor
 
-    private val _calendarDisplays = MutableLiveData<List<CalendarModel>>()
-    val calendarDisplays: LiveData<List<CalendarModel>>
-        get() = _calendarDisplays
+    private val _calendars = MutableLiveData<List<CalendarModel>>()
+    val calendars: LiveData<List<CalendarModel>>
+        get() = _calendars
 
-    val memos = repository.getAllMemos()
+    val memos = memoRepository.getAll()
 
-    private val _shortcuts = MutableLiveData<List<ShortcutModel>>()
     val shortcuts: LiveData<List<ShortcutModel>>
-        get() = _shortcuts
+        get() = Transformations.map(shortcutRepository.getAll()) { list ->
+            list.mapNotNull { it.toModel() }
+        }
 
-    init {
-        viewModelScope.launch(Dispatchers.IO) {
-            val packageManager = application.packageManager
-            val shortcuts = arrayListOf<ShortcutModel>()
+    val shortcutValues: List<Shortcut>
+        get() = shortcutRepository.getAllValue()
 
-            for (shortcut in repository.getAllShortcuts()) {
-                try {
-                    val packageName = shortcut.packageName
-                    val info = packageManager.getApplicationInfo(packageName, 0)
-                    val icon = packageManager.getApplicationIcon(info)
-                    val label = packageManager.getApplicationLabel(info).toString()
+    private val _notifications = MutableLiveData<List<NotificationModel>>()
+    val notifications: LiveData<List<NotificationModel>>
+        get() = _notifications
 
-                    shortcuts.add(ShortcutModel(icon, label, packageName, shortcut.priority, shortcut.showInNotification))
-                } catch (e: PackageManager.NameNotFoundException) {
-                    Timber.e(e)
-                    deleteShortcut(shortcut) {  }
-                }
-            }
+    private fun Shortcut.toModel(): ShortcutModel? {
+        return try {
+            val packageName = this.packageName
+            val info = packageManager.getApplicationInfo(packageName, 0)
+            val icon = packageManager.getApplicationIcon(info)
+            val label = packageManager.getApplicationLabel(info).toString()
 
-            _shortcuts.postValue(shortcuts)
+            ShortcutModel(icon, label, packageName, priority, showInNotification)
+        } catch (e: PackageManager.NameNotFoundException) {
+            Timber.e(e)
+            deleteShortcut(this) {}
+            null
         }
     }
 
-    fun shortcuts() = shortcuts.value
-
-    fun calendarDisplays() = calendarDisplays.value
+    fun calendarDisplays() = calendars.value
     fun contentResolver(): ContentResolver = contentResolver
 
-    private val _events = MutableLiveData<List<Event>>()
+    private val _events = MutableLiveData<List<EventModel>>()
 
     private val _refreshEvents = SingleLiveEvent<Unit>()
     val refreshEvents: SingleLiveEvent<Unit>
@@ -112,14 +118,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _memoChanged.value = value
     }
 
-    fun submitEvents(events: List<Event>) {
+    fun submitEvents(events: List<EventModel>) {
         _events.postValue(events)
     }
 
     fun postCalendarDisplays() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                _calendarDisplays.postValue(CalendarLoader.calendarDisplays(contentResolver))
+                _calendars.postValue(CalendarLoader.calendarDisplays(contentResolver))
             }
         }
     }
@@ -133,50 +139,56 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun refreshCalendarDisplays() {
-        val value = calendarDisplays.value ?: return
-        _calendarDisplays.value = value
+        val value = calendars.value ?: return
+        _calendars.value = value
     }
 
-    fun addShortcut(item: ShortcutModel, onInserted: (ShortcutModel) -> Unit) {
-        repository.insertShortcut(item.toEntity()) {
-            onInserted(item)
+    fun addShortcut(item: Shortcut, onInserted: (ShortcutModel) -> Unit) {
+        shortcutRepository.insert(item) {
+            item.toModel()?.let { model -> onInserted(model) }
         }
     }
 
     fun deleteShortcut(item: Shortcut, onDeleted: (Shortcut) -> Unit) {
-        repository.deleteShortcut(item) {
+        shortcutRepository.delete(item) {
             onDeleted(item)
         }
     }
 
     fun updateShortcuts(shortcuts: List<ShortcutModel>) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.updateShortcuts(shortcuts.map { it.toEntity() })
+            shortcutRepository.updateAll(shortcuts.map { it.toEntity() })
         }
     }
 
     fun deleteMemo(memo: Memo) {
-        repository.deleteMemo(memo) {
+        memoRepository.delete(memo) {
             notifyMemoChanged(MemoChanged(it, MemoChangedState.Deleted))
         }
     }
 
     fun insertMemo(memo: Memo) {
-        repository.insertMemo(memo) {
+        memoRepository.insert(memo) {
             notifyMemoChanged(MemoChanged(it, MemoChangedState.Inserted))
         }
     }
 
-    fun updateMemo(memo: Memo) {
-        repository.updateMemo(memo) {
-            notifyMemoChanged(MemoChanged(it, MemoChangedState.Updated))
+    fun updateMemo(memo: Memo, @MainThread onComplete: (() -> Unit)? = null) {
+        memoRepository.update(memo) {
+            onComplete?.invoke() ?: run {
+                notifyMemoChanged(MemoChanged(it, MemoChangedState.Updated))
+            }
         }
     }
 
     fun updateMemos(list: List<Memo>) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.updateMemos(list)
+            memoRepository.updateAll(list)
         }
+    }
+
+    fun setNotifications(notifications: List<NotificationModel>) {
+        _notifications.value = notifications
     }
 }
 

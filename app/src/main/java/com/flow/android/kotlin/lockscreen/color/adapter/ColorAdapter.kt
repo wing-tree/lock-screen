@@ -5,6 +5,7 @@ import android.graphics.PorterDuff
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.flow.android.kotlin.lockscreen.R
@@ -15,7 +16,7 @@ import com.flow.android.kotlin.lockscreen.util.*
 class ColorAdapter(private val items: IntArray, private val onColorSelected: (color: Int) -> Unit) : RecyclerView.Adapter<ColorAdapter.ViewHolder>() {
     class ViewHolder(val binding: ColorBinding) : RecyclerView.ViewHolder(binding.root)
 
-    private val duration = 20
+    private val duration = 150
     private var colorSelectedPosition = -1
     private var inflater: LayoutInflater? = null
     private var recyclerView: RecyclerView? = null
@@ -24,6 +25,7 @@ class ColorAdapter(private val items: IntArray, private val onColorSelected: (co
         super.onAttachedToRecyclerView(recyclerView)
 
         this.recyclerView = recyclerView
+        this.recyclerView?.itemAnimator = null
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -67,16 +69,7 @@ class ColorAdapter(private val items: IntArray, private val onColorSelected: (co
 
     override fun getItemCount(): Int = items.count()
 
-    fun performClick(color: Int) {
-        val position = items.indexOf(color)
-
-        if (position == -1)
-            return
-
-        val viewHolder = recyclerView?.findViewHolderForAdapterPosition(position)
-
-        if (viewHolder is ViewHolder) {
-            viewHolder.binding.frameLayout.performClick()
-        }
+    fun setInitiallySelectedColor(@ColorInt color: Int) {
+        colorSelectedPosition = items.indexOf(color)
     }
 }

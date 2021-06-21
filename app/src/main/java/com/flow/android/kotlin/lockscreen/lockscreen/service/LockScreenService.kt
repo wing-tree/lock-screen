@@ -1,4 +1,4 @@
-package com.flow.android.kotlin.lockscreen.lockscreen
+package com.flow.android.kotlin.lockscreen.lockscreen.service
 
 import android.app.*
 import android.content.BroadcastReceiver
@@ -12,8 +12,6 @@ import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.WindowInsets
 import android.view.WindowManager
-import androidx.core.app.JobIntentService
-import androidx.core.app.NotificationCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.databinding.HomeBinding
@@ -24,8 +22,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
-import java.util.concurrent.locks.Lock
-import kotlin.Exception
 
 class LockScreenService : Service() {
     object Action {
