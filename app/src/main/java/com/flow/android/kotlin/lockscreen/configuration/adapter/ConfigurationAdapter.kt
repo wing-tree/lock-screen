@@ -91,7 +91,7 @@ class ConfigurationAdapter(private val arrayList: ArrayList<AdapterItem>): Recyc
                     ViewType.List -> ListItemBinding.inflate(layoutInflater, parent, false)
                     ViewType.Subtitle -> SubtitleItemBinding.inflate(layoutInflater, parent, false)
                     ViewType.Switch -> SwitchItemBinding.inflate(layoutInflater, parent, false)
-                    else -> throw InvalidParameterException("Invalid viewType.")
+                    else -> throw InvalidParameterException("Invalid viewType")
                 }
 
                 return ViewHolder(viewBinding)

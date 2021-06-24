@@ -19,7 +19,7 @@ class FragmentStateAdapter(fragmentActivity: FragmentActivity): FragmentStateAda
             1 -> CalendarFragment()
             2 -> ShortcutFragment()
             3 -> NotificationFragment()
-            else -> throw IllegalStateException("Invalid position.")
+            else -> throw IllegalStateException("Invalid position")
         }
     }
 }

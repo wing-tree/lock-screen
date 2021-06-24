@@ -26,7 +26,7 @@
     <color name="inactive">#99000000</color>
 
     <color name="edit_text_background">@color/ivory</color>
-    <color name="card_background">#61212121</color>
+    <color name="card_background">#99212121</color>
 
     <color name="dark">#DE212121</color>
     <color name="light">@color/white</color>

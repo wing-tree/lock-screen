@@ -20,6 +20,8 @@
         <item name="android:windowShowWallpaper">true</item>
 
         <item name="materialButtonStyle">@style/MaterialButton</item>
+
+        <item name="android:textViewStyle">@style/TextViewStyle</item>
     </style>
 
     <style name="Theme.ConfigurationActivity" parent="Theme.MaterialComponents.DayNight.NoActionBar">
@@ -61,7 +63,7 @@
         <item name="backgroundTint">@color/material_button_background_tint</item>
     </style>
 
-    <style name="TextView" parent="@android:style/Widget.DeviceDefault.TextView">
+    <style name="TextViewStyle" parent="@android:style/Widget.DeviceDefault.TextView">
         <item name="android:includeFontPadding">false</item>
         <item name="android:textColor">@color/text</item>
         <item name="android:lineSpacingMultiplier">@dimen/line_spacing_multiplier</item>

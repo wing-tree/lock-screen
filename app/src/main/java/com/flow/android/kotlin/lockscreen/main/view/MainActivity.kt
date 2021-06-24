@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.app.KeyguardManager
+import android.app.Notification
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -108,9 +109,9 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
                 val notificationListener = service.getNotificationListener()
                 val activeNotifications = notificationListener.activeNotifications.mapNotNull {
                     it?.let { sbn -> NotificationModel(
-                            getApplicationLabel(packageManager, sbn.packageName),
-                            sbn.notification,
-                            sbn.postTime
+                            label = getApplicationLabel(packageManager, sbn.packageName),
+                            notification = sbn.notification,
+                            postTime = sbn.postTime
                     ) }
                 }
 
@@ -382,7 +383,7 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
                 val color = when(torch.mode) {
                     Torch.Mode.On -> ContextCompat.getColor(this, R.color.yellow_A_200)
                     Torch.Mode.Off -> ContextCompat.getColor(this, R.color.black)
-                    else -> throw IllegalArgumentException("Invalid mode.")
+                    else -> throw IllegalArgumentException("Invalid mode")
                 }
 
                 if (it is ImageView)

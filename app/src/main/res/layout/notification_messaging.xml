@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/margin_small"
+    android:outlineProvider="none"
+    app:cardBackgroundColor="@color/card_background"
+    app:cardElevation="@dimen/double_extra_small_100"
+    app:cardPreventCornerOverlap="false">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <include
+            android:id="@+id/notification_header"
+            layout="@layout/notification_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_normal"
+            android:layout_marginTop="@dimen/margin_small"
+            android:layout_marginEnd="@dimen/margin_normal" />
+
+        <LinearLayout
+            android:id="@+id/linear_layout_inbox"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_marginStart="@dimen/margin_normal"
+            android:layout_marginTop="@dimen/margin_extra_small"
+            android:layout_marginEnd="@dimen/margin_normal">
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linear_layout_action"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/height_large"
+            android:layout_marginTop="@dimen/margin_small"
+            android:orientation="horizontal" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

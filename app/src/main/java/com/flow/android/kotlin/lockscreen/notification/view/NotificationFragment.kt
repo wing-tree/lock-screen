@@ -30,7 +30,7 @@ class NotificationFragment: BaseMainFragment<FragmentNotificationBinding>() {
 
     private var disposable: Disposable? = null
 
-    private val notificationAdapter by lazy { NotificationAdapter() }
+    private val notificationAdapter by lazy { NotificationAdapter(requireContext().applicationContext) }
     private val nl = NotificationBroadcastReceiver()
     private val notificationBroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {

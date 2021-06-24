@@ -72,7 +72,8 @@ object NotificationBuilder {
                 }
 
                 val builder = NotificationCompat.Builder(context, CHANNEL_ID)
-                    .setStyle(NotificationCompat.InboxStyle().addLine("str111").addLine("str222").setBigContentTitle("big content title").setSummaryText("am i summ."))
+                    .setStyle(NotificationCompat.BigPictureStyle()
+                    )
                         .setSmallIcon(R.drawable.ic_round_lock_open_24)
                         .setContentTitle(contentTitle)
                         .setContentText(contentText)
