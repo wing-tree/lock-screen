@@ -54,6 +54,7 @@ window?.setFlags(
 )
 ```
 
+## [Auto animate layout updates](https://developer.android.com/training/animation/layout)
 ## [Avoiding memory leaks when using Data Binding and View Binding](https://proandroiddev.com/avoiding-memory-leaks-when-using-data-binding-and-view-binding-3b91d571c150)
 ## [CalendarContract.Events](https://developer.android.com/reference/android/provider/CalendarContract.Events)
 ## [CalendarContract.EventsColumns](https://developer.android.com/reference/android/provider/CalendarContract.EventsColumns#ACCESS_CONFIDENTIAL)
