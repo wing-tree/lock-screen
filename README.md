@@ -263,6 +263,7 @@ implementation 'androidx.palette:palette-ktx:1.0.0'
 ```
 ## [Return to app after requesting SYSTEM_ALERT_WINDOW permission](https://stackoverflow.com/questions/40663777/return-to-app-after-requesting-system-alert-window-permission)
 ## [Selecting Colors with the Palette API](https://developer.android.com/training/material/palette-colors)
+## [Transition](https://developer.android.com/reference/android/transition/Transition)
 ## [Using Sync Adapter to transfer data in android](https://nyamebismark12-nb.medium.com/using-sync-adapter-to-transfer-data-ad1e6c3f2d64)
 ## [ViewBinding - how to get binding for included layouts?](https://stackoverflow.com/questions/58730127/viewbinding-how-to-get-binding-for-included-layouts)
 ## [What is the difference between a View and widget in Android?](https://stackoverflow.com/questions/5168549/what-is-the-difference-between-a-view-and-widget-in-android/21541275)
