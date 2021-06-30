@@ -9,7 +9,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.graphics.Point
 import android.graphics.PorterDuff
 import android.net.Uri
 import android.os.*
@@ -49,7 +48,7 @@ import com.flow.android.kotlin.lockscreen.permission.view.PermissionRationaleDia
 import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
 import com.flow.android.kotlin.lockscreen.util.*
-import com.google.android.material.tabs.TabLayout
+import com.flow.android.kotlin.lockscreen.widget.animateSelectedTab
 import com.google.android.material.tabs.TabLayoutMediator
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -61,7 +60,6 @@ import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.karumi.dexter.listener.single.PermissionListener
 import timber.log.Timber
 import java.io.File
-import java.lang.Math.pow
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.abs
@@ -107,15 +105,45 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             if (service is NotificationListener.NotificationListenerBinder) {
                 val notificationListener = service.getNotificationListener()
-                val activeNotifications = notificationListener.activeNotifications.mapNotNull {
-                    it?.let { sbn -> NotificationModel(
-                            label = getApplicationLabel(packageManager, sbn.packageName),
-                            notification = sbn.notification,
-                            postTime = sbn.postTime
-                    ) }
+                val activeNotifications = notificationListener.activeNotifications?.mapNotNull {
+                    it?.let { sbn ->
+                        val notification = sbn.notification
+                        val isGroup = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                            sbn.isGroup
+                        else
+                            notification.group != null || notification.sortKey != null
+
+                        NotificationModel(
+                                group = notification.group ?: BLANK,
+                                groupKey = sbn.groupKey ?: BLANK,
+                                id = System.currentTimeMillis(),
+                                isGroup = isGroup,
+                                label = getApplicationLabel(packageManager, sbn.packageName),
+                                notification = notification,
+                                packageName = sbn.packageName,
+                                postTime = sbn.postTime,
+                                template = notification.extras.getCharSequence(Notification.EXTRA_TEMPLATE).toString(),
+                                children = arrayListOf()
+                        )
+                    }
+                } ?: return
+
+                val notifications = mutableListOf<NotificationModel>()
+
+                notifications.addAll(activeNotifications.filter { it.isGroup.not() })
+
+                activeNotifications.filter { it.isGroup }.groupBy { it.groupKey }.forEach {
+                    val list = it.value
+
+                    if (list.isNotEmpty()) {
+                        for (i in 1 until list.size)
+                            list[0].children.add(list[i])
+
+                        notifications.add(list[0])
+                    }
                 }
 
-                viewModel.setNotifications(activeNotifications)
+                viewModel.setNotifications(notifications)
             } else {
                 // call event for error. todo.
             }
@@ -282,7 +310,7 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
                     viewBinding.frameLayoutRipple.showRipple()
 
                     val distance = sqrt((OpenLock.x - event.x).pow(2) + (OpenLock.y - event.y).pow(2))
-                    var scale = abs(endRange - distance * 0.5F) / endRange
+                    var scale = abs(endRange - distance * 0.45F) / endRange
 
                     when {
                         scale >= 1F -> scale = 1F
@@ -399,11 +427,12 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
                 getString(R.string.main_activity_003)
         )
 
+        viewBinding.viewPager2.offscreenPageLimit = 3
         viewBinding.viewPager2.adapter = FragmentStateAdapter(this)
         TabLayoutMediator(viewBinding.centerAlignedTabLayout, viewBinding.viewPager2) { tab, position ->
             tab.customView = layoutInflater.inflate(
                     R.layout.tab_custom_view,
-                    viewBinding.root,
+                    viewBinding.centerAlignedTabLayout,
                     false
             )
 
@@ -412,25 +441,12 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
             textView.text = tabTexts[position]
         }.attach()
 
-        viewBinding.centerAlignedTabLayout.addOnTabSelectedListener(object :
-                TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab) {
-                animateSelectedTab(tab)
-            }
-
-            override fun onTabUnselected(tab: TabLayout.Tab) {
-                animateUnselectedTab(tab)
-            }
-
-            override fun onTabReselected(tab: TabLayout.Tab) {}
-        })
-
         val selectedTabIndex = ConfigurationPreferences.getSelectedTabIndex(this)
 
         Handler(Looper.getMainLooper()).postDelayed({
             if (selectedTabIndex == 0) {
                 viewBinding.centerAlignedTabLayout.getTabAt(selectedTabIndex)?.let {
-                    animateSelectedTab(it)
+                    it.animateSelectedTab()
                 }
             } else
                 viewBinding.centerAlignedTabLayout.getTabAt(selectedTabIndex)?.select()
@@ -438,14 +454,6 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
             viewBinding.centerAlignedTabLayout.fadeIn(duration)
             viewBinding.viewPager2.fadeIn(duration)
         }, duration)
-    }
-
-    private fun animateSelectedTab(tab: TabLayout.Tab) {
-        tab.view.scale(1.5F)
-    }
-
-    private fun animateUnselectedTab(tab: TabLayout.Tab) {
-        tab.view.scale(1.0F)
     }
 
     private val configurationActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->

@@ -2,6 +2,7 @@
   <dictionary name="kimseongju">
     <words>
       <w>fileprovider</w>
+      <w>gson</w>
       <w>hhmmss</w>
       <w>hmmss</w>
       <w>lockscreen</w>

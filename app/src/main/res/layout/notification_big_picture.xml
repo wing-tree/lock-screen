@@ -1,18 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/linear_layout_big_picture"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:layout_marginBottom="@dimen/margin_small"
+    android:outlineProvider="none"
+    app:cardBackgroundColor="@color/card_background"
+    app:cardElevation="@dimen/double_extra_small_100"
+    app:cardPreventCornerOverlap="false">
 
-    <ImageView
-        android:id="@+id/image_view_big_picture"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:adjustViewBounds="true"
-        android:layout_weight="1"
-        android:scaleType="centerCrop"
-        tools:ignore="ContentDescription" />
-</LinearLayout>
+        android:layout_height="wrap_content">
+
+        <include
+            android:id="@+id/notification_header"
+            layout="@layout/notification_header"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_small"
+            android:layout_marginEnd="@dimen/margin_normal"
+            android:layout_marginStart="@dimen/margin_normal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <include
+            android:id="@+id/notification_body"
+            layout="@layout/notification_body"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/margin_normal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/notification_header"
+            app:layout_constraintTop_toBottomOf="@+id/notification_header" />
+
+        <LinearLayout
+            android:id="@+id/linear_layout_footer"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="@+id/notification_body"
+            app:layout_constraintStart_toStartOf="@+id/notification_body"
+            app:layout_constraintTop_toBottomOf="@+id/notification_body">
+
+            <ImageView
+                android:id="@+id/image_view_picture"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/double_extra_large_100"
+                tools:ignore="ContentDescription" />
+
+            <LinearLayout
+                android:id="@+id/linear_layout_action"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/height_large"
+                android:layout_marginTop="@dimen/margin_small"
+                android:orientation="horizontal" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

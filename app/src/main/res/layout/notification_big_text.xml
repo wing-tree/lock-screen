@@ -1,19 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/linear_layout_inbox"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:layout_marginBottom="1dp"
+    android:orientation="vertical"
+    android:animateLayoutChanges="true"
+    android:background="@color/card_background">
 
-    <TextView
-        android:id="@+id/text_view_big_text"
+    <include
+        android:id="@+id/notification_header"
+        layout="@layout/notification_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_extra_small"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:textColor="@color/white"
-        tools:text="It is better to fail in originality than to succeed in imitation." />
-</LinearLayout>
+        android:layout_marginTop="@dimen/margin_small"
+        android:layout_marginEnd="@dimen/margin_normal"
+        android:layout_marginStart="@dimen/margin_normal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <include
+        android:id="@+id/notification_body"
+        layout="@layout/notification_body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/margin_normal"
+        android:layout_marginStart="@dimen/margin_normal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/notification_header"
+        app:layout_constraintTop_toBottomOf="@+id/notification_header" />
+
+    <LinearLayout
+        android:id="@+id/linear_layout_footer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/margin_normal"
+        android:layout_marginStart="@dimen/margin_normal"
+        android:orientation="vertical"
+        android:animateLayoutChanges="true"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/notification_body"
+        app:layout_constraintStart_toStartOf="@+id/notification_body"
+        app:layout_constraintTop_toBottomOf="@+id/notification_body">
+
+        <TextView
+            android:id="@+id/text_view_big_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <LinearLayout
+            android:id="@+id/linear_layout_action"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/height_large"
+            android:layout_marginTop="@dimen/margin_small"
+            android:orientation="horizontal" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

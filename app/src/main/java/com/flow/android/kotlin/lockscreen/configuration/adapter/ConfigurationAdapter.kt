@@ -15,7 +15,7 @@ class ConfigurationAdapter(private val arrayList: ArrayList<AdapterItem>): Recyc
     private var recyclerView: RecyclerView? = null
 
     class ViewHolder(private val viewBinding: ViewBinding): RecyclerView.ViewHolder(viewBinding.root) {
-        private val duration = 200
+        private val duration = 200L
 
         fun bind(adapterItem: AdapterItem, viewType: Int) {
             when(viewType) {
@@ -75,7 +75,7 @@ class ConfigurationAdapter(private val arrayList: ArrayList<AdapterItem>): Recyc
         }
 
         fun show() {
-            viewBinding.root.expand(200)
+            viewBinding.root.expand(duration)
         }
 
         fun updateDescription(description: String) {

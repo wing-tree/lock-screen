@@ -98,6 +98,9 @@
     <dimen name="max_height_small">72dp</dimen>
     <dimen name="max_height_medium">120dp</dimen>
 
+    <dimen name="width_notification_large_icon">@dimen/normal_225</dimen>
+    <dimen name="height_notification_large_icon">@dimen/normal_225</dimen>
+
     <item name="shadow_dx" format="float" type="dimen">1.0</item>
     <item name="shadow_dy" format="float" type="dimen">1.0</item>
     <item name="shadow_radius" format="float" type="dimen">1.0</item>

@@ -1,25 +1,26 @@
 package com.flow.android.kotlin.lockscreen.notification.adapter
 
 import android.app.Notification
-import android.app.PendingIntent.CanceledException
+import android.app.PendingIntent
 import android.content.Context
-import android.graphics.Bitmap
-import android.media.MediaPlayer
-import android.media.MediaSession2
-import android.media.browse.MediaBrowser
-import android.media.session.MediaSession
-import android.os.Bundle
-import android.service.media.MediaBrowserService
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.AccelerateInterpolator
 import android.widget.LinearLayout
 import android.widget.TableLayout
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.transition.*
+import androidx.transition.TransitionSet.ORDERING_SEQUENTIAL
+import androidx.transition.TransitionSet.ORDERING_TOGETHER
+import androidx.viewbinding.ViewBinding
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.databinding.*
 import com.flow.android.kotlin.lockscreen.notification.model.NotificationModel
@@ -28,140 +29,43 @@ import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
-class NotificationAdapter(private val applicationContext: Context) :
+
+class NotificationAdapter(private val context: Context) :
     ListAdapter<NotificationModel, NotificationAdapter.ViewHolder>(DiffCallback()) {
-    private object NotificationStyle {
-        const val BigPicture = "BigPictureStyle"
-        const val BigText = "BigTextStyle"
-        const val Inbox = "InboxStyle"
-        const val Media = "MediaStyle"
-        const val Messaging = "MessagingStyle"
+
+    private var recyclerView: RecyclerView? = null
+
+    private enum class NotificationStyle(val value: String) {
+        BigPicture(Notification.BigPictureStyle::class.java.name),
+        BigText(Notification.BigTextStyle::class.java.name),
+        Inbox(Notification.InboxStyle::class.java.name),
+        Media(Notification.MediaStyle::class.java.name),
+        Messaging(
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
+                    Notification.MessagingStyle::class.java.name
+                else
+                    BLANK
+        )
     }
 
-    private var layoutInflater: LayoutInflater? = null
+    private enum class ViewType(val value: Int) {
+        BigText(0),
+        BigPicture(1),
+        Inbox(2),
+        Media(3),
+        Messaging(4),
+        Base(5)
+    }
 
-    class ViewHolder private constructor(private val binding: NotificationBaseBinding): RecyclerView.ViewHolder(
-        binding.root
+    private val layoutInflater by lazy { LayoutInflater.from(context) }
+    private val simpleDateFormat by lazy {
+        SimpleDateFormat(context.getString(R.string.format_time_000), Locale.getDefault())
+    }
+
+    inner class ViewHolder(private val viewBinding: ViewBinding): RecyclerView.ViewHolder(
+            viewBinding.root
     ) {
-        private val simpleDateFormat by lazy {
-            val context = binding.root.context
-
-            SimpleDateFormat(context.getString(R.string.format_time_000), Locale.getDefault())
-        }
-
-        fun bind(item: NotificationModel) {
-
-            val context = binding.root.context
-
-            val label = item.label
-            val notification = item.notification
-            val postTime = item.postTime
-
-            val extras: Bundle = notification.extras
-            val subText = extras.getCharSequence(Notification.EXTRA_SUB_TEXT) ?: BLANK
-            val text = extras.getCharSequence(Notification.EXTRA_TEXT) ?: BLANK
-            val title = extras.getCharSequence(Notification.EXTRA_TITLE) ?: BLANK
-
-            bindBaseNotification(binding, item)
-
-            ///////
-            // style 에 따라 처리 필요할 듯.
-            val template = extras.getCharSequence(Notification.EXTRA_TEMPLATE)
-            Notification.EXTRA_PICTURE
-            extras.getParcelable<Bitmap>(Notification.EXTRA_PICTURE)
-
-            println("TTTTTTTTEMEMEME: $template")
-            println("TTTTTTTTEMEMEMESSS: ${template.toString()}")
-            println("YYYYYYYYYYY: ${template?.javaClass?.simpleName}")
-            println("WWWWWWW: :" + Notification.BigTextStyle::class.java.simpleName) // contain으로 . endwith로 검사하면될듯.
-            println("WWWWWW2222W: :" + Notification.BigTextStyle::class.java.name) // 이걸로.
-
-            Notification.EXTRA_MEDIA_SESSION
-
-            val token = extras.getParcelable<MediaSession.Token>(Notification.EXTRA_MEDIA_SESSION)
-
-
-
-            val bigText = extras.getCharSequence(Notification.EXTRA_BIG_TEXT)
-            val textLines = extras.getCharSequence(Notification.EXTRA_TEXT_LINES)
-
-            val keysett = extras.keySet()
-
-
-
-
-            Notification.CATEGORY_SYSTEM // 상수로 되어 있다. 시스템 알림은 제ㅐ외하면 될 듯.
-            /////
-        }
-
-        private fun bindBaseNotification(binding: NotificationBaseBinding, item: NotificationModel) {
-            val context = binding.root.context
-
-            val label = item.label
-            val notification = item.notification
-            val postTime = item.postTime
-
-            val contentIntent = notification.contentIntent
-            val color = notification.color
-            val extras: Bundle = notification.extras
-
-            val subText = extras.getCharSequence(Notification.EXTRA_SUB_TEXT) ?: BLANK
-            val template = extras.getCharSequence(Notification.EXTRA_TEMPLATE) ?: BLANK
-            val text = extras.getCharSequence(Notification.EXTRA_TEXT) ?: BLANK
-            val title = extras.getCharSequence(Notification.EXTRA_TITLE) ?: BLANK
-
-            binding.root.setOnClickListener {
-                try {
-                    contentIntent.send()
-                } catch (e: CanceledException) {
-                    Timber.e(e)
-                }
-            }
-
-            binding.imageViewLargeIcon.hide(true)
-            binding.textViewText.text = text
-            binding.textViewTitle.text = title
-
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M)
-                notification.getLargeIcon()?.let {
-                    binding.imageViewLargeIcon.show()
-                    binding.imageViewLargeIcon.setImageIcon(it)
-                }
-
-            bindHeader(binding.notificationHeader, item)
-            addActions(binding.linearLayoutAction, notification.actions)
-        }
-
-        private fun bindHeader(header: NotificationHeaderBinding, item: NotificationModel) {
-            val label = item.label
-            val notification = item.notification
-            val postTime = item.postTime
-
-            val color = notification.color
-            val extras: Bundle = notification.extras
-
-            val subText = extras.getCharSequence(Notification.EXTRA_SUB_TEXT) ?: BLANK
-
-            header.imageViewSmallIcon
-
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M)
-                notification.smallIcon?.let { header.imageViewSmallIcon.setImageIcon(it) }
-
-            header.textViewLabel.setTextColor(color)
-            header.textViewLabel.text = label
-            header.textViewPostTime.text = postTime.toDateString(simpleDateFormat)
-            header.textViewSubText.text = subText
-
-            header.root.setOnClickListener {
-                if (item.expanded) {
-                    item.expanded = false
-                    collapseViewStub(binding.frameLayout)
-                } else {
-                    item.expanded = true
-                    expandViewStub(binding, notification)
-                }
-            }
-        }
+        fun root() = viewBinding.root
 
         private fun addActions(container: LinearLayout, actions: Array<Notification.Action>?) {
             container.removeAllViews()
@@ -181,9 +85,9 @@ class NotificationAdapter(private val applicationContext: Context) :
                     }
 
                     textView.layoutParams = TableLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        1F
+                            LinearLayout.LayoutParams.WRAP_CONTENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT,
+                            1F
                     )
 
                     container.addView(textView)
@@ -191,92 +95,179 @@ class NotificationAdapter(private val applicationContext: Context) :
             }
         }
 
-        private fun collapseViewStub(container: FrameLayout) {
-            container.hide()
-        }
-
-        private fun expandViewStub(binding: NotificationBaseBinding, notification: Notification) {
+        fun bind(item: NotificationModel) {
+            val notification = item.notification
             val extras = notification.extras
-            val template = extras.getCharSequence(Notification.EXTRA_TEMPLATE) ?: BLANK
+            val text = extras.getCharSequence(Notification.EXTRA_TEXT) ?: BLANK
 
-            when {
-                template.endsWith(NotificationStyle.BigPicture) -> {
-                    binding.notificationBigPicture.root.show()
+            when(viewBinding) {
+                is NotificationBigPictureBinding -> {
+                    bindHeader(viewBinding.notificationHeader, item) {
 
-                    extras.getParcelable<Bitmap>(Notification.EXTRA_PICTURE)?.let {
-                        binding.notificationBigPicture.imageViewBigPicture.setImageBitmap(it)
                     }
+
+                    bindBody(viewBinding.notificationBody, item)
                 }
-                template.endsWith(NotificationStyle.BigText) -> {
-                    val bigText = extras.getCharSequence(Notification.EXTRA_BIG_TEXT)
-                    val text = extras.getCharSequence(Notification.EXTRA_TEXT) ?: BLANK
-                    binding.notificationBigText.root.show()
-                    binding.notificationBigText.textViewBigText.text = bigText ?: text
-                }
-                template.endsWith(NotificationStyle.Inbox) -> {
-                    val bigText = extras.getCharSequence(Notification.EXTRA_BIG_TEXT)
-                    val textLines = extras.getCharSequenceArray(Notification.EXTRA_TEXT_LINES) ?: emptyArray()
-                    val title = extras.getCharSequence(Notification.EXTRA_TITLE) ?: BLANK
+                is NotificationBigTextBinding -> {
+                    val header = viewBinding.notificationHeader
+                    val body = viewBinding.notificationBody
+                    val bigText = extras.getCharSequence(Notification.EXTRA_BIG_TEXT) ?: text
 
-                    binding.notificationInbox.root.show()
-                    with(binding.notificationInbox) {
-                        textViewBigContentTitle.text = bigText ?: title
+                    if (item.expanded) {
+                        body.textViewText.post {
+                            val ellipsisStart = body.textViewText.layout.getEllipsisStart(0)
 
-                        textViewLine0.hide()
-                        textViewLine1.hide()
-                        textViewLine2.hide()
-                        textViewLine3.hide()
-                        textViewLine4.hide()
-                        textViewLine5.hide()
+                            // todo ;;;
 
-                        for ((index, textLine) in textLines.withIndex()) {
-                            if (index > 5)
-                                break
-
-                            val textView = when(index) {
-                                0 -> textViewLine0
-                                1 -> textViewLine1
-                                2 -> textViewLine2
-                                3 -> textViewLine3
-                                4 -> textViewLine4
-                                5 -> textViewLine5
-                                else -> throw IllegalStateException("Invalid index")
-                            }
-
-                            textView.show()
-                            textView.text = textLine
+                            body.textViewText.text = bigText.subSequence(0, ellipsisStart)
+                            viewBinding.textViewBigText.text = bigText.subSequence(ellipsisStart, bigText.length)
                         }
+
+                        viewBinding.linearLayoutFooter.show()
+                    } else {
+                        viewBinding.linearLayoutFooter.hide()
                     }
-                }
-                template.endsWith(NotificationStyle.Media) -> {
 
-                }
-                template.endsWith(NotificationStyle.Messaging) -> {
+                    bindHeader(header, item) {
+                        item.expanded = item.expanded.not()
 
-                }
-                else -> {
+                        notifyItemChanged(adapterPosition)
+                    }
 
+                    bindBody(body, item)
+                    addActions(viewBinding.linearLayoutAction, notification.actions)
+                }
+                is NotificationInboxBinding -> {
+                    bindHeader(viewBinding.notificationHeader, item) {
+
+                    }
+                    bindBody(viewBinding.notificationBody, item)
+                }
+                is NotificationMediaBinding -> {
+                    bindHeader(viewBinding.notificationHeader, item) {
+
+                    }
+                    bindBody(viewBinding.notificationBody, item)
+                }
+                is NotificationMessagingBinding -> {
+                    bindHeader(viewBinding.notificationHeader, item) {
+
+                    }
+                    bindBody(viewBinding.notificationBody, item)
+                }
+                is NotificationBaseBinding -> {
+                    bindHeader(viewBinding.notificationHeader, item) {
+
+                    }
+                    bindBody(viewBinding.notificationBody, item)
                 }
             }
         }
 
-        companion object {
-            fun from(binding: NotificationBaseBinding): ViewHolder {
-                return ViewHolder(binding)
+        private fun bindHeader(header: NotificationHeaderBinding, item: NotificationModel, onClick: () -> Unit) {
+            val notification = item.notification
+            val color = notification.color
+            val extras = notification.extras
+            val label = item.label
+            val postTime = item.postTime
+            val subText = extras.getCharSequence(Notification.EXTRA_SUB_TEXT) ?: BLANK
+
+            header.imageViewExpand.setColorFilter(color)
+            header.textViewLabel.setTextColor(color)
+            header.textViewLabel.text = label
+            header.textViewPostTime.text = postTime.toDateString(simpleDateFormat)
+            header.textViewSubText.text = subText
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                notification.smallIcon?.let {
+                    header.imageViewSmallIcon.setImageIcon(it)
+                    header.imageViewSmallIcon.setColorFilter(color)
+                }
+            }
+
+            header.root.setOnClickListener {
+                onClick.invoke()
+            }
+        }
+
+        private fun bindBody(body: NotificationBodyBinding, item: NotificationModel) {
+            val notification = item.notification
+            val contentIntent = notification.contentIntent
+            val extras = notification.extras
+            val text = extras.getCharSequence(Notification.EXTRA_TEXT) ?: BLANK
+            val title = extras.getCharSequence(Notification.EXTRA_TITLE) ?: BLANK
+
+            body.root.setOnClickListener {
+                try {
+                    contentIntent.send()
+                } catch (e: PendingIntent.CanceledException) {
+                    Timber.e(e)
+                }
+            }
+
+            body.textViewText.text = text
+            body.textViewTitle.text = title
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                notification.getLargeIcon()?.let {
+                    body.imageViewLargeIcon.setImageIcon(it)
+                } ?: run {
+                    body.imageViewLargeIcon.setImageIcon(null)
+                }
             }
         }
     }
 
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        this.recyclerView = recyclerView
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val layoutInflater = this.layoutInflater ?: LayoutInflater.from(parent.context)
+        val viewBinding = when(viewType) {
+            ViewType.BigPicture.value -> NotificationBigPictureBinding.inflate(layoutInflater, parent, false)
+            ViewType.BigText.value -> NotificationBigTextBinding.inflate(layoutInflater, parent, false)
+            ViewType.Inbox.value -> NotificationInboxBinding.inflate(layoutInflater, parent, false)
+            ViewType.Media.value -> NotificationMediaBinding.inflate(layoutInflater, parent, false)
+            ViewType.Messaging.value -> NotificationMessagingBinding.inflate(layoutInflater, parent, false)
+            else -> NotificationBaseBinding.inflate(layoutInflater, parent, false)
+        }
 
-        this.layoutInflater = layoutInflater
-
-        return ViewHolder.from(NotificationBaseBinding.inflate(layoutInflater, parent, false))
+        return ViewHolder(viewBinding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(getItem(position))
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return when(getItem(position).template) {
+            NotificationStyle.BigPicture.value -> ViewType.BigPicture.value
+            NotificationStyle.BigText.value -> ViewType.BigText.value
+            NotificationStyle.Inbox.value -> ViewType.Inbox.value
+            NotificationStyle.Media.value -> ViewType.Media.value
+            NotificationStyle.Messaging.value -> ViewType.Messaging.value
+            else -> ViewType.Base.value
+        }
+    }
+
+    @Suppress("unused")
+    private fun lastVisibleViewHolder(): RecyclerView.ViewHolder? {
+        var viewHolder: RecyclerView.ViewHolder? = null
+
+        recyclerView?.let { recyclerView ->
+            val layoutManager = recyclerView.layoutManager
+
+            if (layoutManager is LinearLayoutManager) {
+                val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
+
+                recyclerView.findViewHolderForAdapterPosition(lastVisibleItemPosition)?.let {
+                    viewHolder = it
+                }
+            }
+        }
+
+        return viewHolder
     }
 }
 

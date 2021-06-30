@@ -1,128 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/margin_small"
-    android:outlineProvider="none"
-    app:cardBackgroundColor="@color/card_background"
-    app:cardElevation="@dimen/double_extra_small_100"
-    app:cardPreventCornerOverlap="false">
+    android:layout_marginBottom="1dp"
+    android:orientation="vertical"
+    android:background="@color/card_background">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <include
+        android:id="@+id/notification_header"
+        layout="@layout/notification_header"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_small"
+        android:layout_marginEnd="@dimen/margin_normal"
+        android:layout_marginStart="@dimen/margin_normal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <include
-            android:id="@+id/notification_header"
-            layout="@layout/notification_header"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_small"
-            android:layout_marginEnd="@dimen/margin_normal"
-            android:layout_marginStart="@dimen/margin_normal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+    <include
+        android:id="@+id/notification_body"
+        layout="@layout/notification_body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/margin_normal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/notification_header"
+        app:layout_constraintTop_toBottomOf="@+id/notification_header" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraint_layout_base"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/margin_normal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/notification_header"
-            app:layout_constraintTop_toBottomOf="@+id/notification_header">
-
-            <TextView
-                android:id="@+id/text_view_title"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_extra_small"
-                android:layout_marginEnd="@dimen/margin_small"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:textColor="@color/white"
-                app:layout_constraintEnd_toStartOf="@+id/image_view_large_icon"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="Title" />
-
-            <TextView
-                android:id="@+id/text_view_text"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_extra_small"
-                android:ellipsize="end"
-                android:maxLines="1"
-                app:layout_constraintEnd_toEndOf="@+id/text_view_title"
-                app:layout_constraintStart_toStartOf="@+id/text_view_title"
-                app:layout_constraintTop_toBottomOf="@+id/text_view_title"
-                tools:text="It is better to fail in originality than to succeed in imitation." />
-
-            <ImageView
-                android:id="@+id/image_view_large_icon"
-                android:layout_width="@dimen/width_large"
-                android:layout_height="@dimen/width_large"
-                android:layout_marginTop="@dimen/margin_small"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:ignore="ContentDescription" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <FrameLayout
-            android:id="@+id/frame_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/notification_header"
-            app:layout_constraintTop_toBottomOf="@+id/notification_header">
-
-            <include
-                android:id="@+id/notification_big_picture"
-                layout="@layout/notification_big_picture"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:visibility="gone" />
-
-            <include
-                android:id="@+id/notification_big_text"
-                layout="@layout/notification_big_text"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:visibility="gone" />
-
-            <include
-                android:id="@+id/notification_inbox"
-                layout="@layout/notification_inbox"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:visibility="gone" />
-
-            <include
-                android:id="@+id/notification_media"
-                layout="@layout/notification_media"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:visibility="gone" />
-
-            <include
-                android:id="@+id/notification_messaging"
-                layout="@layout/notification_messaging"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:visibility="gone" />
-        </FrameLayout>
-
-        <LinearLayout
-            android:id="@+id/linear_layout_action"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/height_large"
-            android:layout_marginTop="@dimen/margin_small"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/constraint_layout_base"/>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</com.google.android.material.card.MaterialCardView>
+    <LinearLayout
+        android:id="@+id/linear_layout_action"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/height_large"
+        android:layout_marginTop="@dimen/margin_small"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/notification_body"
+        tools:visibility="visible"/>
+</LinearLayout>
