@@ -8,7 +8,7 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.*
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.databinding.MemoBinding
 import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
@@ -129,10 +129,11 @@ class MemoAdapter(
 
     fun onMove(from: Int, to: Int) {
         val priority = items[from].priority
+
         items[from].priority = items[to].priority
         items[to].priority = priority
-        Collections.swap(items, from, to)
 
+        Collections.swap(items, from, to)
         notifyItemMoved(from, to)
     }
 

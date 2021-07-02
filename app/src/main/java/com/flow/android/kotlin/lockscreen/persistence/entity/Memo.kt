@@ -11,16 +11,16 @@ import kotlinx.android.parcel.Parcelize
 @Entity(tableName = "memo")
 @Parcelize
 data class Memo (
-    @PrimaryKey(autoGenerate = true)
-    val id: Long = 0L,
-    var alarmTime: Long = 0L,
-    var checklist: Array<ChecklistItem> = arrayOf(),
-    var color: Int,
-    var content: String,
-    var isDone: Boolean = false,
-    var modifiedTime: Long,
-    @ColumnInfo(defaultValue = "0")
-    var priority: Long
+        @PrimaryKey(autoGenerate = true)
+        val id: Long = 0L,
+        var alarmTime: Long = 0L,
+        var checklist: Array<ChecklistItem> = arrayOf(),
+        var color: Int,
+        var content: String,
+        var isDone: Boolean = false,
+        var modifiedTime: Long,
+        @ColumnInfo(defaultValue = "0")
+        var priority: Long
 ) : Parcelable {
     fun contentEquals(memo: Memo): Boolean {
         if (alarmTime != memo.alarmTime)
@@ -48,14 +48,14 @@ data class Memo (
     }
 
     fun deepCopy() = Memo(
-        id = id,
-        alarmTime = alarmTime,
-        checklist = checklist.copyOf(),
-        content = content,
-        color = color,
-        isDone = isDone,
-        modifiedTime = modifiedTime,
-        priority = priority
+            id = id,
+            alarmTime = alarmTime,
+            checklist = checklist.copyOf(),
+            content = content,
+            color = color,
+            isDone = isDone,
+            modifiedTime = modifiedTime,
+            priority = priority
     )
 
     fun checkListToString() = if (checklist.isEmpty())

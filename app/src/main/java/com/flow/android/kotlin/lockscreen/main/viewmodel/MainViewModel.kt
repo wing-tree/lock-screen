@@ -14,7 +14,6 @@ import com.flow.android.kotlin.lockscreen.calendar.model.CalendarModel
 import com.flow.android.kotlin.lockscreen.calendar.model.EventModel
 import com.flow.android.kotlin.lockscreen.configuration.viewmodel.ConfigurationChange
 import com.flow.android.kotlin.lockscreen.notification.model.NotificationModel
-import com.flow.android.kotlin.lockscreen.persistence.entity.ChecklistItem
 import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.persistence.entity.Shortcut
 import com.flow.android.kotlin.lockscreen.repository.MemoRepository

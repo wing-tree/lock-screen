@@ -6,6 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
+    android:paddingEnd="@dimen/padding_normal"
+    android:paddingStart="@dimen/padding_normal"
+    android:paddingTop="@dimen/padding_small"
     app:layout_constraintEnd_toStartOf="@+id/image_view_large_icon"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent">

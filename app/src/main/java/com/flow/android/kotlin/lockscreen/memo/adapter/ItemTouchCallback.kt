@@ -3,7 +3,10 @@ package com.flow.android.kotlin.lockscreen.memo.adapter
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 
-class ItemTouchCallback(private val adapter: MemoAdapter): ItemTouchHelper.Callback() {
+class ItemTouchCallback(
+        private val adapter: MemoAdapter,
+        private val onClearView: () -> Unit
+) : ItemTouchHelper.Callback() {
     override fun getMovementFlags(
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder

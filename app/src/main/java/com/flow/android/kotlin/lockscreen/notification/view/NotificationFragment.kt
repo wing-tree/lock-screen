@@ -13,6 +13,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.flow.android.kotlin.lockscreen.base.BaseMainFragment
 import com.flow.android.kotlin.lockscreen.databinding.FragmentNotificationBinding
+import com.flow.android.kotlin.lockscreen.notification.adapter.DefaultItemAnimator
 import com.flow.android.kotlin.lockscreen.notification.adapter.NotificationAdapter
 import com.flow.android.kotlin.lockscreen.notification.broadcastreceiver.NotificationBroadcastReceiver
 import com.flow.android.kotlin.lockscreen.notification.service.NotificationListener
@@ -80,6 +81,7 @@ class NotificationFragment: BaseMainFragment<FragmentNotificationBinding>() {
     private fun initializeView() {
         viewBinding.recyclerView.apply {
             adapter = notificationAdapter
+            itemAnimator = DefaultItemAnimator()
             layoutManager = LinearLayoutManager(requireContext())
             setHasFixedSize(true)
         }

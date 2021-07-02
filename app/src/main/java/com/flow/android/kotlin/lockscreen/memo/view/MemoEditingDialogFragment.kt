@@ -21,10 +21,10 @@ import com.flow.android.kotlin.lockscreen.base.BaseDialogFragment
 import com.flow.android.kotlin.lockscreen.color.widget.ColorPickerLayout
 import com.flow.android.kotlin.lockscreen.databinding.FragmentMemoEditingDialogBinding
 import com.flow.android.kotlin.lockscreen.datepicker.DatePickerDialogFragment
-import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.memo._interface.OnMemoChangedListener
 import com.flow.android.kotlin.lockscreen.memo.checklist.adapter.ChecklistAdapter
 import com.flow.android.kotlin.lockscreen.persistence.entity.ChecklistItem
+import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.util.*
 import java.text.SimpleDateFormat
 import java.util.*

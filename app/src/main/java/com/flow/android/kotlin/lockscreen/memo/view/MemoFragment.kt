@@ -12,6 +12,7 @@ import com.flow.android.kotlin.lockscreen.main.viewmodel.MemoChangedState
 import com.flow.android.kotlin.lockscreen.memo.adapter.ItemTouchCallback
 import com.flow.android.kotlin.lockscreen.memo.adapter.MemoAdapter
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
+import com.flow.android.kotlin.lockscreen.util.LinearLayoutManagerWrapper
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -35,7 +36,9 @@ class MemoFragment: BaseMainFragment<FragmentMemoBinding>() {
         }
     }
 
-    private val itemTouchHelper by lazy { ItemTouchHelper(ItemTouchCallback(memoAdapter)) }
+    private val itemTouchHelper by lazy { ItemTouchHelper(ItemTouchCallback(memoAdapter) {
+
+    }) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,13 +54,13 @@ class MemoFragment: BaseMainFragment<FragmentMemoBinding>() {
         }
 
         viewBinding.recyclerView.apply {
-            layoutManager = LinearLayoutManager(requireContext())
             adapter = memoAdapter
+            layoutManager = LinearLayoutManagerWrapper(requireContext())
             scheduleLayoutAnimation()
         }
 
         itemTouchHelper.attachToRecyclerView(viewBinding.recyclerView)
-        initializeLiveData()
+        registerObservers()
 
         return view
     }
@@ -72,7 +75,7 @@ class MemoFragment: BaseMainFragment<FragmentMemoBinding>() {
         super.onDestroy()
     }
 
-    private fun initializeLiveData() {
+    private fun registerObservers() {
         compositeDisposable.add(
             viewModel.memos
             .take(1)

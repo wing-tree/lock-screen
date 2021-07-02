@@ -2,7 +2,6 @@ package com.flow.android.kotlin.lockscreen.shortcut.view
 
 import android.app.KeyguardManager
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -62,6 +61,7 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
         }
 
         itemTouchHelper.attachToRecyclerView(viewBinding.recyclerView)
+        registerObservers()
 
         return view
     }
@@ -80,18 +80,7 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        initializeLiveData()
-    }
-
-    override fun onPause() {
-        viewModel.shortcuts.removeObservers(this)
-        viewModel.updateShortcuts(shortcutAdapter.currentList())
-        super.onPause()
-    }
-
-    private fun initializeLiveData() {
+    private fun registerObservers() {
         viewModel.shortcuts.observe(viewLifecycleOwner, {
             shortcutAdapter.submitList(it)
         })

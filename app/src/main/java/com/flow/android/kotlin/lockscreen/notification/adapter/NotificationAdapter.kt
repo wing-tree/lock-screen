@@ -117,10 +117,12 @@ class NotificationAdapter(private val context: Context) :
                         body.textViewText.post {
                             val ellipsisStart = body.textViewText.layout.getEllipsisStart(0)
 
-                            // todo ;;;
+                            // todo ;;; 줄나누기.
 
-                            body.textViewText.text = bigText.subSequence(0, ellipsisStart)
-                            viewBinding.textViewBigText.text = bigText.subSequence(ellipsisStart, bigText.length)
+                            if (ellipsisStart > 0) {
+                                body.textViewText.text = bigText.subSequence(0, ellipsisStart)
+                                viewBinding.textViewBigText.text = bigText.subSequence(ellipsisStart, bigText.length)
+                            }
                         }
 
                         viewBinding.linearLayoutFooter.show()

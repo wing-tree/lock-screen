@@ -7,7 +7,10 @@ import androidx.recyclerview.widget.RecyclerView
 import timber.log.Timber
 import kotlin.math.abs
 
-class ItemTouchCallback(private val adapter: ShortcutAdapter, @MainThread private val onExited: () -> Unit): ItemTouchHelper.Callback() {
+class ItemTouchCallback(
+        private val adapter: ShortcutAdapter,
+        @MainThread private val onExited: () -> Unit
+): ItemTouchHelper.Callback() {
     override fun getMovementFlags(
             recyclerView: RecyclerView,
             viewHolder: RecyclerView.ViewHolder
