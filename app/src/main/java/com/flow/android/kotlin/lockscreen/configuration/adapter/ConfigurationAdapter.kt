@@ -71,7 +71,7 @@ class ConfigurationAdapter(private val arrayList: ArrayList<AdapterItem>): Recyc
         }
 
         fun hide() {
-            viewBinding.root.collapse(1, duration)
+            viewBinding.root.collapse(duration, 0)
         }
 
         fun show() {

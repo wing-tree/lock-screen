@@ -35,14 +35,17 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:id="@+id/checkbox"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:layout_gravity="center"
-            android:minHeight="0dp"
-            android:minWidth="0dp"
-            app:srcCompat="@drawable/ic_round_add_circle_24"/>
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/checkbox"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginEnd="@dimen/margin_extra_small"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:scaleX="0.90"
+                android:scaleY="0.90"
+                app:srcCompat="@drawable/ic_round_add_circle_24"/>
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/image_view_more"

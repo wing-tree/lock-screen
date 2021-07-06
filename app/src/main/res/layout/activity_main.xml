@@ -14,7 +14,9 @@
         android:id="@+id/constraint_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/frame_layout_lock_open"
+        android:layout_marginBottom="@dimen/margin_normal"
+        android:elevation="1dp"
+        app:layout_constraintBottom_toTopOf="@+id/linear_layout_lock_open"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -133,12 +135,13 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <FrameLayout
-        android:id="@+id/frame_layout_lock_open"
+    <LinearLayout
+        android:id="@+id/linear_layout_lock_open"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="@dimen/double_extra_large_125"
         android:clipChildren="false"
         android:clipToPadding="false"
+        android:gravity="center_horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -148,7 +151,6 @@
             android:layout_width="@dimen/large_225"
             android:layout_height="@dimen/large_225"
             android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="@dimen/extra_large_175"
             android:foreground="?attr/selectableItemBackgroundBorderless"
             tools:ignore="UselessParent">
 
@@ -165,5 +167,5 @@
                 app:tint="@color/white"
                 tools:ignore="ContentDescription" />
         </FrameLayout>
-    </FrameLayout>
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

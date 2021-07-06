@@ -7,6 +7,7 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="@dimen/small_100"
     app:cardBackgroundColor="@color/card_background"
+    app:cardCornerRadius="@dimen/default_rounded_corner"
     app:cardElevation="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -18,8 +18,8 @@ import com.flow.android.kotlin.lockscreen.main.viewmodel.MainViewModel
 import com.flow.android.kotlin.lockscreen.memo._interface.OnMemoChangedListener
 import com.flow.android.kotlin.lockscreen.memo.checklist.adapter.ChecklistAdapter
 import com.flow.android.kotlin.lockscreen.memo.util.share
-import com.flow.android.kotlin.lockscreen.persistence.entity.ChecklistItem
-import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
+import com.flow.android.kotlin.lockscreen.persistence.data.entity.ChecklistItem
+import com.flow.android.kotlin.lockscreen.persistence.data.entity.Memo
 import com.flow.android.kotlin.lockscreen.util.LinearLayoutManagerWrapper
 import com.flow.android.kotlin.lockscreen.util.show
 import com.flow.android.kotlin.lockscreen.util.toDateString
@@ -38,10 +38,6 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
 
     private val checklist = MutableLiveData<ArrayList<ChecklistItem>>()
     private val checklistAdapter = ChecklistAdapter(object : ChecklistAdapter.Listener {
-        override fun onAddClick(content: String) {
-
-        }
-
         override fun onMoreClick(item: ChecklistItem) {
 
         }

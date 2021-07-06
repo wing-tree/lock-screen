@@ -11,7 +11,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.*
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.databinding.MemoBinding
-import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
+import com.flow.android.kotlin.lockscreen.persistence.data.entity.Memo
 import com.flow.android.kotlin.lockscreen.util.DEFAULT_FONT_SIZE
 import kotlinx.coroutines.*
 import java.text.SimpleDateFormat

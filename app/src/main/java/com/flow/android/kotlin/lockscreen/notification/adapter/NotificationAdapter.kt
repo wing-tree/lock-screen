@@ -1,26 +1,27 @@
 package com.flow.android.kotlin.lockscreen.notification.adapter
 
+import android.animation.LayoutTransition
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Typeface
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AccelerateDecelerateInterpolator
-import android.view.animation.AccelerateInterpolator
 import android.widget.LinearLayout
 import android.widget.TableLayout
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintSet
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
-import androidx.transition.*
-import androidx.transition.TransitionSet.ORDERING_SEQUENTIAL
-import androidx.transition.TransitionSet.ORDERING_TOGETHER
+import androidx.annotation.ColorInt
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.*
+import androidx.transition.AutoTransition
+import androidx.transition.ChangeBounds
+import androidx.transition.TransitionManager
+import androidx.transition.TransitionSet
 import androidx.viewbinding.ViewBinding
+import com.bumptech.glide.Glide
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.databinding.*
 import com.flow.android.kotlin.lockscreen.notification.model.NotificationModel
@@ -29,10 +30,11 @@ import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
-
 class NotificationAdapter(private val context: Context) :
     ListAdapter<NotificationModel, NotificationAdapter.ViewHolder>(DiffCallback()) {
-
+    private val duration = 300L
+    private val colorDefault by lazy { ContextCompat.getColor(context, R.color.high_emphasis_light) }
+    private val margin by lazy { context.resources.getDimensionPixelSize(R.dimen.extra_small_100) }
     private var recyclerView: RecyclerView? = null
 
     private enum class NotificationStyle(val value: String) {
@@ -54,7 +56,8 @@ class NotificationAdapter(private val context: Context) :
         Inbox(2),
         Media(3),
         Messaging(4),
-        Base(5)
+        Base(5),
+        Group(6)
     }
 
     private val layoutInflater by lazy { LayoutInflater.from(context) }
@@ -67,7 +70,7 @@ class NotificationAdapter(private val context: Context) :
     ) {
         fun root() = viewBinding.root
 
-        private fun addActions(container: LinearLayout, actions: Array<Notification.Action>?) {
+        private fun addActions(container: LinearLayout, actions: Array<Notification.Action>?, @ColorInt color: Int) {
             container.removeAllViews()
 
             if (actions.isNullOrEmpty())
@@ -78,15 +81,24 @@ class NotificationAdapter(private val context: Context) :
                 for (action in actions) {
                     val textView = TextView(container.context).apply {
                         gravity = Gravity.CENTER
-                        this.text = action.title
+                        setTextColor(color)
+                        setTypeface(typeface, Typeface.BOLD)
+
                         setOnClickListener {
                             action.actionIntent.send()
+                        }
+
+                        this.text = action.title
+
+                        with(TypedValue()) {
+                            context.theme.resolveAttribute(android.R.attr.selectableItemBackground, this, true)
+                            setBackgroundResource(this.resourceId)
                         }
                     }
 
                     textView.layoutParams = TableLayout.LayoutParams(
                             LinearLayout.LayoutParams.WRAP_CONTENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT,
+                            LinearLayout.LayoutParams.MATCH_PARENT,
                             1F
                     )
 
@@ -97,37 +109,46 @@ class NotificationAdapter(private val context: Context) :
 
         fun bind(item: NotificationModel) {
             val notification = item.notification
+            val actions = notification.actions
             val extras = notification.extras
             val text = extras.getCharSequence(Notification.EXTRA_TEXT) ?: BLANK
+            var color = notification.color
+
+            val badgeIconType = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
+                notification.badgeIconType
+            else
+                0 // Notification.BADGE_ICON_NONE
+
+            if (color == 0)
+                color = colorDefault
 
             when(viewBinding) {
                 is NotificationBigPictureBinding -> {
-                    bindHeader(viewBinding.notificationHeader, item) {
-
-                    }
-
-                    bindBody(viewBinding.notificationBody, item)
-                }
-                is NotificationBigTextBinding -> {
                     val header = viewBinding.notificationHeader
                     val body = viewBinding.notificationBody
-                    val bigText = extras.getCharSequence(Notification.EXTRA_BIG_TEXT) ?: text
+                    val picture = extras.getParcelable<Bitmap>(Notification.EXTRA_PICTURE)
+
+                    picture?.let {
+                        Glide.with(context)
+                                .load(picture)
+                                .centerCrop()
+                                .into(viewBinding.imageViewPicture)
+                    }
+
+                    addActions(viewBinding.linearLayoutAction, notification.actions, color)
 
                     if (item.expanded) {
-                        body.textViewText.post {
-                            val ellipsisStart = body.textViewText.layout.getEllipsisStart(0)
+                        val to = viewBinding.linearLayoutFooter.measuredHeight(header.root)
 
-                            // todo ;;; 줄나누기.
-
-                            if (ellipsisStart > 0) {
-                                body.textViewText.text = bigText.subSequence(0, ellipsisStart)
-                                viewBinding.textViewBigText.text = bigText.subSequence(ellipsisStart, bigText.length)
-                            }
-                        }
-
-                        viewBinding.linearLayoutFooter.show()
+                        header.imageViewExpand.rotate(180F, duration)
+                        viewBinding.viewMarginTop.expand(duration, margin)
+                        viewBinding.linearLayoutFooter.expand(duration, to)
+                        viewBinding.viewMarginBottom.expand(duration, margin)
                     } else {
-                        viewBinding.linearLayoutFooter.hide()
+                        header.imageViewExpand.rotate(0F, duration)
+                        viewBinding.viewMarginTop.collapse(duration, 0)
+                        viewBinding.linearLayoutFooter.collapse(duration, 0)
+                        viewBinding.viewMarginBottom.collapse(duration, 0)
                     }
 
                     bindHeader(header, item) {
@@ -137,7 +158,76 @@ class NotificationAdapter(private val context: Context) :
                     }
 
                     bindBody(body, item)
-                    addActions(viewBinding.linearLayoutAction, notification.actions)
+                }
+                is NotificationBigTextBinding -> {
+                    val header = viewBinding.notificationHeader
+                    val body = viewBinding.notificationBody
+                    val bigText = extras.getCharSequence(Notification.EXTRA_BIG_TEXT) ?: text
+
+                    addActions(viewBinding.linearLayoutAction, notification.actions, color)
+
+                    if (item.expanded) {
+                        body.textViewText.post {
+                            var ellipsisStart = body.textViewText.layout.getEllipsisStart(0)
+
+                            if (bigText.length > ellipsisStart) {
+                                if (bigText[ellipsisStart].isWhitespace().not()) {
+                                    val subSequence = bigText.subSequence(0, ellipsisStart)
+                                    val index = subSequence.indexOfLast { it.isWhitespace() }
+
+                                    if (index != -1)
+                                        ellipsisStart = index.inc()
+                                }
+                            }
+
+                            if (ellipsisStart > 0) {
+                                body.textViewText.text = bigText.subSequence(0, ellipsisStart)
+                                viewBinding.textViewBigText.text = bigText.subSequence(ellipsisStart, bigText.length)
+                            }
+                        }
+                    }
+
+                    if (item.expanded) {
+                        val to = viewBinding.linearLayoutFooter.measuredHeight(header.root)
+
+                        header.imageViewExpand.rotate(180F, duration)
+                        viewBinding.viewMarginTop.expand(duration, margin)
+                        viewBinding.linearLayoutFooter.expand(duration, to)
+                        viewBinding.viewMarginBottom.expand(duration, margin)
+                    } else {
+                        header.imageViewExpand.rotate(0F, duration)
+                        viewBinding.viewMarginTop.collapse(duration, 0)
+                        viewBinding.linearLayoutFooter.collapse(duration, 0) {
+                            body.textViewText.text = text
+
+                            body.textViewText.post {
+
+                                var ellipsisStart = body.textViewText.layout?.getEllipsisStart(0) ?: 0
+
+                                if (bigText.length > ellipsisStart) {
+                                    if (bigText[ellipsisStart].isWhitespace().not()) {
+                                        val subSequence = bigText.subSequence(0, ellipsisStart)
+                                        val index = subSequence.indexOfLast { it.isWhitespace() }
+
+                                        if (index != -1)
+                                            ellipsisStart = index.inc()
+                                    }
+                                }
+
+                                if (ellipsisStart > 0)
+                                    viewBinding.textViewBigText.text = bigText.subSequence(ellipsisStart, bigText.length)
+                            }
+                        }
+                        viewBinding.viewMarginBottom.collapse(duration, 0)
+                    }
+
+                    bindHeader(header, item) {
+                        item.expanded = item.expanded.not()
+
+                        notifyItemChanged(adapterPosition)
+                    }
+
+                    bindBody(body, item)
                 }
                 is NotificationInboxBinding -> {
                     bindHeader(viewBinding.notificationHeader, item) {
@@ -158,21 +248,73 @@ class NotificationAdapter(private val context: Context) :
                     bindBody(viewBinding.notificationBody, item)
                 }
                 is NotificationBaseBinding -> {
-                    bindHeader(viewBinding.notificationHeader, item) {
+                    val header = viewBinding.notificationHeader
+                    val body = viewBinding.notificationBody
 
+                    if (actions.isNullOrEmpty())
+                        header.imageViewExpand.hide()
+                    else {
+                        header.imageViewExpand.show()
+                        addActions(viewBinding.linearLayoutAction, notification.actions, color)
                     }
+
+                    if (item.expanded) {
+                        val to = viewBinding.linearLayoutFooter.measuredHeight(header.root)
+
+                        header.imageViewExpand.rotate(180F, duration)
+                        viewBinding.viewMarginTop.expand(duration, margin)
+                        viewBinding.linearLayoutFooter.expand(duration, to)
+                        viewBinding.viewMarginBottom.expand(duration, margin)
+                    } else {
+                        header.imageViewExpand.rotate(0F, duration)
+                        viewBinding.viewMarginTop.collapse(duration, 0)
+                        viewBinding.linearLayoutFooter.collapse(duration, 0)
+                        viewBinding.viewMarginBottom.collapse(duration, 0)
+                    }
+
+                    bindHeader(viewBinding.notificationHeader, item) {
+                        item.expanded = item.expanded.not()
+
+                        notifyItemChanged(adapterPosition)
+                    }
+
                     bindBody(viewBinding.notificationBody, item)
+                }
+                is NotificationGroupBinding -> {
+                    val header = viewBinding.notificationHeader
+                    val adapter = NotificationAdapter(context)
+
+                    adapter.submitList(item.children)
+
+                    viewBinding.recyclerView.apply {
+                        this.adapter = adapter
+                        layoutManager = LinearLayoutManagerWrapper(context)
+                    }
+
+                    if (item.expanded) {
+                        adapter.nott()
+                    } else {
+                        adapter.showOnlyTitle()
+                    }
+
+                    bindHeader(header, item) {
+                        item.expanded = item.expanded.not()
+                        notifyItemChanged(adapterPosition)
+                    }
                 }
             }
         }
 
         private fun bindHeader(header: NotificationHeaderBinding, item: NotificationModel, onClick: () -> Unit) {
             val notification = item.notification
-            val color = notification.color
             val extras = notification.extras
             val label = item.label
             val postTime = item.postTime
             val subText = extras.getCharSequence(Notification.EXTRA_SUB_TEXT) ?: BLANK
+            var color = notification.color
+
+            if (color == 0)
+                color = colorDefault
 
             header.imageViewExpand.setColorFilter(color)
             header.textViewLabel.setTextColor(color)
@@ -190,6 +332,10 @@ class NotificationAdapter(private val context: Context) :
             header.root.setOnClickListener {
                 onClick.invoke()
             }
+
+            // todo change.
+            if (showOT)
+                header.root.hide()
         }
 
         private fun bindBody(body: NotificationBodyBinding, item: NotificationModel) {
@@ -217,12 +363,27 @@ class NotificationAdapter(private val context: Context) :
                     body.imageViewLargeIcon.setImageIcon(null)
                 }
             }
+
+            // todo change.
+            if (showOT) {
+                body.textViewText.hide()
+                body.imageViewLargeIcon.hide()
+            }
         }
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
+
         this.recyclerView = recyclerView
+        val itemAnimator = recyclerView.itemAnimator
+
+        if (itemAnimator is SimpleItemAnimator)
+            itemAnimator.supportsChangeAnimations = false
+    }
+
+    override fun getItemId(position: Int): Long {
+        return position.toLong()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -232,6 +393,7 @@ class NotificationAdapter(private val context: Context) :
             ViewType.Inbox.value -> NotificationInboxBinding.inflate(layoutInflater, parent, false)
             ViewType.Media.value -> NotificationMediaBinding.inflate(layoutInflater, parent, false)
             ViewType.Messaging.value -> NotificationMessagingBinding.inflate(layoutInflater, parent, false)
+            ViewType.Group.value -> NotificationGroupBinding.inflate(layoutInflater, parent, false)
             else -> NotificationBaseBinding.inflate(layoutInflater, parent, false)
         }
 
@@ -243,18 +405,24 @@ class NotificationAdapter(private val context: Context) :
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when(getItem(position).template) {
+        val item = getItem(position)
+        return when(item.template) {
             NotificationStyle.BigPicture.value -> ViewType.BigPicture.value
             NotificationStyle.BigText.value -> ViewType.BigText.value
             NotificationStyle.Inbox.value -> ViewType.Inbox.value
             NotificationStyle.Media.value -> ViewType.Media.value
             NotificationStyle.Messaging.value -> ViewType.Messaging.value
-            else -> ViewType.Base.value
+            else -> {
+                if (item.children.isNotEmpty())
+                    ViewType.Group.value
+                else
+                    ViewType.Base.value
+            }
         }
     }
 
     @Suppress("unused")
-    private fun lastVisibleViewHolder(): RecyclerView.ViewHolder? {
+    private fun lastVisibleViewHolder(): ViewHolder? {
         var viewHolder: RecyclerView.ViewHolder? = null
 
         recyclerView?.let { recyclerView ->
@@ -269,7 +437,30 @@ class NotificationAdapter(private val context: Context) :
             }
         }
 
-        return viewHolder
+        return viewHolder as? ViewHolder
+    }
+
+    // test code
+    private var showOT = false
+    private fun showOnlyTitle() {
+        showOT = true
+
+        val transitionSet = TransitionSet()
+
+        transitionSet.addTransition(ChangeBounds())
+
+        recyclerView?.let { TransitionManager.beginDelayedTransition(it, transitionSet) }
+        notifyItemRangeChanged(0, itemCount)
+    }
+    private fun nott() {
+        showOT = false
+
+        val transitionSet = TransitionSet()
+
+        transitionSet.addTransition(ChangeBounds())
+
+        recyclerView?.let { TransitionManager.beginDelayedTransition(it, transitionSet) }
+        notifyItemRangeChanged(0, itemCount)
     }
 }
 

@@ -1,22 +1,23 @@
 package com.flow.android.kotlin.lockscreen.notification.view
 
-import android.app.Notification
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.service.notification.StatusBarNotification
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.flow.android.kotlin.lockscreen.base.BaseMainFragment
 import com.flow.android.kotlin.lockscreen.databinding.FragmentNotificationBinding
-import com.flow.android.kotlin.lockscreen.notification.adapter.DefaultItemAnimator
 import com.flow.android.kotlin.lockscreen.notification.adapter.NotificationAdapter
 import com.flow.android.kotlin.lockscreen.notification.broadcastreceiver.NotificationBroadcastReceiver
 import com.flow.android.kotlin.lockscreen.notification.service.NotificationListener
+import com.flow.android.kotlin.lockscreen.notification.viewmodel.NotificationViewModel
 import io.reactivex.disposables.Disposable
 import timber.log.Timber
 
@@ -26,30 +27,30 @@ class NotificationFragment: BaseMainFragment<FragmentNotificationBinding>() {
     }
 
     private val localBroadcastManager by lazy { LocalBroadcastManager.getInstance(requireContext()) }
+    private val viewModel by viewModels<NotificationViewModel>()
 
     private var disposable: Disposable? = null
 
-    private val notificationAdapter by lazy { NotificationAdapter(requireContext()) }
-    private val nl = NotificationBroadcastReceiver()
-    private val notificationBroadcastReceiver = object : BroadcastReceiver() {
+    private val notificationAdapter by lazy { NotificationAdapter(requireActivity()) }
+    private val notificationBroadcastReceiver = NotificationBroadcastReceiver()
+    private val localBroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             intent ?: return
 
             when(intent.action) {
                 NotificationListener.Action.NOTIFICATION_POSTED -> {
-                    val activeNotifications = intent.getParcelableArrayListExtra<Notification>(
-                            NotificationListener.Extra.ACTIVE_NOTIFICATIONS
+                    val sbn = intent.getParcelableExtra<StatusBarNotification>(
+                            NotificationListener.Extra.NOTIFICATION_POSTED
                     ) ?: return
 
-                    //notifications.value = activeNotifications
+                    viewModel.addNotification(sbn)
                 }
                 NotificationListener.Action.NOTIFICATION_REMOVED -> {
-                    val notification = intent.getParcelableExtra<Notification>(NotificationListener.Extra.NOTIFICATION_REMOVED)
+                    val sbn = intent.getParcelableExtra<StatusBarNotification>(
+                            NotificationListener.Extra.NOTIFICATION_REMOVED
+                    ) ?: return
 
-                    //val value = notifications.value?.toMutableList() ?: return
-
-                    //value.remove(notification)
-                    //notifications.value = value
+                    viewModel.removeNotification(sbn)
                 }
             }
         }
@@ -62,12 +63,12 @@ class NotificationFragment: BaseMainFragment<FragmentNotificationBinding>() {
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
-        requireContext().registerReceiver(nl, IntentFilter().apply {
+        requireContext().registerReceiver(notificationBroadcastReceiver, IntentFilter().apply {
             addAction(NotificationListener.Action.NOTIFICATION_POSTED)
             addAction(NotificationListener.Action.NOTIFICATION_REMOVED)
         })
 
-        localBroadcastManager.registerReceiver(notificationBroadcastReceiver, IntentFilter().apply {
+        localBroadcastManager.registerReceiver(localBroadcastReceiver, IntentFilter().apply {
             addAction(NotificationListener.Action.NOTIFICATION_POSTED)
             addAction(NotificationListener.Action.NOTIFICATION_REMOVED)
         })
@@ -78,10 +79,19 @@ class NotificationFragment: BaseMainFragment<FragmentNotificationBinding>() {
         return viewBinding.root
     }
 
+    override fun onStart() {
+        super.onStart()
+        viewModel.bindNotificationListener()
+    }
+
+    override fun onStop() {
+        viewModel.unbindNotificationListener()
+        super.onStop()
+    }
+
     private fun initializeView() {
         viewBinding.recyclerView.apply {
-            adapter = notificationAdapter
-            itemAnimator = DefaultItemAnimator()
+            adapter = notificationAdapter.apply { setHasStableIds(true) }
             layoutManager = LinearLayoutManager(requireContext())
             setHasFixedSize(true)
         }
@@ -98,8 +108,8 @@ class NotificationFragment: BaseMainFragment<FragmentNotificationBinding>() {
 
     override fun onDestroyView() {
         try {
-            requireContext().unregisterReceiver(nl)
-            localBroadcastManager.unregisterReceiver(notificationBroadcastReceiver)
+            requireContext().unregisterReceiver(notificationBroadcastReceiver)
+            localBroadcastManager.unregisterReceiver(localBroadcastReceiver)
         } catch (e: IllegalArgumentException) {
             Timber.e(e)
         } finally {

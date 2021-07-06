@@ -27,8 +27,8 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
 
     private val activityResultLauncher = registerForActivityResult(CalendarContract()) { result ->
         when(result) {
-            CalendarLoader.RequestCode.EditEvent -> { viewModel.callRefreshEvents() }
-            CalendarLoader.RequestCode.InsertEvent -> { viewModel.callRefreshEvents() }
+            CalendarLoader.RequestCode.EditEvent -> { mainViewModel.callRefreshEvents() }
+            CalendarLoader.RequestCode.InsertEvent -> { mainViewModel.callRefreshEvents() }
         }
     }
 
@@ -77,13 +77,13 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
     }
 
     private fun initializeLiveData() {
-        viewModel.calendars.observe(viewLifecycleOwner, { calendarDisplays ->
+        mainViewModel.calendars.observe(viewLifecycleOwner, { calendarDisplays ->
             val uncheckedCalendarIds = ConfigurationPreferences.getUncheckedCalendarIds(requireContext())
 
             viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
                 for (i in 0..itemCount) {
                     CalendarLoader.events(
-                            viewModel.contentResolver(),
+                            mainViewModel.contentResolver(),
                             calendarDisplays.filter {
                                 uncheckedCalendarIds.contains(it.id.toString()).not()
                             }, i
@@ -96,7 +96,7 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
             }
         })
 
-        viewModel.refreshEvents.observe(viewLifecycleOwner, {
+        mainViewModel.refreshEvents.observe(viewLifecycleOwner, {
             viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
                 val uncheckedCalendarIds = ConfigurationPreferences.getUncheckedCalendarIds(requireContext())
 
@@ -104,8 +104,8 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
 
                 for (i in 0..itemCount) {
                     CalendarLoader.events(
-                            viewModel.contentResolver(),
-                            viewModel.calendarDisplays()?.filter {
+                            mainViewModel.contentResolver(),
+                            mainViewModel.calendarDisplays()?.filter {
                                 uncheckedCalendarIds.contains(it.id.toString()).not()
                             } ?: emptyList(), i
                     ).also { events ->
@@ -140,13 +140,13 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
     }
 
     private fun setIconColor() {
-        viewBinding.imageViewBack.setColorFilter(viewModel.viewPagerRegionColor, PorterDuff.Mode.SRC_IN)
-        viewBinding.imageViewForward.setColorFilter(viewModel.viewPagerRegionColor, PorterDuff.Mode.SRC_IN)
-        viewBinding.appCompatImageView.setColorFilter(viewModel.viewPagerRegionColor, PorterDuff.Mode.SRC_IN)
+        viewBinding.imageViewBack.setColorFilter(mainViewModel.viewPagerRegionColor, PorterDuff.Mode.SRC_IN)
+        viewBinding.imageViewForward.setColorFilter(mainViewModel.viewPagerRegionColor, PorterDuff.Mode.SRC_IN)
+        viewBinding.appCompatImageView.setColorFilter(mainViewModel.viewPagerRegionColor, PorterDuff.Mode.SRC_IN)
     }
 
     private fun setTextColor() {
-        viewBinding.textViewDate.setTextColor(viewModel.viewPagerRegionColor)
+        viewBinding.textViewDate.setTextColor(mainViewModel.viewPagerRegionColor)
     }
 
     private fun Long.format() = simpleDateFormat.format(this)

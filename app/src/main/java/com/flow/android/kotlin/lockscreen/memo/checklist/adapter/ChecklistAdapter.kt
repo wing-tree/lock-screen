@@ -5,9 +5,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.flow.android.kotlin.lockscreen.databinding.ChecklistHeaderBinding
 import com.flow.android.kotlin.lockscreen.databinding.ChecklistItemBinding
-import com.flow.android.kotlin.lockscreen.persistence.entity.ChecklistItem
+import com.flow.android.kotlin.lockscreen.persistence.data.entity.ChecklistItem
 import com.flow.android.kotlin.lockscreen.util.hide
 import com.flow.android.kotlin.lockscreen.util.show
 import kotlinx.coroutines.*
@@ -16,7 +15,6 @@ import kotlin.Comparator
 
 class ChecklistAdapter(private val listener: Listener, private val isEditable: Boolean): ListAdapter<ChecklistItem, ChecklistAdapter.ViewHolder>(DiffCallback()) {
     interface Listener {
-        fun onAddClick(content: String)
         fun onMoreClick(item: ChecklistItem)
         fun onItemCheckedChange(item: ChecklistItem, isChecked: Boolean)
     }
@@ -27,7 +25,7 @@ class ChecklistAdapter(private val listener: Listener, private val isEditable: B
         private val isEditable: Boolean
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: ChecklistItem) {
-            binding.editText.setText(item.content)
+            binding.editText.text = item.content
 
             if (isEditable) {
                 binding.checkbox.hide()

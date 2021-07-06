@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -28,51 +28,29 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <include
-            android:id="@+id/notification_body"
-            layout="@layout/notification_body"
+        <FrameLayout
+            android:id="@+id/frame_layout_footer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/margin_normal"
-            android:layout_marginStart="@dimen/margin_normal"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/notification_header"
             app:layout_constraintStart_toStartOf="@+id/notification_header"
-            app:layout_constraintTop_toBottomOf="@+id/notification_header" />
+            app:layout_constraintTop_toBottomOf="@+id/notification_header">
 
-        <LinearLayout
-            android:id="@+id/linear_layout_footer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/margin_normal"
-            android:layout_marginStart="@dimen/margin_normal"
-            android:orientation="vertical"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="@+id/notification_body"
-            app:layout_constraintStart_toStartOf="@+id/notification_body"
-            app:layout_constraintTop_toBottomOf="@+id/notification_body">
-
-            <TextView
-                android:id="@+id/text_view_big_text"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <LinearLayout
-                android:id="@+id/linear_layout_action"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/large_125"
-                android:layout_marginEnd="@dimen/margin_normal"
-                android:layout_marginStart="@dimen/margin_normal"
-                android:layout_marginTop="@dimen/margin_small"
-                android:orientation="horizontal"
-                android:gravity="center_vertical" />
-        </LinearLayout>
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="@+id/notification_header"
+                app:layout_constraintStart_toStartOf="@+id/notification_header"
+                app:layout_constraintTop_toBottomOf="@+id/notification_header"/>
+        </FrameLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/margin_normal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/linear_layout_footer"/>
+            app:layout_constraintTop_toBottomOf="@+id/frame_layout_footer"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View

@@ -5,5 +5,5 @@ import androidx.viewbinding.ViewBinding
 import com.flow.android.kotlin.lockscreen.main.viewmodel.MainViewModel
 
 abstract class BaseMainFragment<VB: ViewBinding>: BaseFragment<VB>() {
-    protected val viewModel by activityViewModels<MainViewModel>()
+    protected val mainViewModel by activityViewModels<MainViewModel>()
 }

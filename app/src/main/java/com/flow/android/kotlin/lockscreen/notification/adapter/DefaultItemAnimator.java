@@ -356,7 +356,6 @@ public class DefaultItemAnimator extends SimpleItemAnimator {
             final ViewPropertyAnimator oldViewAnim = view.animate().setDuration(
                     getChangeDuration());
             mChangeAnimations.add(changeInfo.oldHolder);
-            oldViewAnim.setInterpolator(new AccelerateDecelerateInterpolator());
             oldViewAnim.translationX(changeInfo.toX - changeInfo.fromX);
             oldViewAnim.translationY(changeInfo.toY - changeInfo.fromY);
             oldViewAnim.alpha(0).setListener(new AnimatorListenerAdapter() {
@@ -381,11 +380,10 @@ public class DefaultItemAnimator extends SimpleItemAnimator {
             final ViewPropertyAnimator newViewAnimation = newView.animate();
             mChangeAnimations.add(changeInfo.newHolder);
             newViewAnimation
-                    .setInterpolator(new AccelerateDecelerateInterpolator())
                     .translationX(0)
                     .translationY(0)
                     .setDuration(getChangeDuration())
-                    .alpha(1).setListener(new AnimatorListenerAdapter() { // 원래 1.
+                    .alpha(1).setListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationStart(Animator animator) {
                     dispatchChangeStarting(changeInfo.newHolder, false);

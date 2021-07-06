@@ -23,8 +23,8 @@ import com.flow.android.kotlin.lockscreen.databinding.FragmentMemoEditingDialogB
 import com.flow.android.kotlin.lockscreen.datepicker.DatePickerDialogFragment
 import com.flow.android.kotlin.lockscreen.memo._interface.OnMemoChangedListener
 import com.flow.android.kotlin.lockscreen.memo.checklist.adapter.ChecklistAdapter
-import com.flow.android.kotlin.lockscreen.persistence.entity.ChecklistItem
-import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
+import com.flow.android.kotlin.lockscreen.persistence.data.entity.ChecklistItem
+import com.flow.android.kotlin.lockscreen.persistence.data.entity.Memo
 import com.flow.android.kotlin.lockscreen.util.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -40,16 +40,6 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
     }
 
     private val checklistAdapter : ChecklistAdapter by lazy { ChecklistAdapter(object : ChecklistAdapter.Listener {
-        override fun onAddClick(content: String) {
-            if (content.isNotBlank()) {
-                val value = checklist.value ?: return
-                val size = value.size
-
-                value.add(size, ChecklistItem(size.toLong(), content, false))
-                checklist.value = value
-            }
-        }
-
         override fun onMoreClick(item: ChecklistItem) {
             val popupWindow = PopupWindow()
         }
@@ -148,37 +138,11 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
                 Mode.Edit
             }
 
-        this.memo.observe(viewLifecycleOwner, {
-            if (checkForChanges()) {
-                if (isContentBlank())
-                    disableSaveButton()
-                else
-                    enableSaveButton()
-            } else
-                disableSaveButton()
-        })
-
-        checklist.observe(viewLifecycleOwner, {
-            memo()?.let { memo ->
-                setMemo(memo.apply {
-                    this.checklist = it.toTypedArray()
-                })
-            }
-
-            checklistAdapter.submitList(it)
-        })
-
         initializeView(memo)
+        registerObservers()
         localBroadcastManager.registerReceiver(localBroadcastReceiver, IntentFilter(Action.Date))
 
         return view
-    }
-
-    override fun onStart() {
-        super.onStart()
-
-        if (mode == Mode.Edit)
-            dialog?.window?.setWindowAnimations(R.style.WindowAnimation_DialogFragment_Null)
     }
 
     override fun onDestroyView() {
@@ -188,15 +152,17 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
     }
 
     private fun initializeView(memo: Memo?) {
+        val checklistHeader = viewBinding.checklistHeader
+
+        viewBinding.recyclerViewChecklist.apply {
+            adapter = checklistAdapter
+            layoutManager = LinearLayoutManagerWrapper(requireContext())
+        }
+
         memo?.let {
             viewBinding.viewMemoColor.backgroundTintList = ColorStateList.valueOf(selectedColor)
             viewBinding.textViewDate.text = it.modifiedTime.toDateString(simpleDateFormat)
             viewBinding.editTextContent.setText(it.content)
-
-            viewBinding.recyclerViewChecklist.apply {
-                adapter = checklistAdapter
-                layoutManager = LinearLayoutManagerWrapper(requireContext())
-            }
 
             checklist.value = ArrayList(it.checklist.toList())
         } ?: run {
@@ -206,6 +172,19 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
         viewBinding.textViewDate.setOnClickListener {
             DatePickerDialogFragment.getInstance(memo()?.modifiedTime ?: currentTimeMillis).also {
                 it.show(requireActivity().supportFragmentManager, it.tag)
+            }
+        }
+
+        checklistHeader.imageView.setOnClickListener {
+            val content = checklistHeader.editText.text.toString()
+
+            if (content.isNotBlank()) {
+                val value = checklist.value ?: arrayListOf()
+                val size = value.size
+
+                value.add(size, ChecklistItem(size.toLong(), content, false))
+                checklist.value = value
+                checklistHeader.editText.text?.clear()
             }
         }
 
@@ -269,8 +248,28 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
 
             dismiss()
         }
+    }
 
+    private fun registerObservers() {
+        this.memo.observe(viewLifecycleOwner, {
+            if (checkForChanges()) {
+                if (isContentBlank())
+                    disableSaveButton()
+                else
+                    enableSaveButton()
+            } else
+                disableSaveButton()
+        })
 
+        checklist.observe(viewLifecycleOwner, {
+            memo()?.let { memo ->
+                setMemo(memo.apply {
+                    this.checklist = it.toTypedArray()
+                })
+            }
+
+            checklistAdapter.submitList(it.toList())
+        })
     }
 
     private fun enableSaveButton() {

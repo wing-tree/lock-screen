@@ -81,7 +81,7 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
     }
 
     private fun registerObservers() {
-        viewModel.shortcuts.observe(viewLifecycleOwner, {
+        mainViewModel.shortcuts.observe(viewLifecycleOwner, {
             shortcutAdapter.submitList(it)
         })
     }
@@ -138,7 +138,7 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
         popupMenu?.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.delete -> {
-                    viewModel.deleteShortcut(shortcut.toEntity()) { showToast("removed!.") }
+                    mainViewModel.deleteShortcut(shortcut.toEntity()) { showToast("removed!.") }
                     true
                 }
                 else -> false

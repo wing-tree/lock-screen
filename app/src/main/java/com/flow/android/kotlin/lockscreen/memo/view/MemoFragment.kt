@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.flow.android.kotlin.lockscreen.base.BaseMainFragment
 import com.flow.android.kotlin.lockscreen.databinding.FragmentMemoBinding
 import com.flow.android.kotlin.lockscreen.main.viewmodel.MemoChangedState
@@ -66,7 +65,7 @@ class MemoFragment: BaseMainFragment<FragmentMemoBinding>() {
     }
 
     override fun onPause() {
-        viewModel.updateMemos(memoAdapter.items())
+        mainViewModel.updateMemos(memoAdapter.items())
         super.onPause()
     }
 
@@ -77,14 +76,14 @@ class MemoFragment: BaseMainFragment<FragmentMemoBinding>() {
 
     private fun registerObservers() {
         compositeDisposable.add(
-            viewModel.memos
+            mainViewModel.memos
             .take(1)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ memoAdapter.addAll(it) }, { Timber.e(it) })
         )
 
-        viewModel.memoChanged.observe(viewLifecycleOwner, {
+        mainViewModel.memoChanged.observe(viewLifecycleOwner, {
             when(it.state) {
                 MemoChangedState.Deleted -> memoAdapter.remove(it.memo)
                 MemoChangedState.Inserted -> memoAdapter.add(it.memo)
@@ -92,7 +91,7 @@ class MemoFragment: BaseMainFragment<FragmentMemoBinding>() {
             }
         })
 
-        viewModel.refreshMemos.observe(viewLifecycleOwner, {
+        mainViewModel.refreshMemos.observe(viewLifecycleOwner, {
             memoAdapter.setFontSize(ConfigurationPreferences.getFontSize(requireContext()))
             memoAdapter.notifyDataSetChanged()
         })

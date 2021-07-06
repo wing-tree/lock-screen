@@ -4,11 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.app.KeyguardManager
-import android.app.Notification
-import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
-import android.content.ServiceConnection
 import android.graphics.PorterDuff
 import android.net.Uri
 import android.os.*
@@ -27,7 +23,6 @@ import androidx.core.content.FileProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.application.ApplicationUtil
-import com.flow.android.kotlin.lockscreen.application.ApplicationUtil.getApplicationLabel
 import com.flow.android.kotlin.lockscreen.calendar.CalendarLoader
 import com.flow.android.kotlin.lockscreen.configuration.view.ConfigurationActivity
 import com.flow.android.kotlin.lockscreen.configuration.viewmodel.ConfigurationChange
@@ -41,11 +36,9 @@ import com.flow.android.kotlin.lockscreen.main.view.MainActivity.OpenLock.endRan
 import com.flow.android.kotlin.lockscreen.main.view.MainActivity.OpenLock.outOfEndRange
 import com.flow.android.kotlin.lockscreen.main.viewmodel.MainViewModel
 import com.flow.android.kotlin.lockscreen.memo._interface.OnMemoChangedListener
-import com.flow.android.kotlin.lockscreen.notification.model.NotificationModel
-import com.flow.android.kotlin.lockscreen.notification.service.NotificationListener
 import com.flow.android.kotlin.lockscreen.permission._interface.OnPermissionAllowClickListener
 import com.flow.android.kotlin.lockscreen.permission.view.PermissionRationaleDialogFragment
-import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
+import com.flow.android.kotlin.lockscreen.persistence.data.entity.Memo
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
 import com.flow.android.kotlin.lockscreen.util.*
 import com.flow.android.kotlin.lockscreen.widget.animateSelectedTab
@@ -99,59 +92,6 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
                 finish()
             }
         })
-    }
-
-    private val notificationListenerConnection = object: ServiceConnection {
-        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            if (service is NotificationListener.NotificationListenerBinder) {
-                val notificationListener = service.getNotificationListener()
-                val activeNotifications = notificationListener.activeNotifications?.mapNotNull {
-                    it?.let { sbn ->
-                        val notification = sbn.notification
-                        val isGroup = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                            sbn.isGroup
-                        else
-                            notification.group != null || notification.sortKey != null
-
-                        NotificationModel(
-                                group = notification.group ?: BLANK,
-                                groupKey = sbn.groupKey ?: BLANK,
-                                id = System.currentTimeMillis(),
-                                isGroup = isGroup,
-                                label = getApplicationLabel(packageManager, sbn.packageName),
-                                notification = notification,
-                                packageName = sbn.packageName,
-                                postTime = sbn.postTime,
-                                template = notification.extras.getCharSequence(Notification.EXTRA_TEMPLATE).toString(),
-                                children = arrayListOf()
-                        )
-                    }
-                } ?: return
-
-                val notifications = mutableListOf<NotificationModel>()
-
-                notifications.addAll(activeNotifications.filter { it.isGroup.not() })
-
-                activeNotifications.filter { it.isGroup }.groupBy { it.groupKey }.forEach {
-                    val list = it.value
-
-                    if (list.isNotEmpty()) {
-                        for (i in 1 until list.size)
-                            list[0].children.add(list[i])
-
-                        notifications.add(list[0])
-                    }
-                }
-
-                viewModel.setNotifications(notifications)
-            } else {
-                // call event for error. todo.
-            }
-        }
-
-        override fun onServiceDisconnected(name: ComponentName?) {
-            // todo show error.
-        }
     }
 
     private val delayMillis = 1000L
@@ -237,7 +177,6 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
 
     override fun onStart() {
         super.onStart()
-        bindNotificationListener()
         homeWatcher.startWatch()
     }
 
@@ -251,7 +190,6 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
 
     override fun onStop() {
         homeWatcher.stopWatch()
-        unbindNotificationListener()
         super.onStop()
     }
 
@@ -290,17 +228,9 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
         }
     }
 
-    private fun bindNotificationListener() {
-        bindService(Intent(this, NotificationListener::class.java), notificationListenerConnection, Context.BIND_AUTO_CREATE)
-    }
-
-    private fun unbindNotificationListener() {
-        unbindService(notificationListenerConnection)
-    }
-
     @SuppressLint("ClickableViewAccessibility")
     private fun initializeView() {
-        viewBinding.frameLayoutLockOpen.setOnTouchListener { v, event ->
+        viewBinding.linearLayoutLockOpen.setOnTouchListener { v, event ->
             when(event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     OpenLock.x = event.x

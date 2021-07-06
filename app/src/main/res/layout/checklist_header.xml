@@ -10,13 +10,13 @@
     app:cardCornerRadius="@dimen/small_100"
     app:cardElevation="0dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/edit_text"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/rounded_corners"
             android:backgroundTint="@color/edit_text_background"
@@ -37,10 +37,10 @@
             android:id="@+id/image_view"
             android:layout_width="@dimen/width_normal"
             android:layout_height="@dimen/height_normal"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
             android:layout_marginEnd="@dimen/margin_small"
-            android:layout_marginTop="@dimen/margin_small"
-            app:layout_constraintEnd_toEndOf="@+id/edit_text"
-            app:layout_constraintTop_toTopOf="@+id/edit_text"
+            android:elevation="@dimen/extra_small_100"
             app:srcCompat="@drawable/ic_round_add_circle_24" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </RelativeLayout>
 </com.google.android.material.card.MaterialCardView>

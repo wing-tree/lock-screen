@@ -2,9 +2,8 @@ package com.flow.android.kotlin.lockscreen.persistence.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.flow.android.kotlin.lockscreen.persistence.entity.Shortcut
+import com.flow.android.kotlin.lockscreen.persistence.data.entity.Shortcut
 import io.reactivex.Completable
-import io.reactivex.Flowable
 
 @Dao
 interface ShortcutDao {

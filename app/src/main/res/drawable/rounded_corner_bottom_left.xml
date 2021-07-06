@@ -3,7 +3,7 @@
     <solid android:color="@color/white" />
 
     <corners
-        android:bottomLeftRadius="8dp" />
+        android:bottomLeftRadius="@dimen/default_rounded_corner" />
 
     <stroke android:width="0dp"
         android:color="#FF000000"/>

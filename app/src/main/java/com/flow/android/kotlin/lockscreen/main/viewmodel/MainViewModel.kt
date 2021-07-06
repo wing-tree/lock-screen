@@ -1,7 +1,6 @@
 package com.flow.android.kotlin.lockscreen.main.viewmodel
 
 import android.app.Application
-import android.app.Notification
 import android.content.ContentResolver
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -13,13 +12,11 @@ import com.flow.android.kotlin.lockscreen.calendar.CalendarLoader
 import com.flow.android.kotlin.lockscreen.calendar.model.CalendarModel
 import com.flow.android.kotlin.lockscreen.calendar.model.EventModel
 import com.flow.android.kotlin.lockscreen.configuration.viewmodel.ConfigurationChange
-import com.flow.android.kotlin.lockscreen.notification.model.NotificationModel
-import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
-import com.flow.android.kotlin.lockscreen.persistence.entity.Shortcut
+import com.flow.android.kotlin.lockscreen.persistence.data.entity.Memo
+import com.flow.android.kotlin.lockscreen.persistence.data.entity.Shortcut
 import com.flow.android.kotlin.lockscreen.repository.MemoRepository
 import com.flow.android.kotlin.lockscreen.repository.ShortcutRepository
 import com.flow.android.kotlin.lockscreen.shortcut.model.*
-import com.flow.android.kotlin.lockscreen.util.BLANK
 import com.flow.android.kotlin.lockscreen.util.SingleLiveEvent
 import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.Dispatchers
@@ -57,10 +54,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     val shortcutValues: List<Shortcut>
         get() = shortcutRepository.getAllValue()
-
-    private val _notifications = MutableLiveData<List<NotificationModel>>()
-    val notifications: LiveData<List<NotificationModel>>
-        get() = _notifications
 
     private fun Shortcut.toModel(): ShortcutModel? {
         return try {
@@ -184,24 +177,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun updateMemos(list: List<Memo>) {
         viewModelScope.launch(Dispatchers.IO) {
             memoRepository.updateAll(list)
-        }
-    }
-
-    fun setNotifications(notifications: List<NotificationModel>) {
-        with(notifications.filter {
-            val template = it.notification.extras.getCharSequence(Notification.EXTRA_TEMPLATE) ?: BLANK
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                if (template.endsWith(Notification.DecoratedCustomViewStyle::class.java.name) ||
-                        template.endsWith(Notification.DecoratedMediaCustomViewStyle::class.java.name))
-                    return@filter false
-            }
-
-            if (it.notification.category == Notification.CATEGORY_SYSTEM)
-                return@filter false
-
-            true
-        }) {
-            _notifications.value = this
         }
     }
 }
