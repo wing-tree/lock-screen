@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.base.BaseMainFragment
+import com.flow.android.kotlin.lockscreen.base.DataChangedState
 import com.flow.android.kotlin.lockscreen.databinding.FragmentShortcutBinding
 import com.flow.android.kotlin.lockscreen.devicecredential.DeviceCredential
 import com.flow.android.kotlin.lockscreen.devicecredential.RequireDeviceCredential
@@ -71,6 +72,7 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
 
         itemTouchHelper.attachToRecyclerView(viewBinding.recyclerView)
         initializeData()
+        registerObservers()
 
         return view
     }
@@ -93,6 +95,16 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
         lifecycleScope.launch(Dispatchers.IO) {
             adapter.addAll(viewModel.getAll())
         }
+    }
+
+    private fun registerObservers() {
+        viewModel.dataChanged.observe(viewLifecycleOwner, {
+            when(it.state) {
+                DataChangedState.Deleted -> { adapter.remove(it.data) }
+                DataChangedState.Inserted -> { adapter.add(it.data) }
+                DataChangedState.Updated -> { adapter.update(it.data) }
+            }
+        })
     }
 
     private fun launchApplication(packageName: String) {
@@ -147,7 +159,7 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
         popupMenu?.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.delete -> {
-                    viewModel.delete(shortcut.toEntity()) { showToast("removed!.") }
+                    viewModel.delete(shortcut.toEntity())
                     true
                 }
                 else -> false

@@ -4,7 +4,6 @@ import android.graphics.Canvas
 import androidx.annotation.MainThread
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import timber.log.Timber
 import kotlin.math.abs
 
 class ItemTouchCallback(
@@ -39,7 +38,7 @@ class ItemTouchCallback(
         val from = viewHolder.adapterPosition
         val to = target.adapterPosition
 
-        adapter.onMove(from, to)
+        adapter.onItemMove(from, to)
 
         return true
     }

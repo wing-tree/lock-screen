@@ -22,7 +22,7 @@ class ItemTouchCallback(
         val from = viewHolder.adapterPosition
         val to = target.adapterPosition
 
-        adapter.onMove(from, to)
+        adapter.onItemMove(from, to)
 
         return true
     }

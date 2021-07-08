@@ -63,7 +63,7 @@ class MemoAdapter(private val listener: Listener) : RecyclerView.Adapter<MemoAda
         notifyItemChanged(index)
     }
 
-    fun onMove(from: Int, to: Int) {
+    fun onItemMove(from: Int, to: Int) {
         if (currentList.count() <= from || currentList.count() <= to)
             return
 

@@ -15,7 +15,6 @@ import android.view.View.GONE
 import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -43,7 +42,6 @@ import com.flow.android.kotlin.lockscreen.permission._interface.OnPermissionAllo
 import com.flow.android.kotlin.lockscreen.permission.view.PermissionRationaleDialogFragment
 import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
-import com.flow.android.kotlin.lockscreen.shortcut.view.AllShortcutBottomSheetDialogFragment
 import com.flow.android.kotlin.lockscreen.shortcut.viewmodel.ShortcutViewModel
 import com.flow.android.kotlin.lockscreen.util.*
 import com.flow.android.kotlin.lockscreen.widget.animateSelectedTab
@@ -66,7 +64,8 @@ import kotlin.math.sqrt
 
 class MainActivity : AppCompatActivity(),
         OnPermissionAllowClickListener, RequireDeviceCredential<Unit> {
-    private val duration = 500L
+    private val shortDuration = 300L
+    private val longDuration = 600L
     private val localBroadcastManager: LocalBroadcastManager by lazy {
         LocalBroadcastManager.getInstance(this)
     }
@@ -234,6 +233,12 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
+    private fun restoreVisibility() {
+        viewBinding.frameLayoutRipple.hideRipple()
+        viewBinding.constraintLayout.scale(1F, shortDuration)
+        viewBinding.imageViewLockOpen.scale(1F, shortDuration)
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     private fun initializeView() {
         viewBinding.linearLayoutLockOpen.setOnTouchListener { v, event ->
@@ -270,11 +275,8 @@ class MainActivity : AppCompatActivity(),
                             confirmDeviceCredential(Unit)
                         else
                             finish()
-                    } else {
-                        viewBinding.frameLayoutRipple.hideRipple()
-                        viewBinding.constraintLayout.scale(1F, 300L)
-                        viewBinding.imageViewLockOpen.scale(1F, 300L)
-                    }
+                    } else
+                        restoreVisibility()
                 }
             }
 
@@ -390,9 +392,9 @@ class MainActivity : AppCompatActivity(),
             } else
                 viewBinding.centerAlignedTabLayout.getTabAt(selectedTabIndex)?.select()
 
-            viewBinding.centerAlignedTabLayout.fadeIn(duration)
-            viewBinding.viewPager2.fadeIn(duration)
-        }, duration)
+            viewBinding.centerAlignedTabLayout.fadeIn(longDuration)
+            viewBinding.viewPager2.fadeIn(longDuration)
+        }, longDuration)
     }
 
     private val configurationActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -490,6 +492,16 @@ class MainActivity : AppCompatActivity(),
     override fun confirmDeviceCredential(value: Unit) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             DeviceCredential.confirmDeviceCredential(this, object : KeyguardManager.KeyguardDismissCallback() {
+                override fun onDismissCancelled() {
+                    super.onDismissCancelled()
+                    restoreVisibility()
+                }
+
+                override fun onDismissError() {
+                    super.onDismissError()
+                    restoreVisibility()
+                }
+
                 override fun onDismissSucceeded() {
                     super.onDismissSucceeded()
                     finish()
@@ -497,6 +509,7 @@ class MainActivity : AppCompatActivity(),
             })
         } else {
             DeviceCredential.confirmDeviceCredential(this)
+            restoreVisibility()
         }
     }
 }

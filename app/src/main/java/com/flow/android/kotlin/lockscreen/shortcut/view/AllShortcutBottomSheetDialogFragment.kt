@@ -67,7 +67,7 @@ class AllShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
     private suspend fun addAll() {
         withContext(Dispatchers.IO) {
             val shortcuts = arrayListOf<Model.Shortcut>()
-            val packageNames = viewModel.shortcutValues.map { it.packageName }
+            val packageNames = viewModel.getAll().map { it.packageName }
             var count = 0
 
             try {

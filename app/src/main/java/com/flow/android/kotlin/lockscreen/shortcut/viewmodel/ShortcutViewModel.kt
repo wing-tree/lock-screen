@@ -2,10 +2,9 @@ package com.flow.android.kotlin.lockscreen.shortcut.viewmodel
 
 import android.app.Application
 import android.content.pm.PackageManager
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import com.flow.android.kotlin.lockscreen.base.DataChanged
+import com.flow.android.kotlin.lockscreen.base.DataChangedState
 import com.flow.android.kotlin.lockscreen.persistence.entity.Shortcut
 import com.flow.android.kotlin.lockscreen.repository.ShortcutRepository
 import com.flow.android.kotlin.lockscreen.shortcut.model.Model
@@ -19,8 +18,9 @@ class ShortcutViewModel(application: Application): AndroidViewModel(application)
 
     suspend fun getAll() = repository.getAll().mapNotNull { it.toModel() }
 
-    val shortcutValues: List<Shortcut>
-        get() = repository.getAllValue()
+    private val _dataChanged = MutableLiveData<DataChanged<Model.Shortcut>>()
+    val dataChanged: LiveData<DataChanged<Model.Shortcut>>
+        get() = _dataChanged
 
     private fun Shortcut.toModel(): Model.Shortcut? {
         return try {
@@ -37,15 +37,20 @@ class ShortcutViewModel(application: Application): AndroidViewModel(application)
         }
     }
 
-    fun insert(item: Shortcut, onInserted: (Model.Shortcut) -> Unit) {
+    fun insert(item: Shortcut, onComplete: (Model.Shortcut) -> Unit) {
         repository.insert(item) {
-            item.toModel()?.let { model -> onInserted(model) }
+            item.toModel()?.let {
+                model -> onComplete(model)
+                _dataChanged.value = DataChanged(model, DataChangedState.Inserted)
+            }
         }
     }
 
-    fun delete(item: Shortcut, onDeleted: ((Shortcut) -> Unit)? = null) {
+    fun delete(item: Shortcut) {
         repository.delete(item) {
-            onDeleted?.invoke(item)
+            it.toModel()?.let { model ->
+                _dataChanged.value = DataChanged(model, DataChangedState.Deleted)
+            }
         }
     }
 
