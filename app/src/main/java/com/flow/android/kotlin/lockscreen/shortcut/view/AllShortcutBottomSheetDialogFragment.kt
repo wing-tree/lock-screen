@@ -11,10 +11,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.flow.android.kotlin.lockscreen.databinding.FragmentAllShortcutBottomSheetDialogBinding
-import com.flow.android.kotlin.lockscreen.devicecredential.DeviceCredentialHelper
-import com.flow.android.kotlin.lockscreen.main.viewmodel.MainViewModel
 import com.flow.android.kotlin.lockscreen.shortcut.adapter.ShortcutAdapter
-import com.flow.android.kotlin.lockscreen.shortcut.model.ShortcutModel
+import com.flow.android.kotlin.lockscreen.shortcut.model.Model
+import com.flow.android.kotlin.lockscreen.shortcut.viewmodel.ShortcutViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,19 +21,19 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class AllShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
-    private val viewModel: MainViewModel by activityViewModels()
+    private val viewModel: ShortcutViewModel by activityViewModels()
 
     private val shortcutAdapter = ShortcutAdapter().apply {
         setListener(object : ShortcutAdapter.Listener {
-            override fun onItemClick(item: ShortcutModel) {
-                viewModel.addShortcut(item.apply {
+            override fun onItemClick(item: Model.Shortcut) {
+                viewModel.insert(item.apply {
                     priority = System.currentTimeMillis()
                 }.toEntity()) {
-                    removeShortcut(item)
+                    remove(item)
                 }
             }
 
-            override fun onItemLongClick(view: View, item: ShortcutModel): Boolean = false
+            override fun onItemLongClick(view: View, item: Model.Shortcut): Boolean = false
         })
     }
 
@@ -59,15 +58,15 @@ class AllShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            addShortcuts()
+            addAll()
         }
 
         return viewBinding?.root
     }
 
-    private suspend fun addShortcuts() {
+    private suspend fun addAll() {
         withContext(Dispatchers.IO) {
-            val shortcuts = arrayListOf<ShortcutModel>()
+            val shortcuts = arrayListOf<Model.Shortcut>()
             val packageNames = viewModel.shortcutValues.map { it.packageName }
             var count = 0
 
@@ -92,7 +91,7 @@ class AllShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
                         continue
 
                     shortcuts.add(
-                            ShortcutModel(
+                            Model.Shortcut(
                                     icon = icon,
                                     label = label,
                                     packageName = packageName,
@@ -120,9 +119,5 @@ class AllShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
                 shortcutAdapter.addAll(shortcuts)
             }
         }
-    }
-
-    private fun removeShortcut(item: ShortcutModel) {
-        shortcutAdapter.remove(item)
     }
 }

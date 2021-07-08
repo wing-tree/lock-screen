@@ -8,17 +8,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.base.BaseMainFragment
 import com.flow.android.kotlin.lockscreen.databinding.FragmentShortcutBinding
-import com.flow.android.kotlin.lockscreen.devicecredential.DeviceCredentialHelper
+import com.flow.android.kotlin.lockscreen.devicecredential.DeviceCredential
 import com.flow.android.kotlin.lockscreen.devicecredential.RequireDeviceCredential
 import com.flow.android.kotlin.lockscreen.shortcut.adapter.ShortcutAdapter
 import com.flow.android.kotlin.lockscreen.shortcut.adapter.ItemTouchCallback
-import com.flow.android.kotlin.lockscreen.shortcut.model.ShortcutModel
+import com.flow.android.kotlin.lockscreen.shortcut.model.Model
+import com.flow.android.kotlin.lockscreen.shortcut.viewmodel.ShortcutViewModel
 import com.flow.android.kotlin.lockscreen.util.BLANK
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDeviceCredential<ShortcutFragment.Value> {
@@ -26,23 +31,27 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
         return FragmentShortcutBinding.inflate(inflater, container, false)
     }
 
-    private val shortcutAdapter = ShortcutAdapter().apply {
+    private val viewModel by activityViewModels<ShortcutViewModel>()
+
+    private val adapter = ShortcutAdapter().apply {
         setListener(object : ShortcutAdapter.Listener {
-            override fun onItemClick(item: ShortcutModel) {
-                if (DeviceCredentialHelper.requireUnlock(requireContext()))
+            override fun onItemClick(item: Model.Shortcut) {
+                if (DeviceCredential.requireUnlock(requireContext()))
                     confirmDeviceCredential(Value(true, item.packageName))
                 else
                     launchApplication(item.packageName)
             }
 
-            override fun onItemLongClick(view: View, item: ShortcutModel): Boolean {
+            override fun onItemLongClick(view: View, item: Model.Shortcut): Boolean {
                 return showPopupMenu(view, item)
             }
         })
     }
 
-    private val itemTouchHelper = ItemTouchHelper(ItemTouchCallback(shortcutAdapter) {
+    private val itemTouchHelper = ItemTouchHelper(ItemTouchCallback(adapter, {
         popupMenu?.dismiss()
+    }) {
+        viewModel.updateAll(adapter.currentList())
     })
 
     private var popupMenu: PopupMenu? = null
@@ -55,13 +64,13 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
         val view = super.onCreateView(inflater, container, savedInstanceState)
 
         viewBinding.recyclerView.apply {
-            setHasFixedSize(true)
+            adapter = this@ShortcutFragment.adapter
             layoutManager = GridLayoutManager(requireContext(), 4)
-            adapter = shortcutAdapter
+            setHasFixedSize(true)
         }
 
         itemTouchHelper.attachToRecyclerView(viewBinding.recyclerView)
-        registerObservers()
+        initializeData()
 
         return view
     }
@@ -70,7 +79,7 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
         super.onViewCreated(view, savedInstanceState)
 
         viewBinding.appCompatImageView.setOnClickListener {
-            if (DeviceCredentialHelper.requireUnlock(requireContext())) {
+            if (DeviceCredential.requireUnlock(requireContext())) {
                 confirmDeviceCredential(Value(false))
             } else {
                 AllShortcutBottomSheetDialogFragment().also {
@@ -80,10 +89,10 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
         }
     }
 
-    private fun registerObservers() {
-        mainViewModel.shortcuts.observe(viewLifecycleOwner, {
-            shortcutAdapter.submitList(it)
-        })
+    private fun initializeData() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            adapter.addAll(viewModel.getAll())
+        }
     }
 
     private fun launchApplication(packageName: String) {
@@ -106,7 +115,7 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
         val packageName = value.packageName
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            DeviceCredentialHelper.confirmDeviceCredential(requireActivity(), object : KeyguardManager.KeyguardDismissCallback() {
+            DeviceCredential.confirmDeviceCredential(requireActivity(), object : KeyguardManager.KeyguardDismissCallback() {
                 override fun onDismissSucceeded() {
                     super.onDismissSucceeded()
 
@@ -120,7 +129,7 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
                 }
             })
         } else {
-            DeviceCredentialHelper.confirmDeviceCredential(this)
+            DeviceCredential.confirmDeviceCredential(this)
         }
     }
 
@@ -128,17 +137,17 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
         super.onActivityResult(requestCode, resultCode, data)
 
         when(requestCode) {
-            DeviceCredentialHelper.RequestCode.ConfirmDeviceCredential -> showToast("fucking man") // todo check.
+            DeviceCredential.RequestCode.ConfirmDeviceCredential -> showToast("fucking man") // todo check.
         }
     }
 
-    private fun showPopupMenu(view: View, shortcut: ShortcutModel): Boolean {
+    private fun showPopupMenu(view: View, shortcut: Model.Shortcut): Boolean {
         popupMenu = PopupMenu(requireContext(), view)
         popupMenu?.inflate(R.menu.shortcut)
         popupMenu?.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.delete -> {
-                    mainViewModel.deleteShortcut(shortcut.toEntity()) { showToast("removed!.") }
+                    viewModel.delete(shortcut.toEntity()) { showToast("removed!.") }
                     true
                 }
                 else -> false

@@ -1,9 +1,8 @@
 package com.flow.android.kotlin.lockscreen.persistence.dao
 
 import androidx.room.*
-import com.flow.android.kotlin.lockscreen.persistence.data.entity.Memo
+import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import io.reactivex.Completable
-import io.reactivex.Flowable
 
 @Dao
 interface MemoDao {
@@ -17,11 +16,11 @@ interface MemoDao {
     fun update(memo: Memo): Completable
 
     @Update
-    suspend fun updateAll(list: List<Memo>)
+    fun updateAll(list: List<Memo>): Completable
 
     @Transaction
     @Query("SELECT * FROM memo ORDER BY priority DESC")
-    fun getAll(): Flowable<List<Memo>>
+    suspend fun getAll(): List<Memo>
 
     @Transaction
     @Query("SELECT * FROM memo WHERE alarmTime BETWEEN :start AND :end")

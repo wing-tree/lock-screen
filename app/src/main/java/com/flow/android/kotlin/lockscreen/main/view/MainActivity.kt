@@ -15,6 +15,7 @@ import android.view.View.GONE
 import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -27,6 +28,8 @@ import com.flow.android.kotlin.lockscreen.calendar.CalendarLoader
 import com.flow.android.kotlin.lockscreen.configuration.view.ConfigurationActivity
 import com.flow.android.kotlin.lockscreen.configuration.viewmodel.ConfigurationChange
 import com.flow.android.kotlin.lockscreen.databinding.ActivityMainBinding
+import com.flow.android.kotlin.lockscreen.devicecredential.DeviceCredential
+import com.flow.android.kotlin.lockscreen.devicecredential.RequireDeviceCredential
 import com.flow.android.kotlin.lockscreen.home.homewatcher.HomePressedListener
 import com.flow.android.kotlin.lockscreen.home.homewatcher.HomeWatcher
 import com.flow.android.kotlin.lockscreen.lockscreen.service.LockScreenService
@@ -35,11 +38,13 @@ import com.flow.android.kotlin.lockscreen.main.torch.Torch
 import com.flow.android.kotlin.lockscreen.main.view.MainActivity.OpenLock.endRange
 import com.flow.android.kotlin.lockscreen.main.view.MainActivity.OpenLock.outOfEndRange
 import com.flow.android.kotlin.lockscreen.main.viewmodel.MainViewModel
-import com.flow.android.kotlin.lockscreen.memo._interface.OnMemoChangedListener
+import com.flow.android.kotlin.lockscreen.memo.viewmodel.MemoViewModel
 import com.flow.android.kotlin.lockscreen.permission._interface.OnPermissionAllowClickListener
 import com.flow.android.kotlin.lockscreen.permission.view.PermissionRationaleDialogFragment
-import com.flow.android.kotlin.lockscreen.persistence.data.entity.Memo
+import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
+import com.flow.android.kotlin.lockscreen.shortcut.view.AllShortcutBottomSheetDialogFragment
+import com.flow.android.kotlin.lockscreen.shortcut.viewmodel.ShortcutViewModel
 import com.flow.android.kotlin.lockscreen.util.*
 import com.flow.android.kotlin.lockscreen.widget.animateSelectedTab
 import com.google.android.material.tabs.TabLayoutMediator
@@ -59,7 +64,8 @@ import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAllowClickListener {
+class MainActivity : AppCompatActivity(),
+        OnPermissionAllowClickListener, RequireDeviceCredential<Unit> {
     private val duration = 500L
     private val localBroadcastManager: LocalBroadcastManager by lazy {
         LocalBroadcastManager.getInstance(this)
@@ -69,10 +75,10 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
         Torch(this)
     }
 
+    private val viewBinding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val viewModel: MainViewModel by viewModels()
-    private var _viewBinding: ActivityMainBinding? = null
-    private val viewBinding: ActivityMainBinding
-        get() = _viewBinding!!
+    private val memoViewModel: MemoViewModel by viewModels()
+    private val shortcutViewModel: ShortcutViewModel by viewModels()
 
     private val homeWatcher = HomeWatcher(this).apply {
         setOnHomePressedListener(object : HomePressedListener {
@@ -124,7 +130,6 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        _viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
         if (ConfigurationPreferences.getShowOnLockScreen(this)) {
@@ -224,6 +229,7 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
 //                        }
                     }
                 }
+                DeviceCredential.RequestCode.ConfirmDeviceCredential -> finish()
             }
         }
     }
@@ -259,9 +265,12 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
                     outOfEndRange = distance * 1.25F > endRange * 0.75F
                 }
                 MotionEvent.ACTION_UP -> {
-                    if (outOfEndRange)
-                        finish()
-                    else {
+                    if (outOfEndRange) {
+                        if (DeviceCredential.requireUnlock(this))
+                            confirmDeviceCredential(Unit)
+                        else
+                            finish()
+                    } else {
                         viewBinding.frameLayoutRipple.hideRipple()
                         viewBinding.constraintLayout.scale(1F, 300L)
                         viewBinding.imageViewLockOpen.scale(1F, 300L)
@@ -459,7 +468,7 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
 
     private fun firstRun() {
         if (ConfigurationPreferences.getFirstRun(this)) {
-            viewModel.insertMemo(
+            memoViewModel.insert(
                     Memo(
                             content = getString(R.string.memo_fragment_000),
                             color = ContextCompat.getColor(this, R.color.unselected),
@@ -473,25 +482,21 @@ class MainActivity : AppCompatActivity(), OnMemoChangedListener, OnPermissionAll
         }
     }
 
-    override fun onMemoDeleted(memo: Memo) {
-        viewModel.deleteMemo(memo)
-    }
-
-    override fun onMemoInserted(memo: Memo) {
-        viewModel.insertMemo(memo)
-    }
-
-    override fun onMemoUpdated(memo: Memo) {
-        viewModel.updateMemo(memo.apply {
-            priority = if (isDone)
-                -System.currentTimeMillis()
-            else
-                modifiedTime
-        })
-    }
-
     override fun onPermissionAllowClick() {
         checkPermission()
         //checkManageOverlayPermission()
+    }
+
+    override fun confirmDeviceCredential(value: Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            DeviceCredential.confirmDeviceCredential(this, object : KeyguardManager.KeyguardDismissCallback() {
+                override fun onDismissSucceeded() {
+                    super.onDismissSucceeded()
+                    finish()
+                }
+            })
+        } else {
+            DeviceCredential.confirmDeviceCredential(this)
+        }
     }
 }

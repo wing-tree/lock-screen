@@ -7,15 +7,15 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
-import com.flow.android.kotlin.lockscreen.calendar.model.EventModel
+import com.flow.android.kotlin.lockscreen.calendar.model.CalendarEventModel
 import com.flow.android.kotlin.lockscreen.databinding.EventItemBinding
 import java.text.SimpleDateFormat
 import java.util.*
 
-class EventAdapter(private val onItemClick: (item: EventModel) -> Unit): ListAdapter<EventModel, EventAdapter.ViewHolder>(DiffCallback()) {
+class EventAdapter(private val onItemClick: (item: CalendarEventModel) -> Unit): ListAdapter<CalendarEventModel, EventAdapter.ViewHolder>(DiffCallback()) {
     val simpleDateFormat = SimpleDateFormat("a hh:mm", Locale.getDefault())
 
-    fun add(item: EventModel) {
+    fun add(item: CalendarEventModel) {
         val list = currentList.toMutableList()
         list.add(item)
         submitList(list)
@@ -23,7 +23,7 @@ class EventAdapter(private val onItemClick: (item: EventModel) -> Unit): ListAda
 
     inner class ViewHolder(private val viewBinding: ViewBinding) : RecyclerView.ViewHolder(viewBinding.root) {
 
-        fun bind(item: EventModel) {
+        fun bind(item: CalendarEventModel) {
             viewBinding as EventItemBinding
 
             val begin = "${item.begin.format()} - "
@@ -57,12 +57,12 @@ class EventAdapter(private val onItemClick: (item: EventModel) -> Unit): ListAda
     }
 }
 
-class DiffCallback: DiffUtil.ItemCallback<EventModel>() {
-    override fun areItemsTheSame(oldItem: EventModel, newItem: EventModel): Boolean {
+class DiffCallback: DiffUtil.ItemCallback<CalendarEventModel>() {
+    override fun areItemsTheSame(oldItem: CalendarEventModel, newItem: CalendarEventModel): Boolean {
         return oldItem.id == newItem.id
     }
 
-    override fun areContentsTheSame(oldItem: EventModel, newItem: EventModel): Boolean {
+    override fun areContentsTheSame(oldItem: CalendarEventModel, newItem: CalendarEventModel): Boolean {
         return oldItem == newItem
     }
 }

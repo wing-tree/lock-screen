@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.flow.android.kotlin.lockscreen.databinding.ChecklistItemBinding
-import com.flow.android.kotlin.lockscreen.persistence.data.entity.ChecklistItem
+import com.flow.android.kotlin.lockscreen.persistence.entity.ChecklistItem
 import com.flow.android.kotlin.lockscreen.util.hide
 import com.flow.android.kotlin.lockscreen.util.show
 import kotlinx.coroutines.*

@@ -2,7 +2,6 @@ package com.flow.android.kotlin.lockscreen.permission.view
 
 import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -11,7 +10,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
-import androidx.core.app.NotificationManagerCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.base.BaseDialogFragment
@@ -57,12 +55,6 @@ class PermissionRationaleDialogFragment: BaseDialogFragment<FragmentPermissionRa
                         permission = Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                         permissionName = getString(R.string.permission_rationale_dialog_fragment_004),
                         rationale = getString(R.string.permission_rationale_dialog_fragment_005)
-                ),
-                PermissionRationale(
-                        icon = 0,
-                        permission = "EnabledListener", // NotificationListenerEnabled
-                        permissionName = "NotificationListenerEnabled",
-                        rationale = "EnabledListener" // 알림을 표시하려면 해당 권한이 필요합니다. // 앱 화면 참고.
                 )
         )
 
@@ -75,9 +67,6 @@ class PermissionRationaleDialogFragment: BaseDialogFragment<FragmentPermissionRa
             }
 
             if (PermissionChecker.checkPermission(requireContext(), permission.permission))
-                continue
-
-            if (PermissionChecker.notificationListenerEnabled(requireContext()))
                 continue
 
             permissionsDenied.add(permission)
@@ -107,9 +96,6 @@ class PermissionRationaleDialogFragment: BaseDialogFragment<FragmentPermissionRa
                     return false
 
                 if (Settings.canDrawOverlays(context).not())
-                    return false
-
-                if (PermissionChecker.notificationListenerEnabled(context).not())
                     return false
 
                 return true

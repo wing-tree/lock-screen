@@ -9,7 +9,8 @@ import kotlin.math.abs
 
 class ItemTouchCallback(
         private val adapter: ShortcutAdapter,
-        @MainThread private val onExited: () -> Unit
+        @MainThread private val onExited: () -> Unit,
+        private val clearView: () -> Unit
 ): ItemTouchHelper.Callback() {
     override fun getMovementFlags(
             recyclerView: RecyclerView,
@@ -48,4 +49,9 @@ class ItemTouchCallback(
     override fun isItemViewSwipeEnabled(): Boolean = false
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
+
+    override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+        super.clearView(recyclerView, viewHolder)
+        clearView.invoke()
+    }
 }

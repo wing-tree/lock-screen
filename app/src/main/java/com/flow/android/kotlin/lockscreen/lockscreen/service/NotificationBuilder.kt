@@ -9,9 +9,9 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.calendar.CalendarLoader
-import com.flow.android.kotlin.lockscreen.calendar.model.EventModel
+import com.flow.android.kotlin.lockscreen.calendar.model.CalendarEventModel
 import com.flow.android.kotlin.lockscreen.main.view.MainActivity
-import com.flow.android.kotlin.lockscreen.persistence.data.entity.Memo
+import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
 import com.flow.android.kotlin.lockscreen.repository.MemoRepository
 import com.flow.android.kotlin.lockscreen.util.BLANK
@@ -100,7 +100,7 @@ object NotificationBuilder {
         }
     }
 
-    private fun eventForNotification(context: Context): EventModel? {
+    private fun eventForNotification(context: Context): CalendarEventModel? {
         val contentResolver = context.contentResolver
 
         val gregorianCalendar = GregorianCalendar().apply {

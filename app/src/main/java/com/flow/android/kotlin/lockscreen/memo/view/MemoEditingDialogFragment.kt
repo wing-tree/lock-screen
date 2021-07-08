@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupWindow
 import androidx.core.os.bundleOf
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.flow.android.kotlin.lockscreen.R
@@ -21,10 +22,10 @@ import com.flow.android.kotlin.lockscreen.base.BaseDialogFragment
 import com.flow.android.kotlin.lockscreen.color.widget.ColorPickerLayout
 import com.flow.android.kotlin.lockscreen.databinding.FragmentMemoEditingDialogBinding
 import com.flow.android.kotlin.lockscreen.datepicker.DatePickerDialogFragment
-import com.flow.android.kotlin.lockscreen.memo._interface.OnMemoChangedListener
 import com.flow.android.kotlin.lockscreen.memo.checklist.adapter.ChecklistAdapter
-import com.flow.android.kotlin.lockscreen.persistence.data.entity.ChecklistItem
-import com.flow.android.kotlin.lockscreen.persistence.data.entity.Memo
+import com.flow.android.kotlin.lockscreen.memo.viewmodel.MemoViewModel
+import com.flow.android.kotlin.lockscreen.persistence.entity.ChecklistItem
+import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.util.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -34,6 +35,10 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
     override fun inflate(inflater: LayoutInflater, container: ViewGroup?): FragmentMemoEditingDialogBinding {
         return FragmentMemoEditingDialogBinding.inflate(inflater, container, false)
     }
+
+    private val viewModel by activityViewModels<MemoViewModel>()
+
+    private val duration = 200L
 
     private val simpleDateFormat by lazy {
         SimpleDateFormat(getString(R.string.format_date_001), Locale.getDefault())
@@ -101,22 +106,12 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
                 ".MemoEditingDialogFragment.Name.Date"
     }
 
-    private val duration = 200
     private val currentTimeMillis = System.currentTimeMillis()
     private var mode = Mode.Add
     private var selectedColor = Color.WHITE
 
     private var originalMemo: Memo? = null
     private val memo = MutableLiveData<Memo>()
-
-    private var onMemoChangedListener: OnMemoChangedListener? = null
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-
-        if (context is OnMemoChangedListener)
-            onMemoChangedListener = context
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -233,7 +228,7 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
         viewBinding.materialButtonSave.setOnClickListener {
             if (checkForChanges()) {
                 if (mode == Mode.Add)
-                    memo()?.let { memo -> onMemoChangedListener?.onMemoInserted(memo) }
+                    memo()?.let { memo -> viewModel.insert(memo) }
                 else if (mode == Mode.Edit) {
                     memo()?.let { memo ->
                         localBroadcastManager.sendBroadcastSync(
@@ -241,7 +236,7 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
                                 putExtra(MemoDetailDialogFragment.Name.Memo, memo)
                             }
                         )
-                        onMemoChangedListener?.onMemoUpdated(memo)
+                        viewModel.update(memo)
                     }
                 }
             }

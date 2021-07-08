@@ -1,4 +1,4 @@
-package com.flow.android.kotlin.lockscreen.persistence.data.entity
+package com.flow.android.kotlin.lockscreen.persistence.entity
 
 import android.os.Parcelable
 import androidx.room.ColumnInfo

@@ -12,7 +12,7 @@ import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.util.BLANK
 import timber.log.Timber
 
-object DeviceCredentialHelper {
+object DeviceCredential {
     object RequestCode {
         const val ConfirmDeviceCredential = 1309
     }
@@ -26,11 +26,24 @@ object DeviceCredentialHelper {
         return keyguardManager.isKeyguardLocked
     }
 
+
     @RequiresApi(Build.VERSION_CODES.O)
     fun confirmDeviceCredential(activity: Activity, keyguardDismissCallback: KeyguardManager.KeyguardDismissCallback) {
         val keyguardManager = activity.getSystemService(KeyguardManager::class.java)
 
         keyguardManager.requestDismissKeyguard(activity, keyguardDismissCallback)
+    }
+
+    fun confirmDeviceCredential(activity: Activity) {
+        val keyguardManager = activity.getSystemService(KEYGUARD_SERVICE) as KeyguardManager
+        val title = if (lockPatternEnable(activity))
+            activity.getString(R.string.device_credential_helper_000)
+        else
+            activity.getString(R.string.device_credential_helper_001)
+
+        val intent = keyguardManager.createConfirmDeviceCredentialIntent(title, BLANK)
+
+        activity.startActivityForResult(intent, RequestCode.ConfirmDeviceCredential)
     }
 
     fun confirmDeviceCredential(fragment: Fragment) {

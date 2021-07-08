@@ -4,13 +4,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.flow.android.kotlin.lockscreen.calendar.model.EventModel
+import com.flow.android.kotlin.lockscreen.calendar.model.CalendarEventModel
 import com.flow.android.kotlin.lockscreen.databinding.EventsItemBinding
 
-class EventsAdapter(private val eventsList: ArrayList<List<EventModel>>, private val onItemClick: (item: EventModel) -> Unit): RecyclerView.Adapter<EventsAdapter.ViewHolder>() {
+class EventsAdapter(private val eventsList: ArrayList<List<CalendarEventModel>>, private val onItemClick: (item: CalendarEventModel) -> Unit): RecyclerView.Adapter<EventsAdapter.ViewHolder>() {
     private var inflater: LayoutInflater? = null
 
-    fun add(list: List<EventModel>, notifyItemInserted: Boolean = true) {
+    fun add(list: List<CalendarEventModel>, notifyItemInserted: Boolean = true) {
         eventsList.add(list)
 
         if (notifyItemInserted)
@@ -23,9 +23,9 @@ class EventsAdapter(private val eventsList: ArrayList<List<EventModel>>, private
 
     class ViewHolder private constructor(
             private val binding: EventsItemBinding,
-            private val onItemClick: (item: EventModel) -> Unit
+            private val onItemClick: (item: CalendarEventModel) -> Unit
     ): RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: List<EventModel>) {
+        fun bind(item: List<CalendarEventModel>) {
             binding.recyclerView.apply {
                 layoutManager = LinearLayoutManager(binding.root.context)
                 adapter = EventAdapter {
@@ -38,7 +38,7 @@ class EventsAdapter(private val eventsList: ArrayList<List<EventModel>>, private
         }
 
         companion object {
-            fun from(binding: EventsItemBinding, onItemClick: (item: EventModel) -> Unit): ViewHolder {
+            fun from(binding: EventsItemBinding, onItemClick: (item: CalendarEventModel) -> Unit): ViewHolder {
                 return ViewHolder(binding, onItemClick)
             }
         }

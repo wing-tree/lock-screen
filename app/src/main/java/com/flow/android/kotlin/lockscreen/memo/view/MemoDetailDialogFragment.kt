@@ -14,12 +14,11 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.base.BaseDialogFragment
 import com.flow.android.kotlin.lockscreen.databinding.FragmentMemoDetailDialogBinding
-import com.flow.android.kotlin.lockscreen.main.viewmodel.MainViewModel
-import com.flow.android.kotlin.lockscreen.memo._interface.OnMemoChangedListener
 import com.flow.android.kotlin.lockscreen.memo.checklist.adapter.ChecklistAdapter
 import com.flow.android.kotlin.lockscreen.memo.util.share
-import com.flow.android.kotlin.lockscreen.persistence.data.entity.ChecklistItem
-import com.flow.android.kotlin.lockscreen.persistence.data.entity.Memo
+import com.flow.android.kotlin.lockscreen.memo.viewmodel.MemoViewModel
+import com.flow.android.kotlin.lockscreen.persistence.entity.ChecklistItem
+import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.util.LinearLayoutManagerWrapper
 import com.flow.android.kotlin.lockscreen.util.show
 import com.flow.android.kotlin.lockscreen.util.toDateString
@@ -33,14 +32,12 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
         return FragmentMemoDetailDialogBinding.inflate(inflater, container, false)
     }
 
-    private val viewModel by activityViewModels<MainViewModel>()
+    private val viewModel by activityViewModels<MemoViewModel>()
     private var memo: Memo? = null
 
     private val checklist = MutableLiveData<ArrayList<ChecklistItem>>()
     private val checklistAdapter = ChecklistAdapter(object : ChecklistAdapter.Listener {
-        override fun onMoreClick(item: ChecklistItem) {
-
-        }
+        override fun onMoreClick(item: ChecklistItem) {}
 
         override fun onItemCheckedChange(item: ChecklistItem, isChecked: Boolean) {
             val checklistItem = memo?.checklist?.find { it.id == item.id } ?: return
@@ -48,7 +45,7 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
 
             memo?.checklist?.set(index, checklistItem.apply { done = isChecked })
 
-            memo?.let { viewModel.updateMemo(it) {
+            memo?.let { viewModel.update(it) {
                 checklist.value?.set(index, checklistItem)
             } }
         }
@@ -58,17 +55,14 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
         SimpleDateFormat(getString(R.string.format_date_001), Locale.getDefault())
     }
 
-    private var onMemoChangedListener: OnMemoChangedListener? = null
-
     private val localBroadcastManager by lazy { LocalBroadcastManager.getInstance(requireContext()) }
     private val localBroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             intent ?: return
 
             if (intent.action == Action.Memo) {
-                val memo = intent.getParcelableExtra<Memo>(Name.Memo) ?: return
-
-                initializeView(memo)
+                memo = intent.getParcelableExtra<Memo>(Name.Memo) ?: return
+                memo?.let { initializeView(it) }
             }
         }
     }
@@ -83,13 +77,6 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
                 ".MemoDetailDialogFragment.Name.Memo"
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-
-        if (context is OnMemoChangedListener)
-            onMemoChangedListener = context
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -97,7 +84,7 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
     ): View? {
         val view = super.onCreateView(inflater, container, savedInstanceState)
 
-        memo = arguments?.getParcelable<Memo>(KEY_MEMO)
+        memo = arguments?.getParcelable(KEY_MEMO)
 
         memo?.let {
             initializeView(it)
@@ -147,7 +134,7 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
                 }
 
                 it.setPositiveButton(getString(R.string.memo_detail_dialog_fragment_004)) { dialogFragment ->
-                    onMemoChangedListener?.onMemoDeleted(memo)
+                    viewModel.delete(memo)
                     dialogFragment.dismiss()
                     this.dismiss()
                 }
@@ -179,7 +166,7 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
         }
 
         viewBinding.materialButtonDone.setOnClickListener {
-            onMemoChangedListener?.onMemoUpdated(memo.apply {
+            viewModel.update(memo.apply {
                 isDone = isDone.not()
             })
 

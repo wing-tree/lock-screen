@@ -3,7 +3,7 @@ package com.flow.android.kotlin.lockscreen.repository
 import android.content.Context
 import androidx.annotation.MainThread
 import com.flow.android.kotlin.lockscreen.persistence.database.AppDatabase
-import com.flow.android.kotlin.lockscreen.persistence.data.entity.Shortcut
+import com.flow.android.kotlin.lockscreen.persistence.entity.Shortcut
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -34,7 +34,7 @@ class ShortcutRepository(context: Context) {
         dao.updateAll(shortcuts)
     }
 
-    fun getAll() = dao.getAll()
+    suspend fun getAll() = dao.getAll()
 
     fun getAllValue() = dao.getAllValue()
 

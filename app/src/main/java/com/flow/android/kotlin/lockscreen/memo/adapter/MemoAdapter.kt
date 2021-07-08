@@ -8,32 +8,83 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.ViewGroup
+import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.*
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.databinding.MemoBinding
-import com.flow.android.kotlin.lockscreen.persistence.data.entity.Memo
+import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.util.DEFAULT_FONT_SIZE
 import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-class MemoAdapter(
-        private val items: ArrayList<Memo>,
-        private val onItemClick: (item: Memo) -> Unit,
-        private val onSwapTouch: (viewHolder: ViewHolder) -> Unit
-) : RecyclerView.Adapter<MemoAdapter.ViewHolder>() {
+class MemoAdapter(private val listener: Listener) : RecyclerView.Adapter<MemoAdapter.ViewHolder>() {
+    private val currentList = arrayListOf<Memo>()
+    private var fontSize = DEFAULT_FONT_SIZE
     private var inflater: LayoutInflater? = null
     private var simpleDateFormat: SimpleDateFormat? = null
 
-    private var fontSize = DEFAULT_FONT_SIZE
+    interface Listener {
+        fun onItemClick(item: Memo)
+        fun onSwapIconTouch(viewHolder: ViewHolder)
+    }
 
     fun setFontSize(fontSize: Float) {
         this.fontSize = fontSize
     }
 
+    fun currentList() = currentList.toList()
+
+    fun add(item: Memo) {
+        currentList.add(0, item)
+        notifyItemInserted(0)
+    }
+
+    fun remove(item: Memo) {
+        val index = currentList.indexOf(currentList.find { it.id == item.id })
+
+        currentList.removeAt(index)
+        notifyItemRemoved(index)
+    }
+
+    fun addAll(list: List<Memo>) {
+        val positionStart = currentList.count()
+
+        currentList.addAll(list)
+        notifyItemRangeInserted(positionStart, list.count())
+    }
+
+    fun update(item: Memo) {
+        val index = currentList.indexOf(currentList.find { it.id == item.id })
+
+        currentList[index] = item
+        notifyItemChanged(index)
+    }
+
+    fun onMove(from: Int, to: Int) {
+        if (currentList.count() <= from || currentList.count() <= to)
+            return
+
+        val priority = currentList[from].priority
+
+        currentList[from].priority = currentList[to].priority
+        currentList[to].priority = priority
+
+        Collections.swap(currentList, from, to)
+        notifyItemMoved(to, from)
+
+    }
+
+    @ColorInt
+    fun getColor(context: Context, @ColorRes id: Int) = ContextCompat.getColor(context, id)
+
     inner class ViewHolder(private val binding: MemoBinding) : RecyclerView.ViewHolder(binding.root) {
         @SuppressLint("ClickableViewAccessibility")
         fun bind(item: Memo) {
+            val context = binding.root.context
+
             binding.textViewContent.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize)
 
             binding.viewMemoColor.backgroundTintList = ColorStateList.valueOf(item.color)
@@ -44,18 +95,36 @@ class MemoAdapter(
                 binding.textViewContent.apply {
                     text = item.content
                     paintFlags = paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                    setTextColor(getColor(context, R.color.disabled_light))
                 }
 
                 binding.textViewDate.apply {
                     text = item.modifiedTime.format(binding.root.context)
                     paintFlags = paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                    setTextColor(getColor(context, R.color.disabled_light))
                 }
+
+                binding.root.setCardBackgroundColor(getColor(context, R.color.disabled_dark))
+            } else {
+                binding.textViewContent.apply {
+                    text = item.content
+                    paintFlags = paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                    setTextColor(getColor(context, R.color.white))
+                }
+
+                binding.textViewDate.apply {
+                    text = item.modifiedTime.format(binding.root.context)
+                    paintFlags = paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                    setTextColor(getColor(context, R.color.high_emphasis_light))
+                }
+
+                binding.root.setCardBackgroundColor(getColor(context, R.color.card_background))
             }
 
             binding.imageViewSwap.setOnTouchListener { _, event ->
                 when(event.action) {
                     MotionEvent.ACTION_DOWN -> {
-                        onSwapTouch(this)
+                        listener.onSwapIconTouch(this)
                         return@setOnTouchListener true
                     }
                 }
@@ -63,9 +132,8 @@ class MemoAdapter(
                 false
             }
 
-
             binding.root.setOnClickListener {
-                onItemClick(item)
+                listener.onItemClick(item)
             }
         }
     }
@@ -84,57 +152,7 @@ class MemoAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(items[position])
-    }
-
-    fun items() = items
-
-    fun add(item: Memo) {
-        items.add(0, item)
-        notifyItemInserted(0)
-    }
-
-    fun remove(item: Memo) {
-        val index = items.indexOf(items.find { it.id == item.id })
-
-        items.removeAt(index)
-        notifyItemRemoved(index)
-    }
-
-    // todo deep copy 문제 발생가능함 응 발생함 ㅅㅂ. 맞나? 해결했엇나 기억안나넴.
-    fun change(item: Memo) {
-        if (item.isDone) {
-            val fromPosition = items.indexOf(items.find { it.id == item.id })
-
-            notifyItemChanged(fromPosition)
-
-            items[fromPosition] = items.last()
-            items[items.count().dec()] = item
-
-            notifyItemMoved(fromPosition, items.count().dec())
-        } else {
-            val index = items.indexOf(items.find { it.id == item.id })
-
-            items[index] = item
-            notifyItemChanged(index)
-        }
-    }
-
-    fun addAll(list: List<Memo>) {
-        val positionStart = items.count()
-
-        items.addAll(list)
-        notifyItemRangeInserted(positionStart, list.count())
-    }
-
-    fun onMove(from: Int, to: Int) {
-        val priority = items[from].priority
-
-        items[from].priority = items[to].priority
-        items[to].priority = priority
-
-        Collections.swap(items, from, to)
-        notifyItemMoved(from, to)
+        holder.bind(currentList[position])
     }
 
     private fun Long.format(context: Context): String {
@@ -144,5 +162,5 @@ class MemoAdapter(
         return simpleDateFormat.format(this)
     }
 
-    override fun getItemCount(): Int = items.count()
+    override fun getItemCount(): Int = currentList.count()
 }

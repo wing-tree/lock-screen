@@ -5,7 +5,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 class ItemTouchCallback(
         private val adapter: MemoAdapter,
-        private val onClearView: () -> Unit
+        private val clearView: () -> Unit
 ) : ItemTouchHelper.Callback() {
     override fun getMovementFlags(
         recyclerView: RecyclerView,
@@ -32,4 +32,9 @@ class ItemTouchCallback(
     override fun isItemViewSwipeEnabled(): Boolean = false
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
+
+    override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+        super.clearView(recyclerView, viewHolder)
+        clearView.invoke()
+    }
 }

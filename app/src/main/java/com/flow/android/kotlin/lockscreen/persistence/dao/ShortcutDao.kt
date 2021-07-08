@@ -2,7 +2,7 @@ package com.flow.android.kotlin.lockscreen.persistence.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.flow.android.kotlin.lockscreen.persistence.data.entity.Shortcut
+import com.flow.android.kotlin.lockscreen.persistence.entity.Shortcut
 import io.reactivex.Completable
 
 @Dao
@@ -18,7 +18,7 @@ interface ShortcutDao {
 
     @Transaction
     @Query("SELECT * FROM shortcut ORDER BY priority DESC")
-    fun getAll(): LiveData<List<Shortcut>>
+    suspend fun getAll(): List<Shortcut>
 
     @Transaction
     @Query("SELECT * FROM shortcut ORDER BY priority ASC")

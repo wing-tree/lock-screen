@@ -10,7 +10,7 @@ import androidx.core.database.getIntOrNull
 import androidx.core.database.getLongOrNull
 import androidx.core.database.getStringOrNull
 import com.flow.android.kotlin.lockscreen.calendar.model.CalendarModel
-import com.flow.android.kotlin.lockscreen.calendar.model.EventModel
+import com.flow.android.kotlin.lockscreen.calendar.model.CalendarEventModel
 import com.flow.android.kotlin.lockscreen.util.BLANK
 import java.util.*
 
@@ -101,8 +101,8 @@ object CalendarLoader {
     }
 
     @Suppress("SpellCheckingInspection")
-    private fun instances(contentResolver: ContentResolver, selection: String, DTSTART: Calendar, DTEND: Calendar): ArrayList<EventModel>? {
-        val events = arrayListOf<EventModel>()
+    private fun instances(contentResolver: ContentResolver, selection: String, DTSTART: Calendar, DTEND: Calendar): ArrayList<CalendarEventModel>? {
+        val events = arrayListOf<CalendarEventModel>()
 
         val builder: Uri.Builder = CalendarContract.Instances.CONTENT_URI.buildUpon()
         ContentUris.appendId(builder, DTSTART.timeInMillis)
@@ -145,7 +145,7 @@ object CalendarLoader {
                 }
             }
 
-            events.add(EventModel(
+            events.add(CalendarEventModel(
                     begin = begin,
                     calendarColor = calendarColor,
                     calendarDisplayName = calendarDisplayName,
@@ -169,9 +169,9 @@ object CalendarLoader {
         return events
     }
 
-    fun events(contentResolver: ContentResolver, calendarModels: List<CalendarModel>, amount: Int): ArrayList<EventModel> {
+    fun events(contentResolver: ContentResolver, calendarModels: List<CalendarModel>, amount: Int): ArrayList<CalendarEventModel> {
 
-        val events = arrayListOf<EventModel>()
+        val events = arrayListOf<CalendarEventModel>()
 
         @Suppress("LocalVariableName", "SpellCheckingInspection")
         val DTSTART = Calendar.getInstance()
@@ -201,11 +201,11 @@ object CalendarLoader {
         return events
     }
 
-    fun editEvent(activityResultLauncher: ActivityResultLauncher<EventModel?>, event: EventModel) {
-        activityResultLauncher.launch(event)
+    fun editEvent(activityResultLauncher: ActivityResultLauncher<CalendarEventModel?>, calendarEvent: CalendarEventModel) {
+        activityResultLauncher.launch(calendarEvent)
     }
 
-    fun insertEvent(activityResultLauncher: ActivityResultLauncher<EventModel?>) {
+    fun insertEvent(activityResultLauncher: ActivityResultLauncher<CalendarEventModel?>) {
         activityResultLauncher.launch(null)
     }
 }

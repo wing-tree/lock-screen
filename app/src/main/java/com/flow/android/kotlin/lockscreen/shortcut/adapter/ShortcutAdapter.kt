@@ -7,17 +7,19 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.flow.android.kotlin.lockscreen.databinding.ShortcutBinding
-import com.flow.android.kotlin.lockscreen.shortcut.model.ShortcutModel
+import com.flow.android.kotlin.lockscreen.shortcut.model.Model
+
 import java.util.*
 
-
 class ShortcutAdapter: RecyclerView.Adapter<ShortcutAdapter.ViewHolder>() {
+    private val currentList = arrayListOf<Model.Shortcut>()
+
     private var layoutInflater: LayoutInflater? = null
     private var recyclerView: RecyclerView? = null
 
     interface Listener {
-        fun onItemClick(item: ShortcutModel)
-        fun onItemLongClick(view: View, item: ShortcutModel): Boolean
+        fun onItemClick(item: Model.Shortcut)
+        fun onItemLongClick(view: View, item: Model.Shortcut): Boolean
     }
 
     private var listener: Listener? = null
@@ -36,39 +38,23 @@ class ShortcutAdapter: RecyclerView.Adapter<ShortcutAdapter.ViewHolder>() {
         super.onDetachedFromRecyclerView(recyclerView)
     }
 
-    private val diffCallback = object : DiffUtil.ItemCallback<ShortcutModel>() {
-        override fun areItemsTheSame(oldItem: ShortcutModel, newItem: ShortcutModel): Boolean {
-            return oldItem.packageName == newItem.packageName
-        }
-
-        override fun areContentsTheSame(oldItem: ShortcutModel, newItem: ShortcutModel): Boolean {
-            return oldItem == newItem
-        }
-    }
-
-    fun addAll(list: List<ShortcutModel>) {
-        val currentList = asyncListDiffer.currentList.toMutableList()
+    fun addAll(list: List<Model.Shortcut>) {
+        val positionStart = currentList.count()
 
         currentList.addAll(list)
-        submitList(currentList)
+        notifyItemRangeInserted(positionStart, list.count())
     }
 
-    fun remove(item: ShortcutModel) {
-        val currentList = asyncListDiffer.currentList.toMutableList()
+    fun remove(item: Model.Shortcut) {
+        val index = currentList.indexOf(currentList.find { it.packageName == item.packageName })
 
-        currentList.remove(item)
-        submitList(currentList)
-    }
-
-    private val asyncListDiffer = AsyncListDiffer(this, diffCallback)
-
-    fun submitList(list: List<ShortcutModel>) {
-        asyncListDiffer.submitList(list)
+        currentList.removeAt(index)
+        notifyItemRemoved(index)
     }
 
     inner class ViewHolder(private val binding: ShortcutBinding): RecyclerView.ViewHolder(binding.root) {
         @SuppressLint("ClickableViewAccessibility")
-        fun bind(item: ShortcutModel) {
+        fun bind(item: Model.Shortcut) {
             Glide.with(binding.root.context).load(item.icon).into(binding.imageView)
             binding.root.tag = adapterPosition
             binding.textView.text = item.label
@@ -99,29 +85,23 @@ class ShortcutAdapter: RecyclerView.Adapter<ShortcutAdapter.ViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = asyncListDiffer.currentList[position]
-
-        holder.bind(item)
+        holder.bind(currentList[position])
     }
 
-    override fun getItemCount(): Int = asyncListDiffer.currentList.count()
+    override fun getItemCount(): Int = currentList.count()
 
     fun onMove(from: Int, to: Int) {
-        if (from == to)
-            return
-
-        val currentList = asyncListDiffer.currentList.toList()
-
         if (currentList.count() <= from || currentList.count() <= to)
             return
 
-        val priority = asyncListDiffer.currentList[from]?.priority ?: System.currentTimeMillis()
-        currentList[from]?.priority = currentList[to]?.priority ?: System.currentTimeMillis()
-        currentList[to]?.priority = priority
+        val priority = currentList[from].priority
+
+        currentList[from].priority = currentList[to].priority
+        currentList[to].priority = priority
 
         Collections.swap(currentList, from, to)
-        submitList(currentList)
+        notifyItemMoved(from, to)
     }
 
-    fun currentList(): List<ShortcutModel> = asyncListDiffer.currentList
+    fun currentList(): List<Model.Shortcut> = currentList.toList()
 }

@@ -6,10 +6,9 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.flow.android.kotlin.lockscreen.calendar.view.CalendarFragment
 import com.flow.android.kotlin.lockscreen.shortcut.view.ShortcutFragment
 import com.flow.android.kotlin.lockscreen.memo.view.MemoFragment
-import com.flow.android.kotlin.lockscreen.notification.view.NotificationFragment
 
 class FragmentStateAdapter(fragmentActivity: FragmentActivity): FragmentStateAdapter(fragmentActivity) {
-    private val itemCount = 4
+    private val itemCount = 3
 
     override fun getItemCount(): Int = itemCount
 
@@ -18,7 +17,6 @@ class FragmentStateAdapter(fragmentActivity: FragmentActivity): FragmentStateAda
             0 -> MemoFragment()
             1 -> CalendarFragment()
             2 -> ShortcutFragment()
-            3 -> NotificationFragment()
             else -> throw IllegalStateException("Invalid position")
         }
     }

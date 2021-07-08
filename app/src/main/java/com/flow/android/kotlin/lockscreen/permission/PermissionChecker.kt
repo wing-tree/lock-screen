@@ -11,10 +11,4 @@ internal object PermissionChecker {
     internal fun checkPermission(context: Context, permission: String): Boolean {
         return context.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
     }
-
-    internal fun notificationListenerEnabled(context: Context): Boolean {
-        return with(NotificationManagerCompat.getEnabledListenerPackages(context)) {
-            contains(context.packageName)
-        }
-    }
 }
