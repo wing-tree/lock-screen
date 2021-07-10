@@ -56,7 +56,7 @@ class MemoFragment: BaseMainFragment<FragmentMemoBinding>() {
         super.onCreateView(inflater, container, savedInstanceState)
         initializeViews()
         initializeData()
-        registerObservers()
+        registerLifecycleObservers()
 
         return viewBinding.root
     }
@@ -87,8 +87,8 @@ class MemoFragment: BaseMainFragment<FragmentMemoBinding>() {
         }
     }
 
-    private fun registerObservers() {
-        mainViewModel.refreshMemos.observe(viewLifecycleOwner, {
+    private fun registerLifecycleObservers() {
+        viewModel.refresh.observe(viewLifecycleOwner, {
             adapter.setFontSize(ConfigurationPreferences.getFontSize(requireContext()))
             adapter.notifyDataSetChanged()
         })

@@ -13,30 +13,25 @@ import android.provider.Settings
 import android.view.MotionEvent
 import android.view.View.GONE
 import android.view.WindowManager
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.application.ApplicationUtil
-import com.flow.android.kotlin.lockscreen.calendar.CalendarLoader
+import com.flow.android.kotlin.lockscreen.base.BaseActivity
+import com.flow.android.kotlin.lockscreen.calendar.viewmodel.CalendarViewModel
 import com.flow.android.kotlin.lockscreen.configuration.view.ConfigurationActivity
 import com.flow.android.kotlin.lockscreen.configuration.viewmodel.ConfigurationChange
 import com.flow.android.kotlin.lockscreen.databinding.ActivityMainBinding
 import com.flow.android.kotlin.lockscreen.devicecredential.DeviceCredential
 import com.flow.android.kotlin.lockscreen.devicecredential.RequireDeviceCredential
-import com.flow.android.kotlin.lockscreen.home.homewatcher.HomePressedListener
-import com.flow.android.kotlin.lockscreen.home.homewatcher.HomeWatcher
 import com.flow.android.kotlin.lockscreen.lockscreen.service.LockScreenService
 import com.flow.android.kotlin.lockscreen.main.adapter.FragmentStateAdapter
 import com.flow.android.kotlin.lockscreen.main.torch.Torch
-import com.flow.android.kotlin.lockscreen.main.view.MainActivity.OpenLock.endRange
-import com.flow.android.kotlin.lockscreen.main.view.MainActivity.OpenLock.outOfEndRange
+import com.flow.android.kotlin.lockscreen.main.view.MainActivity.Unlock.endRange
+import com.flow.android.kotlin.lockscreen.main.view.MainActivity.Unlock.outOfEndRange
 import com.flow.android.kotlin.lockscreen.main.viewmodel.MainViewModel
+import com.flow.android.kotlin.lockscreen.main.viewmodel.Refresh
 import com.flow.android.kotlin.lockscreen.memo.viewmodel.MemoViewModel
 import com.flow.android.kotlin.lockscreen.permission._interface.OnPermissionAllowClickListener
 import com.flow.android.kotlin.lockscreen.permission.view.PermissionRationaleDialogFragment
@@ -44,8 +39,6 @@ import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
 import com.flow.android.kotlin.lockscreen.shortcut.viewmodel.ShortcutViewModel
 import com.flow.android.kotlin.lockscreen.util.*
-import com.flow.android.kotlin.lockscreen.widget.animateSelectedTab
-import com.google.android.material.tabs.TabLayoutMediator
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
@@ -55,49 +48,23 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.karumi.dexter.listener.single.PermissionListener
 import timber.log.Timber
-import java.io.File
-import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-class MainActivity : AppCompatActivity(),
+class MainActivity : BaseActivity(),
         OnPermissionAllowClickListener, RequireDeviceCredential<Unit> {
-    private val shortDuration = 300L
-    private val longDuration = 600L
-    private val localBroadcastManager: LocalBroadcastManager by lazy {
-        LocalBroadcastManager.getInstance(this)
-    }
-
+    private val duration = 300L
     private val torch: Torch by lazy {
         Torch(this)
     }
 
     private val viewBinding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val viewModel: MainViewModel by viewModels()
+    private val calendarViewModel: CalendarViewModel by viewModels()
     private val memoViewModel: MemoViewModel by viewModels()
     private val shortcutViewModel: ShortcutViewModel by viewModels()
-
-    private val homeWatcher = HomeWatcher(this).apply {
-        setOnHomePressedListener(object : HomePressedListener {
-            override fun onHomeKeyPressed() {
-                if (isFinishing)
-                    return
-
-                localBroadcastManager.sendBroadcastSync(Intent(LockScreenService.Action.HomeKeyPressed))
-                finish()
-            }
-
-            override fun onRecentAppsPressed() {
-                if (isFinishing)
-                    return
-
-                localBroadcastManager.sendBroadcastSync(Intent(LockScreenService.Action.RecentAppsPressed))
-                finish()
-            }
-        })
-    }
 
     private val delayMillis = 1000L
     private val handler by lazy { Handler(mainLooper) }
@@ -120,7 +87,7 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
-    private object OpenLock {
+    private object Unlock {
         var x = 0F
         var y = 0F
         const val endRange = 600F
@@ -134,16 +101,13 @@ class MainActivity : AppCompatActivity(),
         if (ConfigurationPreferences.getShowOnLockScreen(this)) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
                 setShowWhenLocked(true)
-                window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
                 val keyguardManager = getSystemService(KEYGUARD_SERVICE) as KeyguardManager
 
                 keyguardManager.requestDismissKeyguard(this, null)
             } else {
                 @Suppress("DEPRECATION")
-                window.addFlags(
-                        WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD or
-                                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or
+                window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD or
                                 WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
                 )
             }
@@ -161,14 +125,16 @@ class MainActivity : AppCompatActivity(),
                 }
             } else {
                 startService()
-                viewModel.postCalendarDisplays()
+                calendarViewModel.postValue()
             }
         } else {
             startService()
-            viewModel.postCalendarDisplays()
+            calendarViewModel.postValue()
         }
 
-        initializeView()
+        initializeViews()
+        registerLifecycleObservers()
+        initializeActivityResultLaunchers()
         firstRun()
     }
 
@@ -179,11 +145,6 @@ class MainActivity : AppCompatActivity(),
             viewBinding.frameLayoutRipple.forceRippleAnimation()
     }
 
-    override fun onStart() {
-        super.onStart()
-        homeWatcher.startWatch()
-    }
-
     override fun onPause() {
         with(viewBinding.centerAlignedTabLayout.selectedTabPosition) {
             ConfigurationPreferences.putSelectedTabIndex(this@MainActivity, this)
@@ -192,65 +153,29 @@ class MainActivity : AppCompatActivity(),
         super.onPause()
     }
 
-    override fun onStop() {
-        homeWatcher.stopWatch()
-        super.onStop()
-    }
-
     override fun finish() {
         super.finish()
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (resultCode == RESULT_OK) {
-            @Suppress("SpellCheckingInspection")
-            when(requestCode) {
-                CalendarLoader.RequestCode.EditEvent -> {
-                    data ?: return
-
-                    viewModel.callRefreshEvents()
-
-//                    viewModel.calendarDisplays()?.let { calendarDisplays ->
-//                        CalendarHelper.events(contentResolver, calendarDisplays, 0).also { events ->
-//                            events.let { viewModel.submitEvents(it) }
-//                        }
-//                    }
-                }
-                CalendarLoader.RequestCode.InsertEvent -> {
-                    data ?: return
-
-                    viewModel.calendarDisplays()?.let { calendarDisplays ->
-//                        CalendarHelper.events(contentResolver, calendarDisplays).also { events ->
-//                            events?.let { viewModel.submitEvents(it) }
-//                        }
-                    }
-                }
-                DeviceCredential.RequestCode.ConfirmDeviceCredential -> finish()
-            }
-        }
-    }
-
     private fun restoreVisibility() {
         viewBinding.frameLayoutRipple.hideRipple()
-        viewBinding.constraintLayout.scale(1F, shortDuration)
-        viewBinding.imageViewLockOpen.scale(1F, shortDuration)
+        viewBinding.constraintLayout.scale(1F, duration)
+        viewBinding.imageViewUnlock.scale(1F, duration)
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private fun initializeView() {
-        viewBinding.linearLayoutLockOpen.setOnTouchListener { v, event ->
+    private fun initializeViews() {
+        viewBinding.linearLayoutUnlock.setOnTouchListener { v, event ->
             when(event.action) {
                 MotionEvent.ACTION_DOWN -> {
-                    OpenLock.x = event.x
-                    OpenLock.y = event.y
+                    Unlock.x = event.x
+                    Unlock.y = event.y
                 }
                 MotionEvent.ACTION_MOVE -> {
                     viewBinding.frameLayoutRipple.showRipple()
 
-                    val distance = sqrt((OpenLock.x - event.x).pow(2) + (OpenLock.y - event.y).pow(2))
+                    val distance = sqrt((Unlock.x - event.x).pow(2) + (Unlock.y - event.y).pow(2))
                     var scale = abs(endRange - distance * 0.45F) / endRange
 
                     when {
@@ -263,9 +188,9 @@ class MainActivity : AppCompatActivity(),
                     viewBinding.constraintLayout.alpha = alpha
                     viewBinding.constraintLayout.scaleX = scale
                     viewBinding.constraintLayout.scaleY = scale
-                    viewBinding.imageViewLockOpen.alpha = alpha
-                    viewBinding.imageViewLockOpen.scaleX = scale
-                    viewBinding.imageViewLockOpen.scaleY = scale
+                    viewBinding.imageViewUnlock.alpha = alpha
+                    viewBinding.imageViewUnlock.scaleX = scale
+                    viewBinding.imageViewUnlock.scaleY = scale
 
                     outOfEndRange = distance * 1.25F > endRange * 0.75F
                 }
@@ -289,15 +214,6 @@ class MainActivity : AppCompatActivity(),
                 .withListener(object : PermissionListener {
                     override fun onPermissionGranted(response: PermissionGrantedResponse) {
                         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also {
-                            //startActivity(intent) 무미건조한 카메라 기능
-
-                            // 시스템 카메라.
-                            // 검색.
-
-                            val file = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
-                                    .format(Date()).toString() + ".jpg")
-                            val uri = FileProvider.getUriForFile(this@MainActivity, "com.flow.android.kotlin.lockscreen.fileprovider", file)
-
                             ApplicationUtil.findCameraAppPackageName(this@MainActivity)?.let {
                                 var intent: Intent? = null
 
@@ -324,9 +240,7 @@ class MainActivity : AppCompatActivity(),
                         }
                     }
 
-                    override fun onPermissionDenied(response: PermissionDeniedResponse) {
-
-                    }
+                    override fun onPermissionDenied(response: PermissionDeniedResponse) {}
 
                     override fun onPermissionRationaleShouldBeShown(
                             permission: PermissionRequest?,
@@ -341,7 +255,7 @@ class MainActivity : AppCompatActivity(),
             Intent(this, ConfigurationActivity::class.java).also {
                 it.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT)
 
-                configurationActivityResultLauncher.launch(it)
+                getActivityResultLauncher(ConfigurationActivity.Name.ConfigurationChange)?.launch(it)
             }
         }
 
@@ -350,61 +264,61 @@ class MainActivity : AppCompatActivity(),
                 torch.toggle()
 
                 val color = when(torch.mode) {
-                    Torch.Mode.On -> ContextCompat.getColor(this, R.color.yellow_A_200)
-                    Torch.Mode.Off -> ContextCompat.getColor(this, R.color.black)
+                    Torch.Mode.On -> {
+                        viewBinding.frameLayoutHighlight.showRipple()
+                        ContextCompat.getColor(this, R.color.yellow_A_200)
+                    }
+                    Torch.Mode.Off -> {
+                        viewBinding.frameLayoutHighlight.hideRipple()
+                        ContextCompat.getColor(this, R.color.white)
+                    }
                     else -> throw IllegalArgumentException("Invalid mode")
                 }
 
-                if (it is ImageView)
-                    it.setColorFilter(color, PorterDuff.Mode.SRC_IN)
+                viewBinding.imageViewHighlight.setColorFilter(color, PorterDuff.Mode.SRC_IN)
             }
         } else
             viewBinding.imageViewHighlight.visibility = GONE
 
-        val tabTexts = arrayOf(
-                getString(R.string.main_activity_002),
-                getString(R.string.main_activity_000),
-                getString(R.string.main_activity_001),
-                getString(R.string.main_activity_003)
+        TabLayoutInitializer.initialize(
+                viewBinding.centerAlignedTabLayout,
+                viewBinding.viewPager2,
+                FragmentStateAdapter(this)
         )
-
-        viewBinding.viewPager2.offscreenPageLimit = 3
-        viewBinding.viewPager2.adapter = FragmentStateAdapter(this)
-        TabLayoutMediator(viewBinding.centerAlignedTabLayout, viewBinding.viewPager2) { tab, position ->
-            tab.customView = layoutInflater.inflate(
-                    R.layout.tab_custom_view,
-                    viewBinding.centerAlignedTabLayout,
-                    false
-            )
-
-            val textView = tab.customView?.findViewById<TextView>(R.id.text_view) ?: return@TabLayoutMediator
-
-            textView.text = tabTexts[position]
-        }.attach()
-
-        val selectedTabIndex = ConfigurationPreferences.getSelectedTabIndex(this)
-
-        Handler(Looper.getMainLooper()).postDelayed({
-            if (selectedTabIndex == 0) {
-                viewBinding.centerAlignedTabLayout.getTabAt(selectedTabIndex)?.let {
-                    it.animateSelectedTab()
-                }
-            } else
-                viewBinding.centerAlignedTabLayout.getTabAt(selectedTabIndex)?.select()
-
-            viewBinding.centerAlignedTabLayout.fadeIn(longDuration)
-            viewBinding.viewPager2.fadeIn(longDuration)
-        }, longDuration)
     }
 
-    private val configurationActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == RESULT_OK) {
-            val configurationChange = result.data?.getParcelableExtra<ConfigurationChange>(
-                    ConfigurationActivity.Name.ConfigurationChange
-            ) ?: return@registerForActivityResult
+    private fun registerLifecycleObservers() {
+        viewModel.refresh.observe(this, {
+            it ?: return@observe
 
-            viewModel.refresh(configurationChange)
-        }
+            when(it) {
+                Refresh.Calendar -> calendarViewModel.callRefresh()
+                Refresh.Memo -> memoViewModel.callRefresh()
+                Refresh.Shortcut -> shortcutViewModel.callRefresh()
+            }
+        })
+    }
+
+    private fun initializeActivityResultLaunchers() {
+        putActivityResultLauncher(
+                DeviceCredential.Key.ConfirmDeviceCredential,
+                registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
+                    finish()
+                }
+        )
+
+        putActivityResultLauncher(
+                ConfigurationActivity.Name.ConfigurationChange,
+                registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                    if (result.resultCode == RESULT_OK) {
+                        val configurationChange = result.data?.getParcelableExtra<ConfigurationChange>(
+                                ConfigurationActivity.Name.ConfigurationChange
+                        ) ?: return@registerForActivityResult
+
+                        viewModel.refresh(configurationChange)
+                    }
+                }
+        )
     }
 
     private fun checkManageOverlayPermission() {
@@ -444,7 +358,7 @@ class MainActivity : AppCompatActivity(),
                     override fun onPermissionsChecked(report: MultiplePermissionsReport) {
                         for (grantedPermissionResponse in report.grantedPermissionResponses) {
                             when (grantedPermissionResponse.permissionName) {
-                                Manifest.permission.READ_CALENDAR -> viewModel.postCalendarDisplays()
+                                Manifest.permission.READ_CALENDAR -> calendarViewModel.postValue()
                             }
                         }
 
@@ -508,7 +422,11 @@ class MainActivity : AppCompatActivity(),
                 }
             })
         } else {
-            DeviceCredential.confirmDeviceCredential(this)
+            DeviceCredential.confirmDeviceCredential(
+                    this,
+                    getActivityResultLauncher(DeviceCredential.Key.ConfirmDeviceCredential)
+            )
+
             restoreVisibility()
         }
     }

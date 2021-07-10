@@ -9,6 +9,7 @@ import com.flow.android.kotlin.lockscreen.base.DataChanged
 import com.flow.android.kotlin.lockscreen.base.DataChangedState
 import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.repository.MemoRepository
+import com.flow.android.kotlin.lockscreen.util.SingleLiveEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -25,6 +26,14 @@ class MemoViewModel(application: Application) : AndroidViewModel(application) {
     private val _dataChanged = MutableLiveData<DataChanged<Memo>>()
     val dataChanged: LiveData<DataChanged<Memo>>
         get() = _dataChanged
+
+    private val _refresh = SingleLiveEvent<Unit>()
+    val refresh: LiveData<Unit>
+        get() = _refresh
+
+    fun callRefresh() {
+        _refresh.call()
+    }
 
     fun delete(memo: Memo) {
         repository.delete(memo) { _dataChanged.value = DataChanged(memo, DataChangedState.Deleted) }
@@ -43,9 +52,7 @@ class MemoViewModel(application: Application) : AndroidViewModel(application) {
 
     fun updateAll(list: List<Memo>) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.updateAll(list) {
-                //EventBus.processor(MemoFragment.KEY_PROCESSOR)?.onNext(false)
-            }
+            repository.updateAll(list)
         }
     }
 }

@@ -1,23 +1,40 @@
 package com.flow.android.kotlin.lockscreen.calendar.viewmodel
 
 import android.app.Application
+import android.content.ContentResolver
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.flow.android.kotlin.lockscreen.calendar.model.CalendarModel
-import com.flow.android.kotlin.lockscreen.calendar.model.CalendarEventModel
+import androidx.lifecycle.viewModelScope
+import com.flow.android.kotlin.lockscreen.calendar.CalendarLoader
+import com.flow.android.kotlin.lockscreen.calendar.model.Model
 import com.flow.android.kotlin.lockscreen.util.SingleLiveEvent
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class CalendarViewModel(application: Application): AndroidViewModel(application) {
-    private val contentResolver = application.contentResolver
+    val contentResolver: ContentResolver = application.contentResolver
 
-    private val _calendars = MutableLiveData<List<CalendarModel>>()
-    val calendars: LiveData<List<CalendarModel>>
+    private val _calendars = MutableLiveData<List<Model.Calendar>>()
+    val calendars: LiveData<List<Model.Calendar>>
         get() = _calendars
 
-    private val _events = MutableLiveData<List<CalendarEventModel>>()
+    private val _calendarEvents = MutableLiveData<List<Model.CalendarEvent>>()
 
-    private val _refreshEvents = SingleLiveEvent<Unit>()
-    val refreshEvents: SingleLiveEvent<Unit>
-        get() = _refreshEvents
+    private val _refresh = SingleLiveEvent<Unit>()
+    val refresh: LiveData<Unit>
+        get() = _refresh
+
+    fun callRefresh() {
+        _refresh.call()
+    }
+
+    fun postValue() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                _calendars.postValue(CalendarLoader.calendarDisplays(contentResolver))
+            }
+        }
+    }
 }

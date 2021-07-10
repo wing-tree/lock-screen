@@ -8,16 +8,13 @@ import android.content.IntentFilter
 import android.os.Build
 import android.os.IBinder
 import android.provider.Settings
-import android.util.DisplayMetrics
 import android.view.LayoutInflater
-import android.view.WindowInsets
 import android.view.WindowManager
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.flow.android.kotlin.lockscreen.R
-import com.flow.android.kotlin.lockscreen.databinding.HomeBinding
+import com.flow.android.kotlin.lockscreen.databinding.BlindScreenBinding
+import com.flow.android.kotlin.lockscreen.lockscreen.blindscreen.BlindScreenPresenter
 import com.flow.android.kotlin.lockscreen.main.view.MainActivity
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
-import com.flow.android.kotlin.lockscreen.util.toPx
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -33,9 +30,7 @@ class LockScreenService : Service() {
                 ".LockScreenService.Action.StopSelf"
     }
 
-    private val binding: HomeBinding by lazy {
-        HomeBinding.inflate(LayoutInflater.from(this))
-    }
+    private val blindScreenPresenter by lazy { BlindScreenPresenter(this) }
 
     private val localBroadcastManager: LocalBroadcastManager by lazy {
         LocalBroadcastManager.getInstance(this)
@@ -44,8 +39,6 @@ class LockScreenService : Service() {
     private val windowManager: WindowManager by lazy {
         getSystemService(WINDOW_SERVICE) as WindowManager
     }
-
-    private var isHomeVisible = false
 
     private val notificationManager: NotificationManager by lazy {
         getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -88,15 +81,15 @@ class LockScreenService : Service() {
         }
     }
 
-    private val homeReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+    private val bottomNavigationBroadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             when (intent.action) {
                 Action.HomeKeyPressed, Action.RecentAppsPressed -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         if (Settings.canDrawOverlays(context))
-                            showHome()
+                            blindScreenPresenter.show()
                     } else {
-                        showHome()
+                        blindScreenPresenter.show()
                     }
                 }
                 else -> {
@@ -109,7 +102,7 @@ class LockScreenService : Service() {
     override fun onCreate() {
         super.onCreate()
 
-        localBroadcastManager.registerReceiver(homeReceiver, IntentFilter().apply {
+        localBroadcastManager.registerReceiver(bottomNavigationBroadcastReceiver, IntentFilter().apply {
             addAction(Action.HomeKeyPressed)
             addAction(Action.RecentAppsPressed)
         })
@@ -137,88 +130,19 @@ class LockScreenService : Service() {
 
     override fun onDestroy() {
         try {
-            localBroadcastManager.unregisterReceiver(homeReceiver)
-            //IllegalArgumentException: Receiver not registered: todo
+            blindScreenPresenter.hide()
+            localBroadcastManager.unregisterReceiver(bottomNavigationBroadcastReceiver)
             unregisterReceiver(broadcastReceiver)
-
-            if (isHomeVisible)
-                windowManager.removeViewImmediate(binding.root)
         } catch (e: IllegalArgumentException) {
             Timber.e(e)
-            //stopSelf()
         } finally {
             disposable?.dispose()
         }
 
-        isHomeVisible = false
+        blindScreenPresenter.isBlindScreenVisible = false
 
         super.onDestroy()
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
-
-    private fun showHome() {
-        if (isHomeVisible)
-            return
-
-        binding.textView.setOnClickListener {
-            windowManager.removeViewImmediate(binding.root)
-            isHomeVisible = false
-        }
-
-        val type =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                    WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-                else
-                    @Suppress("DEPRECATION")
-                    WindowManager.LayoutParams.TYPE_PHONE
-
-        val layoutParams = WindowManager.LayoutParams(
-                type,
-                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
-                        or WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
-                        or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-        )
-
-        layoutParams.height = windowHeight()
-        layoutParams.windowAnimations = R.style.WindowAnimation
-
-        windowManager.addView(binding.root, layoutParams)
-        isHomeVisible = true
-    }
-
-    private fun windowHeight(): Int {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val windowMetrics = windowManager.currentWindowMetrics
-            val insets = windowMetrics.windowInsets.getInsetsIgnoringVisibility(WindowInsets.Type.systemBars())
-            windowMetrics.bounds.height() + insets.bottom + insets.top
-        } else {
-            val displayMetrics = DisplayMetrics()
-            @Suppress("DEPRECATION")
-            windowManager.defaultDisplay.getMetrics(displayMetrics)
-
-            val navigationBarHeight = navigationBarHeight()
-            val statusBarHeight = statusBarHeight()
-
-            displayMetrics.heightPixels + navigationBarHeight.times(2) + statusBarHeight.times(2)
-        }
-    }
-
-    private fun navigationBarHeight(): Int {
-        val identifier = resources.getIdentifier("navigation_bar_height", "dimen", "android")
-
-        if (identifier > 0)
-            return resources.getDimensionPixelSize(identifier)
-
-        return 48.toPx
-    }
-
-    private fun statusBarHeight(): Int {
-        val identifier = resources.getIdentifier("status_bar_height", "dimen", "android")
-
-        if (identifier > 0)
-            return resources.getDimensionPixelSize(identifier)
-
-        return 25.toPx
-    }
 }

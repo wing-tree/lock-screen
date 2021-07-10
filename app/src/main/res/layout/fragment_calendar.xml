@@ -7,42 +7,62 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/app_compat_image_view"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:background="@null"
+        android:layout_width="@dimen/width_extra_large"
+        android:layout_height="@dimen/height_extra_large"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:elevation="@dimen/small_100"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_round_add_24" />
+        app:srcCompat="@drawable/ic_round_add_24"
+        app:tint="@color/white" />
 
-    <TextView
-        android:id="@+id/text_view_date"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:id="@+id/relative_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/text_size_large"
+        android:layout_marginEnd="@dimen/margin_double_extra_large"
+        android:layout_marginStart="@dimen/margin_double_extra_large"
+        android:layout_marginTop="@dimen/margin_small"
+        android:gravity="center_vertical"
         app:layout_constraintBottom_toTopOf="@+id/view_pager2"
-        app:layout_constraintEnd_toStartOf="@+id/image_view_forward"
-        app:layout_constraintStart_toEndOf="@+id/image_view_back"
-        app:layout_constraintTop_toBottomOf="@+id/app_compat_image_view"
-        tools:text="오늘" />
+        app:layout_constraintTop_toBottomOf="@+id/app_compat_image_view">
 
-    <ImageView
-        android:id="@+id/image_view_back"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        app:layout_constraintStart_toStartOf="@+id/view_pager2"
-        app:layout_constraintTop_toTopOf="@+id/text_view_date"
-        app:srcCompat="@drawable/ic_round_arrow_back_ios_48"
-        tools:ignore="ContentDescription" />
+        <TextView
+            android:id="@+id/text_view_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:paddingBottom="@dimen/double_extra_small_100"
+            android:shadowColor="@color/shadow"
+            android:shadowDx="@dimen/shadow_dx"
+            android:shadowDy="@dimen/shadow_dy"
+            android:shadowRadius="@dimen/shadow_radius"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_large"
+            android:textStyle="bold"
+            app:layout_constraintVertical_bias="0.4"
+            tools:text="오늘" />
 
-    <ImageView
-        android:id="@+id/image_view_forward"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        app:layout_constraintEnd_toEndOf="@+id/view_pager2"
-        app:layout_constraintTop_toTopOf="@+id/text_view_date"
-        app:srcCompat="@drawable/ic_round_arrow_forward_ios_48"
-        tools:ignore="ContentDescription" />
+        <ImageView
+            android:id="@+id/image_view_back"
+            android:layout_width="@dimen/large_100"
+            android:layout_height="@dimen/large_100"
+            android:layout_alignParentStart="true"
+            app:srcCompat="@drawable/ic_round_arrow_back_ios_48"
+            app:tint="@color/white"
+            tools:ignore="ContentDescription" />
+
+        <ImageView
+            android:id="@+id/image_view_forward"
+            android:layout_width="@dimen/large_100"
+            android:layout_height="@dimen/large_100"
+            android:layout_alignParentEnd="true"
+            app:srcCompat="@drawable/ic_round_arrow_forward_ios_48"
+            app:tint="@color/white"
+            tools:ignore="ContentDescription" />
+
+    </RelativeLayout>
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/view_pager2"
@@ -55,5 +75,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/image_view_forward" />
+        app:layout_constraintTop_toBottomOf="@+id/relative_layout" />
 </androidx.constraintlayout.widget.ConstraintLayout>

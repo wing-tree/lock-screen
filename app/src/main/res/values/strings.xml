@@ -17,7 +17,8 @@
     <string name="fragment_permission_rationale_dialog_002">Allow</string>
 
     <!-- home -->
-    <string name="home_001">It cannot be unlocked with the home key.</string>
+    <string name="blind_screen_000">Unlocking with the home button is not allowed as per security policy.</string>
+    <string name="blind_screen_001">Drag to unlock</string>
 
     <!-- shortcut -->
     <string name="shortcut_000">Remove from screen</string>

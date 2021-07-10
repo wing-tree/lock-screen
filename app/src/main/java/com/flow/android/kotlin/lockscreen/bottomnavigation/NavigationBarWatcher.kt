@@ -1,39 +1,46 @@
-package com.flow.android.kotlin.lockscreen.home.homewatcher
+package com.flow.android.kotlin.lockscreen.bottomnavigation
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import timber.log.Timber
+import java.lang.Exception
 
-class HomeWatcher(private val context: Context) {
+class NavigationBarWatcher(private val context: Context) {
     private val intentFilter: IntentFilter by lazy { IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS) }
-    private val innerReceiver: InnerReceiver by lazy { InnerReceiver() }
-    private var homePressedListener: HomePressedListener? = null
 
-    fun setOnHomePressedListener(homePressedListener: HomePressedListener) {
-        this.homePressedListener = homePressedListener
+    private var bottomNavigationItemPressedListener: BottomNavigationItemPressedListener? = null
+    private var innerBroadcastReceiver: InnerBroadcastReceiver? = null
+
+    fun setOnNavigationBarItemPressedListener(bottomNavigationItemPressedListener: BottomNavigationItemPressedListener) {
+        this.bottomNavigationItemPressedListener = bottomNavigationItemPressedListener
     }
 
     fun startWatch() {
-        homePressedListener?.let {
-            context.registerReceiver(innerReceiver, intentFilter)
+        bottomNavigationItemPressedListener?.let {
+            innerBroadcastReceiver = InnerBroadcastReceiver()
+            context.registerReceiver(innerBroadcastReceiver, intentFilter)
         }
     }
 
     fun stopWatch() {
-        homePressedListener?.let {
-            context.unregisterReceiver(innerReceiver)
+        bottomNavigationItemPressedListener?.let {
+            innerBroadcastReceiver?.let {
+                context.unregisterReceiver(it)
+                innerBroadcastReceiver = null
+            }
         }
     }
 
-    internal inner class InnerReceiver : BroadcastReceiver() {
+    internal inner class InnerBroadcastReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             val action = intent.action
 
             if (action == Intent.ACTION_CLOSE_SYSTEM_DIALOGS) {
                 val systemDialogReasonKey = intent.getStringExtra(SYSTEM_DIALOG_REASON_KEY) ?: return
 
-                homePressedListener?.let {
+                bottomNavigationItemPressedListener?.let {
                     when(systemDialogReasonKey) {
                         SYSTEM_DIALOG_REASON_HOME_KEY -> it.onHomeKeyPressed()
                         SYSTEM_DIALOG_REASON_RECENT_APPS -> it.onRecentAppsPressed()

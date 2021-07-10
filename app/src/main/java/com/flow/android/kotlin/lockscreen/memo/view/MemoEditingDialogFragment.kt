@@ -45,8 +45,11 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
     }
 
     private val checklistAdapter : ChecklistAdapter by lazy { ChecklistAdapter(object : ChecklistAdapter.Listener {
-        override fun onMoreClick(item: ChecklistItem) {
-            val popupWindow = PopupWindow()
+        override fun onCancelClick(item: ChecklistItem) {
+            val value = checklist.value ?: return
+
+            value.remove(item)
+            checklist.value = value
         }
 
         override fun onItemCheckedChange(item: ChecklistItem, isChecked: Boolean) {}
@@ -134,7 +137,7 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
             }
 
         initializeView(memo)
-        registerObservers()
+        registerLifecycleObservers()
         localBroadcastManager.registerReceiver(localBroadcastReceiver, IntentFilter(Action.Date))
 
         return view
@@ -245,7 +248,7 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
         }
     }
 
-    private fun registerObservers() {
+    private fun registerLifecycleObservers() {
         this.memo.observe(viewLifecycleOwner, {
             if (checkForChanges()) {
                 if (isContentBlank())

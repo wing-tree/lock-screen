@@ -9,8 +9,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.core.database.getIntOrNull
 import androidx.core.database.getLongOrNull
 import androidx.core.database.getStringOrNull
-import com.flow.android.kotlin.lockscreen.calendar.model.CalendarModel
-import com.flow.android.kotlin.lockscreen.calendar.model.CalendarEventModel
+import com.flow.android.kotlin.lockscreen.calendar.model.Model
 import com.flow.android.kotlin.lockscreen.util.BLANK
 import java.util.*
 
@@ -70,8 +69,8 @@ object CalendarLoader {
         const val InsertEvent = 2057
     }
 
-    fun calendarDisplays(contentResolver: ContentResolver): List<CalendarModel> {
-        val calendarDisplays = mutableListOf<CalendarModel>()
+    fun calendarDisplays(contentResolver: ContentResolver): List<Model.Calendar> {
+        val calendarDisplays = mutableListOf<Model.Calendar>()
         val contentUri = CalendarContract.Calendars.CONTENT_URI
         val cursor = contentResolver.query(
                 contentUri,
@@ -92,7 +91,7 @@ object CalendarLoader {
             // val isPrimary = cursor.getString(Calendars.Index.IS_PRIMARY)
 
             // if (isPrimary == "1")
-            calendarDisplays.add(CalendarModel(_id, calendarDisplayName))
+            calendarDisplays.add(Model.Calendar(_id, calendarDisplayName))
         }
 
         cursor.close()
@@ -101,8 +100,8 @@ object CalendarLoader {
     }
 
     @Suppress("SpellCheckingInspection")
-    private fun instances(contentResolver: ContentResolver, selection: String, DTSTART: Calendar, DTEND: Calendar): ArrayList<CalendarEventModel>? {
-        val events = arrayListOf<CalendarEventModel>()
+    private fun instances(contentResolver: ContentResolver, selection: String, DTSTART: Calendar, DTEND: Calendar): ArrayList<Model.CalendarEvent>? {
+        val events = arrayListOf<Model.CalendarEvent>()
 
         val builder: Uri.Builder = CalendarContract.Instances.CONTENT_URI.buildUpon()
         ContentUris.appendId(builder, DTSTART.timeInMillis)
@@ -145,7 +144,7 @@ object CalendarLoader {
                 }
             }
 
-            events.add(CalendarEventModel(
+            events.add(Model.CalendarEvent(
                     begin = begin,
                     calendarColor = calendarColor,
                     calendarDisplayName = calendarDisplayName,
@@ -169,9 +168,9 @@ object CalendarLoader {
         return events
     }
 
-    fun events(contentResolver: ContentResolver, calendarModels: List<CalendarModel>, amount: Int): ArrayList<CalendarEventModel> {
+    fun events(contentResolver: ContentResolver, calendarModels: List<Model.Calendar>, amount: Int): ArrayList<Model.CalendarEvent> {
 
-        val events = arrayListOf<CalendarEventModel>()
+        val events = arrayListOf<Model.CalendarEvent>()
 
         @Suppress("LocalVariableName", "SpellCheckingInspection")
         val DTSTART = Calendar.getInstance()
@@ -201,11 +200,11 @@ object CalendarLoader {
         return events
     }
 
-    fun editEvent(activityResultLauncher: ActivityResultLauncher<CalendarEventModel?>, calendarEvent: CalendarEventModel) {
+    fun editEvent(activityResultLauncher: ActivityResultLauncher<Model.CalendarEvent?>, calendarEvent: Model.CalendarEvent) {
         activityResultLauncher.launch(calendarEvent)
     }
 
-    fun insertEvent(activityResultLauncher: ActivityResultLauncher<CalendarEventModel?>) {
+    fun insertEvent(activityResultLauncher: ActivityResultLauncher<Model.CalendarEvent?>) {
         activityResultLauncher.launch(null)
     }
 }

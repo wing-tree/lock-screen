@@ -26,16 +26,35 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <View
-                android:id="@+id/view_memo_color"
-                android:layout_width="8dp"
-                android:layout_height="8dp"
-                android:layout_marginStart="@dimen/margin_normal"
-                android:background="@drawable/background_memo_color"
+            <LinearLayout
+                android:id="@+id/frame_layout_memo_color"
+                android:layout_width="@dimen/small_150"
+                android:layout_height="@dimen/small_150"
+                android:layout_marginStart="@dimen/normal_100"
+                android:gravity="center"
                 app:layout_constraintBottom_toBottomOf="@+id/text_view_date"
                 app:layout_constraintEnd_toStartOf="@+id/text_view_date"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/text_view_date" />
+                app:layout_constraintTop_toTopOf="@+id/text_view_date">
+
+                <View
+                    android:id="@+id/view_memo_color"
+                    android:layout_width="@dimen/extra_small_225"
+                    android:layout_height="@dimen/extra_small_225"
+                    android:layout_marginEnd="1dp"
+                    android:background="@drawable/background_memo_color" />
+
+                <ImageView
+                    android:id="@+id/image_view_memo_color"
+                    android:layout_width="@dimen/small_150"
+                    android:layout_height="@dimen/small_150"
+                    android:layout_marginEnd="1dp"
+                    android:scaleType="fitXY"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_round_check_circle_24"
+                    app:tint="@color/white"
+                    tools:ignore="ContentDescription" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/text_view_date"
@@ -44,18 +63,20 @@
                 android:layout_marginStart="@dimen/margin_small"
                 android:layout_marginEnd="@dimen/margin_small"
                 android:layout_toStartOf="@id/text_view_checklist_count"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:textColor="@color/high_emphasis"
-                android:textSize="@dimen/text_size_small"
+                android:textSize="@dimen/text_size_medium_small"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/text_view_checklist_count"
-                app:layout_constraintStart_toEndOf="@+id/view_memo_color"
+                app:layout_constraintStart_toEndOf="@+id/frame_layout_memo_color"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="Date" />
 
             <TextView
                 android:id="@+id/text_view_checklist_count"
-                android:layout_width="@dimen/width_small"
-                android:layout_height="@dimen/height_small"
+                android:layout_width="@dimen/normal_125"
+                android:layout_height="@dimen/normal_125"
                 android:layout_marginEnd="@dimen/margin_small"
                 android:layout_weight="1"
                 app:layout_constraintBottom_toBottomOf="@+id/text_view_date"
@@ -65,8 +86,8 @@
 
             <ImageView
                 android:id="@+id/image_view_swap"
-                android:layout_width="@dimen/width_small"
-                android:layout_height="@dimen/height_small"
+                android:layout_width="@dimen/normal_125"
+                android:layout_height="@dimen/normal_125"
                 android:layout_marginEnd="@dimen/margin_normal"
                 android:layout_weight="1"
                 app:layout_constraintBottom_toBottomOf="@+id/text_view_checklist_count"
@@ -85,7 +106,7 @@
             android:layout_marginBottom="@dimen/margin_small"
             android:layout_marginEnd="@dimen/margin_normal"
             android:layout_marginStart="@dimen/margin_normal"
-            android:layout_marginTop="1dp"
+            android:layout_marginTop="@dimen/double_extra_small_100"
             android:ellipsize="end"
             android:maxLines="3"
             android:textColor="@color/white"

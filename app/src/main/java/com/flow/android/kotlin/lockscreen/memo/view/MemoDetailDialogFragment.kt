@@ -37,7 +37,7 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
 
     private val checklist = MutableLiveData<ArrayList<ChecklistItem>>()
     private val checklistAdapter = ChecklistAdapter(object : ChecklistAdapter.Listener {
-        override fun onMoreClick(item: ChecklistItem) {}
+        override fun onCancelClick(item: ChecklistItem) {}
 
         override fun onItemCheckedChange(item: ChecklistItem, isChecked: Boolean) {
             val checklistItem = memo?.checklist?.find { it.id == item.id } ?: return
@@ -88,7 +88,7 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
 
         memo?.let {
             initializeView(it)
-            registerObserver()
+            registerLifecycleObservers()
         } ?: run {
             // show error.
         }
@@ -174,7 +174,7 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
         }
     }
 
-    private fun registerObserver() {
+    private fun registerLifecycleObservers() {
         checklist.observe(viewLifecycleOwner, {
             checklistAdapter.submitList(it)
         })

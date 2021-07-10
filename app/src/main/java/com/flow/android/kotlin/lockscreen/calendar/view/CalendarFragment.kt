@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.flow.android.kotlin.lockscreen.R
@@ -13,8 +14,10 @@ import com.flow.android.kotlin.lockscreen.calendar.CalendarLoader
 import com.flow.android.kotlin.lockscreen.databinding.FragmentCalendarBinding
 import com.flow.android.kotlin.lockscreen.calendar.adapter.EventsAdapter
 import com.flow.android.kotlin.lockscreen.calendar.contract.CalendarContract
+import com.flow.android.kotlin.lockscreen.calendar.viewmodel.CalendarViewModel
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
@@ -25,10 +28,18 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
         return FragmentCalendarBinding.inflate(inflater, container, false)
     }
 
+    private val viewModel by activityViewModels<CalendarViewModel>()
+
+    private val duration = 150L
+
     private val activityResultLauncher = registerForActivityResult(CalendarContract()) { result ->
-        when(result) {
-            CalendarLoader.RequestCode.EditEvent -> { mainViewModel.callRefreshEvents() }
-            CalendarLoader.RequestCode.InsertEvent -> { mainViewModel.callRefreshEvents() }
+        lifecycleScope.launch {
+            delay(duration)
+
+            when (result) {
+                CalendarLoader.RequestCode.EditEvent -> viewModel.callRefresh()
+                CalendarLoader.RequestCode.InsertEvent -> viewModel.callRefresh()
+            }
         }
     }
 
@@ -37,6 +48,7 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
     }
 
     private val itemCount = 7
+
     private val onPageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
             super.onPageSelected(position)
@@ -64,7 +76,7 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
         val view = super.onCreateView(inflater, container, savedInstanceState)
 
         initializeView()
-        initializeLiveData()
+        registerLifecycleObservers()
         setIconColor()
         setTextColor()
 
@@ -76,14 +88,14 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
         super.onDestroyView()
     }
 
-    private fun initializeLiveData() {
-        mainViewModel.calendars.observe(viewLifecycleOwner, { calendarDisplays ->
+    private fun registerLifecycleObservers() {
+        viewModel.calendars.observe(viewLifecycleOwner, { calendarDisplays ->
             val uncheckedCalendarIds = ConfigurationPreferences.getUncheckedCalendarIds(requireContext())
 
             viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
                 for (i in 0..itemCount) {
                     CalendarLoader.events(
-                            mainViewModel.contentResolver(),
+                            viewModel.contentResolver,
                             calendarDisplays.filter {
                                 uncheckedCalendarIds.contains(it.id.toString()).not()
                             }, i
@@ -96,7 +108,7 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
             }
         })
 
-        mainViewModel.refreshEvents.observe(viewLifecycleOwner, {
+        viewModel.refresh.observe(viewLifecycleOwner, {
             viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
                 val uncheckedCalendarIds = ConfigurationPreferences.getUncheckedCalendarIds(requireContext())
 
@@ -104,8 +116,8 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
 
                 for (i in 0..itemCount) {
                     CalendarLoader.events(
-                            mainViewModel.contentResolver(),
-                            mainViewModel.calendarDisplays()?.filter {
+                            viewModel.contentResolver,
+                            viewModel.calendars.value?.filter {
                                 uncheckedCalendarIds.contains(it.id.toString()).not()
                             } ?: emptyList(), i
                     ).also { events ->

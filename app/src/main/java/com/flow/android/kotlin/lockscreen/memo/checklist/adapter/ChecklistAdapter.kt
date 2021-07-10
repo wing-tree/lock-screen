@@ -15,7 +15,7 @@ import kotlin.Comparator
 
 class ChecklistAdapter(private val listener: Listener, private val isEditable: Boolean): ListAdapter<ChecklistItem, ChecklistAdapter.ViewHolder>(DiffCallback()) {
     interface Listener {
-        fun onMoreClick(item: ChecklistItem)
+        fun onCancelClick(item: ChecklistItem)
         fun onItemCheckedChange(item: ChecklistItem, isChecked: Boolean)
     }
 
@@ -29,14 +29,14 @@ class ChecklistAdapter(private val listener: Listener, private val isEditable: B
 
             if (isEditable) {
                 binding.checkbox.hide()
-                binding.imageViewMore.show()
+                binding.imageViewCancel.show()
 
-                binding.imageViewMore.setOnClickListener {
-                    listener.onMoreClick(item)
+                binding.imageViewCancel.setOnClickListener {
+                    listener.onCancelClick(item)
                 }
             } else {
                 binding.checkbox.show()
-                binding.imageViewMore.hide()
+                binding.imageViewCancel.hide()
 
                 binding.checkbox.isChecked = item.done
 

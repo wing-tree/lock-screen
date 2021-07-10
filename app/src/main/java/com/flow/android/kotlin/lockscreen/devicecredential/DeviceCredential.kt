@@ -4,17 +4,21 @@ import android.app.Activity
 import android.app.KeyguardManager
 import android.content.Context
 import android.content.Context.KEYGUARD_SERVICE
+import android.content.Intent
 import android.os.Build
 import android.provider.Settings
+import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.util.BLANK
 import timber.log.Timber
 
 object DeviceCredential {
-    object RequestCode {
-        const val ConfirmDeviceCredential = 1309
+    object Key {
+        private const val Prefix = "com.flow.android.kotlin.lockscreen.devicecredential.DeviceCredential"
+        const val ConfirmDeviceCredential = "$Prefix.KEY_CONFIRM_DEVICE_CREDENTIAL"
     }
 
     fun requireUnlock(context: Context): Boolean {
@@ -26,7 +30,6 @@ object DeviceCredential {
         return keyguardManager.isKeyguardLocked
     }
 
-
     @RequiresApi(Build.VERSION_CODES.O)
     fun confirmDeviceCredential(activity: Activity, keyguardDismissCallback: KeyguardManager.KeyguardDismissCallback) {
         val keyguardManager = activity.getSystemService(KeyguardManager::class.java)
@@ -34,28 +37,30 @@ object DeviceCredential {
         keyguardManager.requestDismissKeyguard(activity, keyguardDismissCallback)
     }
 
-    fun confirmDeviceCredential(activity: Activity) {
+    fun confirmDeviceCredential(activity: AppCompatActivity, activityResultLauncher: ActivityResultLauncher<Intent>?) {
         val keyguardManager = activity.getSystemService(KEYGUARD_SERVICE) as KeyguardManager
         val title = if (lockPatternEnable(activity))
             activity.getString(R.string.device_credential_helper_000)
         else
             activity.getString(R.string.device_credential_helper_001)
 
+        @Suppress("DEPRECATION")
         val intent = keyguardManager.createConfirmDeviceCredentialIntent(title, BLANK)
 
-        activity.startActivityForResult(intent, RequestCode.ConfirmDeviceCredential)
+        activityResultLauncher?.launch(intent)
     }
 
-    fun confirmDeviceCredential(fragment: Fragment) {
+    fun confirmDeviceCredential(fragment: Fragment, activityResultLauncher: ActivityResultLauncher<Intent>?) {
         val keyguardManager = fragment.requireActivity().getSystemService(KEYGUARD_SERVICE) as KeyguardManager
         val title = if (lockPatternEnable(fragment.requireContext()))
             fragment.getString(R.string.device_credential_helper_000)
         else
             fragment.getString(R.string.device_credential_helper_001)
 
+        @Suppress("DEPRECATION")
         val intent = keyguardManager.createConfirmDeviceCredentialIntent(title, BLANK)
 
-        fragment.startActivityForResult(intent, RequestCode.ConfirmDeviceCredential)
+        activityResultLauncher?.launch(intent)
     }
 
     private fun lockPatternEnable(context: Context): Boolean {

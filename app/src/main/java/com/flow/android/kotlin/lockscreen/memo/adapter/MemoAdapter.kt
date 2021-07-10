@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Paint
+import android.graphics.PorterDuff
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -16,6 +17,8 @@ import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.databinding.MemoBinding
 import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.util.DEFAULT_FONT_SIZE
+import com.flow.android.kotlin.lockscreen.util.hide
+import com.flow.android.kotlin.lockscreen.util.show
 import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -87,7 +90,6 @@ class MemoAdapter(private val listener: Listener) : RecyclerView.Adapter<MemoAda
 
             binding.textViewContent.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize)
 
-            binding.viewMemoColor.backgroundTintList = ColorStateList.valueOf(item.color)
             binding.textViewContent.text = item.content
             binding.textViewDate.text = item.modifiedTime.format(binding.root.context)
 
@@ -104,6 +106,10 @@ class MemoAdapter(private val listener: Listener) : RecyclerView.Adapter<MemoAda
                     setTextColor(getColor(context, R.color.disabled_light))
                 }
 
+                binding.viewMemoColor.hide()
+                binding.imageViewMemoColor.show()
+                binding.imageViewMemoColor.setColorFilter(item.color, PorterDuff.Mode.SRC_IN)
+
                 binding.root.setCardBackgroundColor(getColor(context, R.color.disabled_dark))
             } else {
                 binding.textViewContent.apply {
@@ -117,6 +123,10 @@ class MemoAdapter(private val listener: Listener) : RecyclerView.Adapter<MemoAda
                     paintFlags = paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
                     setTextColor(getColor(context, R.color.high_emphasis_light))
                 }
+
+                binding.imageViewMemoColor.hide()
+                binding.viewMemoColor.show()
+                binding.viewMemoColor.backgroundTintList = ColorStateList.valueOf(item.color)
 
                 binding.root.setCardBackgroundColor(getColor(context, R.color.card_background))
             }

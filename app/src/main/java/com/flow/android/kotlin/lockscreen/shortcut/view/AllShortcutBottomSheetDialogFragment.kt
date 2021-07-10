@@ -15,14 +15,12 @@ import com.flow.android.kotlin.lockscreen.shortcut.adapter.ShortcutAdapter
 import com.flow.android.kotlin.lockscreen.shortcut.model.Model
 import com.flow.android.kotlin.lockscreen.shortcut.viewmodel.ShortcutViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import timber.log.Timber
 
 class AllShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
     private val viewModel: ShortcutViewModel by activityViewModels()
-
+    private val job = Job()
     private val shortcutAdapter = ShortcutAdapter().apply {
         setListener(object : ShortcutAdapter.Listener {
             override fun onItemClick(item: Model.Shortcut) {
@@ -64,8 +62,13 @@ class AllShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
         return viewBinding?.root
     }
 
+    override fun onDestroyView() {
+        job.cancel()
+        super.onDestroyView()
+    }
+
     private suspend fun addAll() {
-        withContext(Dispatchers.IO) {
+        withContext(Dispatchers.IO + job) {
             val shortcuts = arrayListOf<Model.Shortcut>()
             val packageNames = viewModel.getAll().map { it.packageName }
             var count = 0
@@ -82,7 +85,7 @@ class AllShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
                     val label = resolveInfo.loadLabel(packageManager).toString()
                     val packageName = resolveInfo.activityInfo.packageName
 
-                    if (isDetached)
+                    if (isAdded.not() || isDetached)
                         return@withContext
 
                     if (packageNames.contains(packageName))
@@ -112,6 +115,8 @@ class AllShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
             } catch (e: PackageManager.NameNotFoundException) {
                 Timber.e(e)
             } catch (e: IllegalStateException) {
+                Timber.e(e)
+            } catch (e: CancellationException) {
                 Timber.e(e)
             }
 

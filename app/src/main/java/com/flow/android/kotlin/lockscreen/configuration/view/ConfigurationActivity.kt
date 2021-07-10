@@ -60,8 +60,9 @@ class ConfigurationActivity: AppCompatActivity() {
     }
 
     object Name {
-        const val ConfigurationChange = "com.flow.android.kotlin.lockscreen.configuration.view" +
-                "ConfigurationActivity.Name.ConfigurationChange"
+        private const val Prefix = "com.flow.android.kotlin.lockscreen.configuration.view" +
+                ".ConfigurationActivity.Name"
+        const val ConfigurationChange = "$Prefix.ConfigurationChange"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

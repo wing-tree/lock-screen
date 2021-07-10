@@ -6,20 +6,23 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/app_compat_image_view"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:background="@null"
+        android:layout_width="@dimen/width_extra_large"
+        android:layout_height="@dimen/height_extra_large"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:elevation="@dimen/small_100"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_round_add_24" />
+        app:srcCompat="@drawable/ic_round_add_24"
+        app:tint="@color/white" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="@dimen/margin_double_extra_large"
         android:layout_marginEnd="@dimen/margin_double_extra_large"
+        android:layout_marginStart="@dimen/margin_double_extra_large"
+        android:layout_marginTop="@dimen/margin_small"
         android:layoutAnimation="@anim/layout_animation"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

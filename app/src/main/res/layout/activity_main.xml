@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#40000000"
+    android:background="#4D000000"
     android:clipChildren="false"
     android:clipToPadding="false"
     tools:context=".main.view.MainActivity">
@@ -15,8 +15,9 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginBottom="@dimen/margin_normal"
-        android:elevation="1dp"
-        app:layout_constraintBottom_toTopOf="@+id/linear_layout_lock_open"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        app:layout_constraintBottom_toTopOf="@+id/linear_layout_unlock"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -26,7 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_extra_large"
-            android:layout_marginTop="@dimen/margin_double_extra_large"
+            android:layout_marginTop="@dimen/large_175"
             android:orientation="vertical"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -34,31 +35,34 @@
             <TextClock
                 android:id="@+id/text_clock_time"
                 android:layout_width="wrap_content"
-                android:layout_height="56dp"
+                android:layout_height="wrap_content"
                 android:format12Hour="@string/format_time_001"
+                android:fontFamily="sans-serif-light"
                 android:gravity="center_vertical"
                 android:includeFontPadding="false"
                 android:shadowColor="@color/shadow"
                 android:shadowDx="@dimen/shadow_dx"
                 android:shadowDy="@dimen/shadow_dy"
                 android:shadowRadius="@dimen/shadow_radius"
-                android:textSize="40dp"
-                tools:ignore="SpUsage"
+                android:textColor="@color/white"
+                android:textSize="42sp"
                 tools:text="12시 00분" />
 
             <TextClock
                 android:id="@+id/text_clock_date"
                 android:layout_width="wrap_content"
-                android:layout_height="48dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_extra_small"
                 android:format12Hour="@string/format_date_000"
+                android:fontFamily="sans-serif-light"
                 android:gravity="center_vertical"
                 android:includeFontPadding="false"
                 android:shadowColor="@color/shadow"
                 android:shadowDx="@dimen/shadow_dx"
                 android:shadowDy="@dimen/shadow_dy"
                 android:shadowRadius="@dimen/shadow_radius"
-                android:textSize="32dp"
-                tools:ignore="SpUsage"
+                android:textColor="@color/white"
+                android:textSize="34sp"
                 tools:text="Fri, January 1" />
         </LinearLayout>
 
@@ -66,9 +70,11 @@
             android:id="@+id/constraint_layout_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_double_extra_large"
-            android:layout_marginEnd="@dimen/margin_extra_large"
+            android:layout_marginTop="@dimen/large_175"
+            android:layout_marginEnd="@dimen/margin_normal"
             android:orientation="horizontal"
+            android:clipChildren="false"
+            android:clipToPadding="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -83,16 +89,21 @@
                 app:tint="@android:color/white"
                 tools:ignore="ContentDescription" />
 
-            <ImageView
-                android:id="@+id/image_view_highlight"
+            <FrameLayout
+                android:id="@+id/frame_layout_highlight"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:padding="@dimen/small_100"
-                app:srcCompat="@drawable/ic_round_flashlight_on_24"
-                app:tint="@android:color/white"
-                tools:ignore="ContentDescription" />
+                android:foreground="?attr/selectableItemBackgroundBorderless">
 
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/image_view_highlight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/small_100"
+                    app:srcCompat="@drawable/ic_round_flashlight_on_24"
+                    app:tint="@android:color/white"
+                    tools:ignore="ContentDescription" />
+            </FrameLayout>
 
             <ImageView
                 android:id="@+id/image_view_settings"
@@ -109,6 +120,7 @@
             android:id="@+id/center_aligned_tab_layout"
             android:layout_width="match_parent"
             android:layout_height="@dimen/large_150"
+            android:layout_marginTop="@dimen/margin_small"
             android:background="@android:color/transparent"
             android:visibility="invisible"
             app:layout_constraintEnd_toEndOf="parent"
@@ -120,7 +132,6 @@
             app:tabPaddingEnd="@dimen/large_100"
             app:tabPaddingStart="@dimen/large_100"
             app:tabTextAppearance="@style/TextAppearance.Tab" />
-        <!-- todo: check padding,, -->
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/view_pager2"
@@ -132,11 +143,10 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/center_aligned_tab_layout" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
-        android:id="@+id/linear_layout_lock_open"
+        android:id="@+id/linear_layout_unlock"
         android:layout_width="match_parent"
         android:layout_height="@dimen/extra_large_275"
         android:clipChildren="false"
@@ -148,22 +158,22 @@
 
         <FrameLayout
             android:id="@+id/frame_layout_ripple"
-            android:layout_width="@dimen/large_225"
-            android:layout_height="@dimen/large_225"
+            android:layout_width="@dimen/large_175"
+            android:layout_height="@dimen/large_175"
             android:layout_marginTop="@dimen/margin_normal"
             android:foreground="?attr/selectableItemBackgroundBorderless"
             tools:ignore="UselessParent">
 
             <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/image_view_lock_open"
+                android:id="@+id/image_view_unlock"
                 android:layout_width="@dimen/width_double_extra_large"
                 android:layout_height="@dimen/height_double_extra_large"
                 android:layout_gravity="center"
                 android:background="@drawable/oval_border"
                 android:duplicateParentState="true"
-                android:paddingBottom="1dp"
-                android:scaleType="center"
-                app:srcCompat="@drawable/ic_round_lock_open_24"
+                android:padding="@dimen/small_125"
+                android:scaleType="centerInside"
+                app:srcCompat="@drawable/ic_unlock_90px"
                 app:tint="@color/white"
                 tools:ignore="ContentDescription" />
         </FrameLayout>

@@ -3,6 +3,8 @@ package com.flow.android.kotlin.lockscreen.util
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
+import android.content.res.ColorStateList
+import android.graphics.ColorFilter
 import android.graphics.drawable.RippleDrawable
 import android.os.Handler
 import android.os.Looper
@@ -11,6 +13,7 @@ import android.view.View.MeasureSpec
 import android.view.ViewGroup
 import android.view.animation.*
 import android.widget.FrameLayout
+import androidx.annotation.ColorInt
 import timber.log.Timber
 
 
@@ -33,7 +36,7 @@ fun FrameLayout.hideRipple() {
     }
 }
 
-fun FrameLayout.showRipple() {
+fun FrameLayout.showRipple(@ColorInt colorPressed: Int? = null) {
     if (foreground is RippleDrawable) {
         val rippleDrawable = foreground
 
@@ -136,6 +139,23 @@ fun View.fadeOut(duration: Number, onAnimationEnd: (() -> Unit)? = null) {
                     super.onAnimationEnd(animation)
                 }
             })
+    }
+}
+
+fun View.showRipple() {
+    if (background is RippleDrawable) {
+        val rippleDrawable = background
+
+        rippleDrawable.state = intArrayOf(
+                android.R.attr.state_pressed,
+                android.R.attr.state_enabled
+        )
+    }
+}
+
+fun View.hideRipple() {
+    if (background is RippleDrawable) {
+        background.state = intArrayOf()
     }
 }
 

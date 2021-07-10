@@ -6,13 +6,13 @@ import android.content.Intent
 import android.provider.CalendarContract
 import androidx.activity.result.contract.ActivityResultContract
 import com.flow.android.kotlin.lockscreen.calendar.CalendarLoader
-import com.flow.android.kotlin.lockscreen.calendar.model.CalendarEventModel
+import com.flow.android.kotlin.lockscreen.calendar.model.Model
 import com.flow.android.kotlin.lockscreen.util.BLANK
 
-class CalendarContract: ActivityResultContract<CalendarEventModel?, Int>() {
+class CalendarContract: ActivityResultContract<Model.CalendarEvent?, Int>() {
     private var output = 0
 
-    override fun createIntent(context: Context, input: CalendarEventModel?): Intent {
+    override fun createIntent(context: Context, input: Model.CalendarEvent?): Intent {
         return input?.let {
             val uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, it.eventId)
 

@@ -1,30 +1,63 @@
 package com.flow.android.kotlin.lockscreen.application
 
 import android.app.Activity
-import android.app.AlertDialog
 import android.app.Application
+import android.content.Intent
 import android.os.Bundle
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.flow.android.kotlin.lockscreen.BuildConfig
+import com.flow.android.kotlin.lockscreen.bottomnavigation.BottomNavigationItemPressedListener
+import com.flow.android.kotlin.lockscreen.bottomnavigation.NavigationBarWatcher
+import com.flow.android.kotlin.lockscreen.lockscreen.service.LockScreenService
 import timber.log.Timber
 import timber.log.Timber.DebugTree
 
 class MainApplication: Application(), Application.ActivityLifecycleCallbacks {
+    private val localBroadcastManager: LocalBroadcastManager by lazy {
+        LocalBroadcastManager.getInstance(this)
+    }
+
     override fun onCreate() {
         super.onCreate()
+        registerActivityLifecycleCallbacks(this)
 
         if (BuildConfig.DEBUG)
             Timber.plant(DebugTree())
     }
 
+    private val homeWatcher = NavigationBarWatcher(this)
+
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
     override fun onActivityStarted(activity: Activity) {}
-    override fun onActivityResumed(activity: Activity) {}
-    override fun onActivityPaused(activity: Activity) {}
 
-    override fun onActivityStopped(activity: Activity) {
-        // 확인 필요. todo.
+    override fun onActivityResumed(activity: Activity) {
+        with(homeWatcher) {
+            setOnNavigationBarItemPressedListener(homePressedListener(activity))
+            startWatch()
+        }
     }
 
+    override fun onActivityPaused(activity: Activity) {
+        homeWatcher.stopWatch()
+    }
+
+    override fun onActivityStopped(activity: Activity) {}
     override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
     override fun onActivityDestroyed(activity: Activity) {}
+
+    private fun homePressedListener(activity: Activity) = object : BottomNavigationItemPressedListener {
+        override fun onHomeKeyPressed() {
+            if (activity.isFinishing.not()) {
+                localBroadcastManager.sendBroadcastSync(Intent(LockScreenService.Action.HomeKeyPressed))
+                activity.finish()
+            }
+        }
+
+        override fun onRecentAppsPressed() {
+            if (activity.isFinishing.not()) {
+                localBroadcastManager.sendBroadcastSync(Intent(LockScreenService.Action.RecentAppsPressed))
+                activity.finish()
+            }
+        }
+    }
 }

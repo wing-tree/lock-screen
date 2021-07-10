@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:id="@+id/constraint_layout"
+    android:layout_height="match_parent"
+    android:background="@drawable/background_blind_screen">
+
+    <LinearLayout
+        android:id="@+id/linear_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/margin_double_extra_large"
+        android:layout_marginStart="@dimen/margin_double_extra_large"
+        android:layout_marginTop="@dimen/double_extra_large_125"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+        <LinearLayout
+            android:id="@+id/linear_layout_date_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <TextClock
+                android:id="@+id/text_clock_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:format12Hour="@string/format_time_001"
+                android:fontFamily="sans-serif-light"
+                android:gravity="center_vertical"
+                android:includeFontPadding="false"
+                android:shadowColor="@color/shadow"
+                android:shadowDx="@dimen/shadow_dx"
+                android:shadowDy="@dimen/shadow_dy"
+                android:shadowRadius="@dimen/shadow_radius"
+                android:textColor="@color/white"
+                android:textSize="56sp"
+                tools:text="12시 00분" />
+
+            <TextClock
+                android:id="@+id/text_clock_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_extra_small"
+                android:format12Hour="@string/format_date_000"
+                android:fontFamily="sans-serif-light"
+                android:gravity="center_vertical"
+                android:includeFontPadding="false"
+                android:shadowColor="@color/shadow"
+                android:shadowDx="@dimen/shadow_dx"
+                android:shadowDy="@dimen/shadow_dy"
+                android:shadowRadius="@dimen/shadow_radius"
+                android:textColor="@color/white"
+                android:textSize="35sp"
+                tools:text="Fri, January 1" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/extra_large_150"
+            android:gravity="center"
+            android:text="@string/blind_screen_000"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_large"
+            android:shadowColor="@color/shadow"
+            android:shadowDx="@dimen/shadow_dx"
+            android:shadowDy="@dimen/shadow_dy"
+            android:shadowRadius="@dimen/shadow_radius" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_large"
+            android:gravity="center"
+            android:text="@string/blind_screen_001"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_medium"
+            android:shadowColor="@color/shadow"
+            android:shadowDx="@dimen/shadow_dx"
+            android:shadowDy="@dimen/shadow_dy"
+            android:shadowRadius="@dimen/shadow_radius" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/frame_layout_ripple"
+        android:layout_width="@dimen/extra_large_125"
+        android:layout_height="@dimen/extra_large_125"
+        android:layout_marginTop="@dimen/extra_large_150"
+        android:foreground="@drawable/ripple_unlock"
+        app:layout_constraintTop_toBottomOf="@id/linear_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="UselessParent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/image_view_unlock"
+            android:layout_width="@dimen/width_double_extra_large"
+            android:layout_height="@dimen/height_double_extra_large"
+            android:layout_gravity="center"
+            android:background="@drawable/oval_border"
+            android:duplicateParentState="true"
+            android:padding="@dimen/small_125"
+            android:scaleType="centerInside"
+            app:srcCompat="@drawable/ic_unlock_90px"
+            app:tint="@color/white"
+            tools:ignore="ContentDescription" />
+    </FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

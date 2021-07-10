@@ -4,18 +4,19 @@
 
     <string name="today">오늘</string>
 
-    <string name="format_date_000">M월 d일 EEE</string>
+    <string name="format_date_000">M월 d일 EEEE</string>
     <string name="format_date_001">M월 d일</string>
 
-    <string name="notification_content_text">안정적인 실행을 위한 알림입니다.</string>
+    <string name="notification_content_text">안정적인 실행을 위한 알림입니다</string>
 
     <!-- fragment_permission_rationale_dialog -->
     <string name="fragment_permission_rationale_dialog_000">앱 권한</string>
     <string name="fragment_permission_rationale_dialog_001">거부</string>
     <string name="fragment_permission_rationale_dialog_002">허용</string>
 
-    <!-- home -->
-    <string name="home_001">홈 키로 잠금 해제 할 수 없습니다.</string>
+    <!-- bline_screen -->
+    <string name="blind_screen_000">보안정책에 따라 홈 버튼으로 잠금 해제 할 수 없습니다.</string>
+    <string name="blind_screen_001">드래그해서 잠금 해제</string>
 
     <!-- shortcut -->
     <string name="shortcut_000">화면에서 삭제</string>
@@ -27,7 +28,7 @@
     <string name="configuration_activity_003">잠금화면</string>
 
     <!-- DeviceCredentialHelper -->
-    <string name="device_credential_helper_000">잠금해제 패턴을 그리세요</string>
+    <string name="device_credential_helper_000">잠금 해제 패턴을 그리세요</string>
     <string name="device_credential_helper_001">비밀번호 또는 PIN을 입력하세요</string>
 
     <!-- DisplayConfigurationFragment -->

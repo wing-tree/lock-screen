@@ -7,11 +7,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.base.BaseMainFragment
 import com.flow.android.kotlin.lockscreen.base.DataChangedState
@@ -33,6 +35,12 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
     }
 
     private val viewModel by activityViewModels<ShortcutViewModel>()
+
+    private val activityResultLauncherMap = mapOf(
+            DeviceCredential.Key.ConfirmDeviceCredential to registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
+                Timber.d(tag)
+            }
+    )
 
     private val adapter = ShortcutAdapter().apply {
         setListener(object : ShortcutAdapter.Listener {
@@ -72,7 +80,7 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
 
         itemTouchHelper.attachToRecyclerView(viewBinding.recyclerView)
         initializeData()
-        registerObservers()
+        registerLifecycleObservers()
 
         return view
     }
@@ -97,7 +105,7 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
         }
     }
 
-    private fun registerObservers() {
+    private fun registerLifecycleObservers() {
         viewModel.dataChanged.observe(viewLifecycleOwner, {
             when(it.state) {
                 DataChangedState.Deleted -> { adapter.remove(it.data) }
@@ -141,15 +149,9 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
                 }
             })
         } else {
-            DeviceCredential.confirmDeviceCredential(this)
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        when(requestCode) {
-            DeviceCredential.RequestCode.ConfirmDeviceCredential -> showToast("fucking man") // todo check.
+            activityResultLauncherMap[DeviceCredential.Key.ConfirmDeviceCredential]?.let {
+                DeviceCredential.confirmDeviceCredential(this, it)
+            }
         }
     }
 

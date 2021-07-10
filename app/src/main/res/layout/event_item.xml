@@ -5,9 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/small_100"
+    android:layout_marginBottom="1dp"
     app:cardBackgroundColor="@color/card_background"
-    app:cardCornerRadius="@dimen/default_rounded_corner"
     app:cardElevation="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -16,10 +15,10 @@
 
         <View
             android:id="@+id/view_calendar_color"
-            android:layout_width="8dp"
-            android:layout_height="8dp"
+            android:layout_width="@dimen/extra_small_225"
+            android:layout_height="@dimen/extra_small_225"
             android:layout_marginStart="@dimen/normal_100"
-            android:background="@drawable/background_calendar_color"
+            android:background="@drawable/background_calendar_event_color"
             app:layout_constraintBottom_toBottomOf="@+id/text_view_title"
             app:layout_constraintEnd_toStartOf="@+id/text_view_title"
             app:layout_constraintStart_toStartOf="parent"
@@ -32,7 +31,8 @@
             android:layout_marginStart="@dimen/margin_normal"
             android:layout_marginEnd="@dimen/margin_normal"
             android:layout_marginTop="@dimen/margin_small"
-            android:maxLines="2"
+            android:maxLines="3"
+            android:textColor="@color/white"
             android:textSize="@dimen/text_size_medium"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/view_calendar_color"
@@ -43,9 +43,10 @@
             android:id="@+id/text_view_begin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingBottom="@dimen/padding_small"
-            android:paddingTop="@dimen/padding_small"
-            app:layout_constraintStart_toEndOf="@+id/text_view_title"
+            android:layout_marginBottom="@dimen/margin_small"
+            android:layout_marginTop="@dimen/margin_extra_small"
+            android:textColor="@color/high_emphasis_light"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@+id/text_view_title"
             app:layout_constraintTop_toBottomOf="@+id/text_view_title"
             tools:text="오전 10:00 -" />
@@ -54,9 +55,8 @@
             android:id="@+id/text_view_end"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="1dp"
-            android:paddingBottom="@dimen/padding_small"
-            android:paddingTop="@dimen/padding_small"
+            android:textColor="@color/high_emphasis_light"
+            app:layout_constraintBottom_toBottomOf="@+id/text_view_begin"
             app:layout_constraintStart_toEndOf="@+id/text_view_begin"
             app:layout_constraintTop_toTopOf="@+id/text_view_begin"
             tools:text="오전 11:00" />
