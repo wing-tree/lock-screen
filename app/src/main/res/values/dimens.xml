@@ -8,6 +8,9 @@
          5. Button: 2dp to 8dp
          6. Dialog: 24dp -->
 
+    <dimen name="double_extra_small_25">0.5dp</dimen>
+    <dimen name="double_extra_small_50">1dp</dimen>
+    <dimen name="double_extra_small_75">1.5dp</dimen>
     <dimen name="double_extra_small_100">2dp</dimen>
     <dimen name="double_extra_small_125">2.5dp</dimen>
     <dimen name="double_extra_small_150">3dp</dimen>
@@ -118,4 +121,6 @@
     <item name="shadow_dx" format="float" type="dimen">1.0</item>
     <item name="shadow_dy" format="float" type="dimen">1.0</item>
     <item name="shadow_radius" format="float" type="dimen">1.0</item>
+
+    <dimen name="height_preference_screen">@dimen/large_225</dimen>
 </resources>

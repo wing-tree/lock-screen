@@ -2,8 +2,8 @@
     <!-- Base application theme. -->
     <style name="Theme.LockScreen" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorPrimary">@color/light_blue_500</item>
+        <item name="colorPrimaryVariant">@color/light_blue_700</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>
@@ -11,7 +11,6 @@
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">@android:color/transparent</item>
-        <!-- Customize your theme here. -->
 
         <item name="android:windowAnimationStyle">@style/WindowAnimation</item>
         <item name="android:windowBackground">@android:color/transparent</item>
@@ -25,6 +24,17 @@
     </style>
 
     <style name="Theme.ConfigurationActivity" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/light_blue_500</item>
+        <item name="colorPrimaryVariant">@color/light_blue_700</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">@color/light_blue_700</item>
+
         <item name="android:windowAnimationStyle">@style/WindowAnimation.ConfigurationActivity</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowDisablePreview">true</item>
@@ -67,5 +77,9 @@
         <item name="android:includeFontPadding">false</item>
         <item name="android:textColor">@color/text</item>
         <item name="android:lineSpacingMultiplier">@dimen/line_spacing_multiplier</item>
+    </style>
+
+    <style name="Toolbar">
+        <item name="android:textColorSecondary">@color/title</item>
     </style>
 </resources>

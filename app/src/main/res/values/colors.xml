@@ -15,6 +15,9 @@
     <color name="yellow_A_200">#ffff00</color>
     <color name="ivory">#FFFFF0</color>
 
+    <color name="light_blue_500">#03a9f4</color>
+    <color name="light_blue_700">#0288d1</color>
+
     <color name="background">@color/white</color>
     <color name="surface">@color/white</color>
 
@@ -86,7 +89,10 @@
     <color name="button_text_disabled">@color/disabled</color>
     <color name="button_text_enabled">@color/high_emphasis</color>
 
+    <color name="divider">#1F000000</color>
+    <color name="icon">@color/black</color>
     <color name="shadow">@color/black</color>
-
     <color name="text">@color/white</color>
+    <color name="title">@color/black</color>
+    <color name="toolbar">@color/white</color>
 </resources>

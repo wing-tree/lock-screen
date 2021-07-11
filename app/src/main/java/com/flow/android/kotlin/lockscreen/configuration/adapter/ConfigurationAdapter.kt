@@ -2,20 +2,35 @@ package com.flow.android.kotlin.lockscreen.configuration.adapter
 
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.ViewGroup
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.flow.android.kotlin.lockscreen.databinding.*
+import com.flow.android.kotlin.lockscreen.util.LinearLayoutManagerWrapper
 import com.flow.android.kotlin.lockscreen.util.collapse
 import com.flow.android.kotlin.lockscreen.util.expand
 import java.security.InvalidParameterException
 
-class ConfigurationAdapter(private val arrayList: ArrayList<AdapterItem>): RecyclerView.Adapter<ConfigurationAdapter.ViewHolder>() {
+class ConfigurationAdapter(private val currentList: ArrayList<AdapterItem>, private val isEnabledDividers: Boolean = true): RecyclerView.Adapter<ConfigurationAdapter.ViewHolder>() {
     private var recyclerView: RecyclerView? = null
 
+    init {
+        if (isEnabledDividers) {
+            val arrayList = arrayListOf<AdapterItem>()
+
+            currentList.forEach {
+                arrayList.add(it)
+                arrayList.add(AdapterItem.DividerItem())
+            }
+
+            currentList.clear()
+            currentList.addAll(arrayList)
+        }
+    }
+
     class ViewHolder(private val viewBinding: ViewBinding): RecyclerView.ViewHolder(viewBinding.root) {
-        private val duration = 200L
+        private val duration = 300L
 
         fun bind(adapterItem: AdapterItem, viewType: Int) {
             when(viewType) {
@@ -23,12 +38,12 @@ class ConfigurationAdapter(private val arrayList: ArrayList<AdapterItem>): Recyc
                     // pass
                 }
                 ViewType.Item -> {
-                    viewBinding as ItemBinding
+                    viewBinding as PreferenceScreenBinding
                     val item = adapterItem as AdapterItem.Item
 
-                    viewBinding.image.setImageDrawable(item.drawable)
-                    viewBinding.textDescription.text = item.description
-                    viewBinding.textTitle.text = item.title
+                    viewBinding.imageViewIcon.setImageDrawable(item.drawable)
+                    viewBinding.textViewSummary.text = item.description
+                    viewBinding.textViewTitle.text = item.title
 
                     viewBinding.root.setOnClickListener {
                         item.onClick.invoke(viewBinding, item)
@@ -36,17 +51,32 @@ class ConfigurationAdapter(private val arrayList: ArrayList<AdapterItem>): Recyc
                 }
                 ViewType.List -> {
                     viewBinding as ListItemBinding
-                    val listItem = adapterItem as AdapterItem.ListItem
 
-                    viewBinding.image.setImageDrawable(listItem.drawable)
-                    viewBinding.recyclerView.apply {
-                        adapter = listItem.adapter
-                        layoutManager = LinearLayoutManager(viewBinding.root.context)
-                    }
-                    viewBinding.textTitle.text = listItem.title
+                    if (adapterItem is AdapterItem.ListItem) {
+                        viewBinding.image.setImageDrawable(adapterItem.drawable)
+                        viewBinding.recyclerView.apply {
+                            adapter = adapterItem.adapter
+                            layoutManager = LinearLayoutManagerWrapper(viewBinding.root.context)
+                            setHasFixedSize(true)
 
-                    viewBinding.root.setOnClickListener {
-                        listItem.onClick.invoke(viewBinding, listItem)
+                            addOnItemTouchListener(object : RecyclerView.OnItemTouchListener {
+                                override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+                                    if (e.action == MotionEvent.ACTION_MOVE)
+                                        rv.parent.requestDisallowInterceptTouchEvent(true)
+
+                                    return false
+                                }
+
+                                override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {}
+                                override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {}
+                            })
+                        }
+
+                        viewBinding.textTitle.text = adapterItem.title
+
+                        viewBinding.root.setOnClickListener {
+                            adapterItem.onClick.invoke(viewBinding, adapterItem)
+                        }
                     }
                 }
                 ViewType.Subtitle -> {
@@ -78,16 +108,16 @@ class ConfigurationAdapter(private val arrayList: ArrayList<AdapterItem>): Recyc
             viewBinding.root.expand(duration)
         }
 
-        fun updateDescription(description: String) {
-            if (viewBinding is ItemBinding)
-                viewBinding.textDescription.text = description
+        fun updateSummary(summary: String) {
+            if (viewBinding is PreferenceScreenBinding)
+                viewBinding.textViewSummary.text = summary
         }
 
         companion object {
             fun from(layoutInflater: LayoutInflater, parent: ViewGroup, viewType: Int): ViewHolder {
                 val viewBinding = when(viewType) {
                     ViewType.Divider -> DividerItemBinding.inflate(layoutInflater, parent, false)
-                    ViewType.Item -> ItemBinding.inflate(layoutInflater, parent, false)
+                    ViewType.Item -> PreferenceScreenBinding.inflate(layoutInflater, parent, false)
                     ViewType.List -> ListItemBinding.inflate(layoutInflater, parent, false)
                     ViewType.Subtitle -> SubtitleItemBinding.inflate(layoutInflater, parent, false)
                     ViewType.Switch -> SwitchItemBinding.inflate(layoutInflater, parent, false)
@@ -111,13 +141,13 @@ class ConfigurationAdapter(private val arrayList: ArrayList<AdapterItem>): Recyc
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(arrayList[position], getItemViewType(position))
+        holder.bind(currentList[position], getItemViewType(position))
     }
 
-    override fun getItemCount(): Int = arrayList.count()
+    override fun getItemCount(): Int = currentList.count()
 
     override fun getItemViewType(position: Int): Int {
-        return when(arrayList[position]) {
+        return when(currentList[position]) {
             is AdapterItem.DividerItem -> ViewType.Divider
             is AdapterItem.Item -> ViewType.Item
             is AdapterItem.ListItem -> ViewType.List
@@ -127,8 +157,8 @@ class ConfigurationAdapter(private val arrayList: ArrayList<AdapterItem>): Recyc
     }
 
     fun hideItem(id: Long) {
-        val item = arrayList.find { it.id == id } ?: return
-        val index = arrayList.indexOf(item)
+        val item = currentList.find { it.id == id } ?: return
+        val index = currentList.indexOf(item)
         val viewHolder = recyclerView?.findViewHolderForAdapterPosition(index)
 
         viewHolder?.let {
@@ -139,8 +169,8 @@ class ConfigurationAdapter(private val arrayList: ArrayList<AdapterItem>): Recyc
     }
 
     fun showItem(id: Long) {
-        val item = arrayList.find { it.id == id } ?: return
-        val index = arrayList.indexOf(item)
+        val item = currentList.find { it.id == id } ?: return
+        val index = currentList.indexOf(item)
         val viewHolder = recyclerView?.findViewHolderForAdapterPosition(index)
 
         viewHolder?.let {
@@ -151,14 +181,14 @@ class ConfigurationAdapter(private val arrayList: ArrayList<AdapterItem>): Recyc
     }
 
     fun updateDescription(id: Long, description: String) {
-        val item = arrayList.find { it.id == id } ?: return
-        val index = arrayList.indexOf(item)
+        val item = currentList.find { it.id == id } ?: return
+        val index = currentList.indexOf(item)
 
         if (item is AdapterItem.Item) {
             val viewHolder = recyclerView?.findViewHolderForAdapterPosition(index)
 
             if (viewHolder is ViewHolder) {
-                viewHolder.updateDescription(description)
+                viewHolder.updateSummary(description)
             }
         }
     }
@@ -186,7 +216,7 @@ sealed class AdapterItem {
             override var isEnabled: Boolean = true,
             val description: String,
             val drawable: Drawable?,
-            val onClick: (ItemBinding, Item) -> Unit,
+            val onClick: (PreferenceScreenBinding, Item) -> Unit,
             val title: String
     ): AdapterItem()
 
@@ -195,8 +225,9 @@ sealed class AdapterItem {
             override var isEnabled: Boolean = true,
             val adapter: RecyclerView.Adapter<*>,
             val drawable: Drawable?,
-            val onClick: (ListItemBinding, ListItem) -> Unit,
-            val title: String
+            val onClick: (binding: ListItemBinding, item: ListItem) -> Unit,
+            val title: String,
+            var isExpanded: Boolean = false
     ): AdapterItem()
 
     data class SubtitleItem(

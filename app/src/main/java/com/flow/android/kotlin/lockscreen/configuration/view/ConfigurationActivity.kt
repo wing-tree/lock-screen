@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.flow.android.kotlin.lockscreen.R
@@ -18,30 +20,26 @@ import com.flow.android.kotlin.lockscreen.configuration.display.view.DisplayConf
 import com.flow.android.kotlin.lockscreen.configuration.lockscreen.view.LockScreenConfigurationFragment
 import com.flow.android.kotlin.lockscreen.configuration.viewmodel.ConfigurationViewModel
 import com.flow.android.kotlin.lockscreen.databinding.ActivityConfigurationBinding
-import com.flow.android.kotlin.lockscreen.util.BLANK
 
 class ConfigurationActivity: AppCompatActivity() {
-    private var _viewBinding: ActivityConfigurationBinding? = null
-    private val viewBinding: ActivityConfigurationBinding
-        get() = _viewBinding!!
-
+    private val viewBinding by lazy { ActivityConfigurationBinding.inflate(layoutInflater) }
     private val viewModel: ConfigurationViewModel by viewModels()
 
     private val activity = this
     private val checkBoxAdapter = CheckBoxAdapter(arrayListOf())
 
-    private val configurationAdapter: ConfigurationAdapter by lazy {
+    private val adapter: ConfigurationAdapter by lazy {
         ConfigurationAdapter(arrayListOf(
                 AdapterItem.Item(
-                        drawable = null,
-                        description = BLANK,
+                        drawable = ContextCompat.getDrawable(this, R.drawable.ic_round_today_24),
+                        description = getString(R.string.configuration_activity_006),
                         onClick = { _, _ ->
                             addFragment(CalendarConfigurationFragment())
                         },
                         title = getString(R.string.calendar)
                 ),
                 AdapterItem.Item(
-                        drawable = null,
+                        drawable = ContextCompat.getDrawable(this, R.drawable.ic_mobile_48px),
                         description = getString(R.string.configuration_activity_002),
                         onClick = { _, _ ->
                             addFragment(DisplayConfigurationFragment())
@@ -49,7 +47,7 @@ class ConfigurationActivity: AppCompatActivity() {
                         title = getString(R.string.configuration_activity_001)
                 ),
                 AdapterItem.Item(
-                        drawable = null,
+                        drawable = ContextCompat.getDrawable(this, R.drawable.ic_round_screen_lock_portrait_24),
                         description = getString(R.string.configuration_activity_000),
                         onClick = { _, _ ->
                             addFragment(LockScreenConfigurationFragment())
@@ -67,16 +65,16 @@ class ConfigurationActivity: AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        _viewBinding = ActivityConfigurationBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
+        initializeToolbar(viewBinding.toolbar)
 
         viewBinding.recyclerView.apply {
-            adapter = configurationAdapter
+            adapter = this@ConfigurationActivity.adapter
             layoutManager = LinearLayoutManager(activity)
         }
 
         val uncheckedCalendarIds = ConfigurationPreferences.getUncheckedCalendarIds(this)
-        val checkBoxItems = CalendarLoader.calendarDisplays(contentResolver).map {
+        val checkBoxItems = CalendarLoader.calendars(contentResolver).map {
             CheckBoxItem(
                     isChecked = uncheckedCalendarIds.contains(it.id.toString()).not(),
                     text = it.name,
@@ -95,7 +93,6 @@ class ConfigurationActivity: AppCompatActivity() {
     override fun onBackPressed() {
         if (supportFragmentManager.fragments.isNotEmpty()) {
             super.onBackPressed()
-
             return
         }
 
@@ -105,6 +102,14 @@ class ConfigurationActivity: AppCompatActivity() {
 
         setResult(RESULT_OK, intent)
         finish()
+        overridePendingTransition(R.anim.fade_in, R.anim.slide_out_left)
+    }
+
+    private fun initializeToolbar(toolbar: Toolbar) {
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
+        toolbar.setNavigationOnClickListener { onBackPressed() }
     }
 
     private fun addFragment(fragment: Fragment) {

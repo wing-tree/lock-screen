@@ -33,7 +33,7 @@ class CalendarViewModel(application: Application): AndroidViewModel(application)
     fun postValue() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                _calendars.postValue(CalendarLoader.calendarDisplays(contentResolver))
+                _calendars.postValue(CalendarLoader.calendars(contentResolver))
             }
         }
     }

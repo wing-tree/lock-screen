@@ -1,13 +1,14 @@
 package com.flow.android.kotlin.lockscreen.configuration.display.view
 
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.base.ConfigurationFragment
 import com.flow.android.kotlin.lockscreen.configuration.adapter.AdapterItem
 import com.flow.android.kotlin.lockscreen.configuration.adapter.ConfigurationAdapter
-import com.flow.android.kotlin.lockscreen.databinding.ItemBinding
+import com.flow.android.kotlin.lockscreen.databinding.PreferenceScreenBinding
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
@@ -21,6 +22,8 @@ class DisplayConfigurationFragment : ConfigurationFragment() {
 
     private val oldFontSize by lazy { ConfigurationPreferences.getFontSize(requireContext()) }
     private var newFontSize = -1F
+
+    override val toolbarTitleResId: Int = R.string.configuration_activity_001
 
     override fun onPause() {
         if (newFontSize != oldFontSize)
@@ -56,12 +59,12 @@ class DisplayConfigurationFragment : ConfigurationFragment() {
                 AdapterItem.Item(
                         drawable = ContextCompat.getDrawable(context, R.drawable.ic_round_format_size_24),
                         description = "${oldFontSize.toInt()}sp",
-                        onClick = { itemBinding: ItemBinding, _ ->
+                        onClick = { viewBinding: PreferenceScreenBinding, _ ->
                             MaterialAlertDialogBuilder(requireContext()).setItems(fontSizes.map { "${it}sp" }.toTypedArray()) { _, i ->
                                 val text = "${fontSizes[i]}sp"
 
                                 ConfigurationPreferences.putFontSize(requireContext(), fontSizes[i].toFloat())
-                                itemBinding.textDescription.text = text
+                                viewBinding.textViewSummary.text = text
                                 newFontSize = fontSizes[i].toFloat()
                             }.show()
                         },

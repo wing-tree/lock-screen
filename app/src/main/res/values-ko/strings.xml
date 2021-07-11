@@ -24,8 +24,11 @@
     <!-- ConfigurationActivity -->
     <string name="configuration_activity_000">잠금 설정, 잠금 방식</string>
     <string name="configuration_activity_001">디스플레이</string>
-    <string name="configuration_activity_002">다크 모드, 잠금화면 글자 색상</string>
+    <string name="configuration_activity_002">다크 모드, 글꼴 크기</string>
     <string name="configuration_activity_003">잠금화면</string>
+    <string name="configuration_activity_004">설정</string>
+    <string name="configuration_activity_005">캘린더</string>
+    <string name="configuration_activity_006">표시할 캘린더</string>
 
     <!-- DeviceCredentialHelper -->
     <string name="device_credential_helper_000">잠금 해제 패턴을 그리세요</string>

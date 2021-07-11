@@ -256,6 +256,7 @@ class MainActivity : BaseActivity(),
                 it.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT)
 
                 getActivityResultLauncher(ConfigurationActivity.Name.ConfigurationChange)?.launch(it)
+                overridePendingTransition(R.anim.slide_in_left, R.anim.fade_out)
             }
         }
 
@@ -336,11 +337,6 @@ class MainActivity : BaseActivity(),
             startService()
     }
 
-    private fun checkNotificationListenerEnabled() {
-        val intent = Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")
-        startActivity(intent)
-    }
-
     private fun startService() {
         val intent = Intent(applicationContext, LockScreenService::class.java)
 
@@ -370,7 +366,6 @@ class MainActivity : BaseActivity(),
                         }
 
                         checkManageOverlayPermission()
-                        checkNotificationListenerEnabled()
                     }
 
                     override fun onPermissionRationaleShouldBeShown(

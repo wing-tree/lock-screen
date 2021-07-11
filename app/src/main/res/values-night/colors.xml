@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="background">#121212</color>
-    <color name="surface">@color/grey_900</color>
+    <color name="surface">@color/grey_800</color>
 
     <color name="edit_text_background">@color/grey_800</color>
 
@@ -19,4 +19,9 @@
 
     <color name="button_text_disabled">@color/disabled</color>
     <color name="button_text_enabled">@color/white</color>
+
+    <color name="divider">#33FFFFFF</color>
+    <color name="icon">@color/white</color>
+    <color name="title">@color/white</color>
+    <color name="toolbar">@color/black</color>
 </resources>

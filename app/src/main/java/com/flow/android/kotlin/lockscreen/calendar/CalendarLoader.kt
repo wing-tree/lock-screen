@@ -69,7 +69,7 @@ object CalendarLoader {
         const val InsertEvent = 2057
     }
 
-    fun calendarDisplays(contentResolver: ContentResolver): List<Model.Calendar> {
+    fun calendars(contentResolver: ContentResolver): List<Model.Calendar> {
         val calendarDisplays = mutableListOf<Model.Calendar>()
         val contentUri = CalendarContract.Calendars.CONTENT_URI
         val cursor = contentResolver.query(
@@ -168,7 +168,7 @@ object CalendarLoader {
         return events
     }
 
-    fun events(contentResolver: ContentResolver, calendarModels: List<Model.Calendar>, amount: Int): ArrayList<Model.CalendarEvent> {
+    fun calendarEvents(contentResolver: ContentResolver, calendarModels: List<Model.Calendar>, amount: Int): ArrayList<Model.CalendarEvent> {
 
         val events = arrayListOf<Model.CalendarEvent>()
 

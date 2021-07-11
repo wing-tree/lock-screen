@@ -8,7 +8,11 @@ import com.flow.android.kotlin.lockscreen.configuration.adapter.AdapterItem
 import com.flow.android.kotlin.lockscreen.configuration.adapter.CheckBoxAdapter
 import com.flow.android.kotlin.lockscreen.configuration.adapter.CheckBoxItem
 import com.flow.android.kotlin.lockscreen.configuration.adapter.ConfigurationAdapter
+import com.flow.android.kotlin.lockscreen.databinding.PreferenceScreenBinding
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
+import com.flow.android.kotlin.lockscreen.util.collapse
+import com.flow.android.kotlin.lockscreen.util.expand
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class CalendarConfigurationFragment: ConfigurationFragment() {
     private val checkBoxAdapter = CheckBoxAdapter(arrayListOf())
@@ -23,10 +27,12 @@ class CalendarConfigurationFragment: ConfigurationFragment() {
         super.onPause()
     }
 
+    override val toolbarTitleResId: Int = R.string.configuration_activity_005
+
     override fun createConfigurationAdapter(): ConfigurationAdapter {
         val context = requireContext()
         uncheckedCalendarIds.addAll(ConfigurationPreferences.getUncheckedCalendarIds(context))
-        val calendarDisplays = CalendarLoader.calendarDisplays(contentResolver).map {
+        val calendarDisplays = CalendarLoader.calendars(contentResolver).map {
             CheckBoxItem(
                     isChecked = uncheckedCalendarIds.contains(it.id.toString()).not(),
                     text = it.name,
@@ -45,8 +51,13 @@ class CalendarConfigurationFragment: ConfigurationFragment() {
                 AdapterItem.ListItem(
                         adapter = checkBoxAdapter,
                         drawable = ContextCompat.getDrawable(context, R.drawable.ic_round_today_24),
-                        onClick = { listItemBinding, listItem ->
+                        onClick = { binding, item ->
+                            if (item.isExpanded)
+                                binding.recyclerView.expand(300L)
+                            else
+                                binding.recyclerView.collapse(300L)
 
+                            item.isExpanded = item.isExpanded.not()
                         },
                         title = getString(R.string.calendar),
                 )

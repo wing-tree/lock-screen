@@ -2,11 +2,13 @@ package com.flow.android.kotlin.lockscreen.configuration.lockscreen.view
 
 import android.content.Intent
 import android.os.Build
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.base.ConfigurationFragment
 import com.flow.android.kotlin.lockscreen.configuration.adapter.AdapterItem
 import com.flow.android.kotlin.lockscreen.configuration.adapter.ConfigurationAdapter
+import com.flow.android.kotlin.lockscreen.configuration.view.ConfigurationActivity
 import com.flow.android.kotlin.lockscreen.lockscreen.service.LockScreenService
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
 
@@ -14,6 +16,8 @@ class LockScreenConfigurationFragment : ConfigurationFragment() {
     private object Id {
         const val DisplayAfterUnlocking = 2249L
     }
+
+    override val toolbarTitleResId: Int = R.string.configuration_activity_003
 
     override fun createConfigurationAdapter(): ConfigurationAdapter {
         val context = requireContext()

@@ -94,7 +94,7 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
 
             viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
                 for (i in 0..itemCount) {
-                    CalendarLoader.events(
+                    CalendarLoader.calendarEvents(
                             viewModel.contentResolver,
                             calendarDisplays.filter {
                                 uncheckedCalendarIds.contains(it.id.toString()).not()
@@ -115,7 +115,7 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
                 eventsAdapter.clear()
 
                 for (i in 0..itemCount) {
-                    CalendarLoader.events(
+                    CalendarLoader.calendarEvents(
                             viewModel.contentResolver,
                             viewModel.calendars.value?.filter {
                                 uncheckedCalendarIds.contains(it.id.toString()).not()

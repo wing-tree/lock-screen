@@ -26,8 +26,11 @@
     <!-- ConfigurationActivity -->
     <string name="configuration_activity_000">Lock setting, Lock type</string>
     <string name="configuration_activity_001">Display</string>
-    <string name="configuration_activity_002">Dark mode, Lock screen text color</string>
+    <string name="configuration_activity_002">Dark mode, Font size</string>
     <string name="configuration_activity_003">Lock screen</string>
+    <string name="configuration_activity_004">Settings</string>
+    <string name="configuration_activity_005">Calendar</string>
+    <string name="configuration_activity_006">Calendar to display</string>
 
     <!-- DeviceCredentialHelper -->
     <string name="device_credential_helper_000">Draw unlock pattern</string>

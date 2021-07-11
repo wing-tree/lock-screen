@@ -13,13 +13,14 @@ object ConfigurationPreferences {
 
     @Suppress("SpellCheckingInspection")
     private object Key {
-        const val DarkMode = "com.flow.android.kotlin.lockscreen.preferences.Key.DarkMode"
-        const val DisplayAfterUnlocking = "com.flow.android.kotlin.lockscreen.preferences.key.display_after_unlocking"
-        const val FirstRun = "com.flow.android.kotlin.lockscreen.preferences.key.first_run"
-        const val FontSize = "com.flow.android.kotlin.lockscreen.preferences.Key.FontSize"
-        const val SelectedTabIndex = "com.flow.android.kotlin.lockscreen.preferences.key.selected_tab_index"
-        const val ShowOnLockScreen = "com.flow.android.kotlin.lockscreen.preferences.key.show_on_lock_screen"
-        const val UncheckedCalendarIDs = "com.flow.android.kotlin.lockscreen.preferences.key.unchecked_calendar_ids"
+        private const val Prefix = "com.flow.android.kotlin.lockscreen.preferences.Key"
+        const val DarkMode = "$Prefix.DarkMode"
+        const val DisplayAfterUnlocking = "$Prefix.display_after_unlocking"
+        const val FirstRun = "$Prefix.first_run"
+        const val FontSize = "$Prefix.FontSize"
+        const val SelectedTabIndex = "$Prefix.selected_tab_index"
+        const val ShowOnLockScreen = "$Prefix.show_on_lock_screen"
+        const val UncheckedCalendarIDs = "$Prefix.unchecked_calendar_ids"
     }
 
     fun getShowOnLockScreen(context: Context): Boolean {

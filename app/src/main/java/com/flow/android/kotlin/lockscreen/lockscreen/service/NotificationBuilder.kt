@@ -110,10 +110,10 @@ object NotificationBuilder {
         val currentTimeHourOfDay = gregorianCalendar.get(GregorianCalendar.HOUR_OF_DAY)
         val currentTimeMinute = gregorianCalendar.get(GregorianCalendar.MINUTE) + currentTimeHourOfDay * 60
 
-        val calendars = CalendarLoader.calendarDisplays(contentResolver)
+        val calendars = CalendarLoader.calendars(contentResolver)
         val uncheckedCalendarIds = ConfigurationPreferences.getUncheckedCalendarIds(context)
 
-        val events = CalendarLoader.events(context.contentResolver, calendars.filter {
+        val events = CalendarLoader.calendarEvents(context.contentResolver, calendars.filter {
             uncheckedCalendarIds.contains(it.id.toString()).not()
         }, 0)
 
