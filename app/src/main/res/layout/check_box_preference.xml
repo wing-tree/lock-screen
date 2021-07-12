@@ -4,17 +4,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="@dimen/height_one_line"
+    android:paddingEnd="@dimen/margin_extra_small"
+    android:paddingStart="0dp">
 
     <CheckBox
-        android:id="@+id/checkBox"
+        android:id="@+id/check_box"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingEnd="@dimen/padding_small"
-        android:paddingStart="@dimen/padding_small"
+        android:layout_height="@dimen/height_one_line"
+        android:layoutDirection="rtl"
+        android:paddingEnd="0dp"
+        android:paddingStart="@dimen/padding_normal"
+        android:textSize="@dimen/text_size_medium"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="CheckBox"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

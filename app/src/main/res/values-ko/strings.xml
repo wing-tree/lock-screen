@@ -18,6 +18,14 @@
     <string name="blind_screen_000">보안정책에 따라 홈 버튼으로 잠금 해제 할 수 없습니다.</string>
     <string name="blind_screen_001">드래그해서 잠금 해제</string>
 
+    <!-- settings -->
+    <string name="settings_000">캘린더</string>
+    <string name="settings_001">표시할 캘린더</string>
+    <string name="settings_002">디스플레이</string>
+    <string name="settings_003">다크 모드, 글꼴 크기</string>
+    <string name="settings_004">잠금화면</string>
+    <string name="settings_005">잠금 설정, 잠금 방식</string>
+
     <!-- shortcut -->
     <string name="shortcut_000">화면에서 삭제</string>
 

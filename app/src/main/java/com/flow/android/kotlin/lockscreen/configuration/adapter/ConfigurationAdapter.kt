@@ -38,7 +38,7 @@ class ConfigurationAdapter(private val currentList: ArrayList<AdapterItem>, priv
                     // pass
                 }
                 ViewType.Item -> {
-                    viewBinding as PreferenceScreenBinding
+                    viewBinding as PreferenceBinding
                     val item = adapterItem as AdapterItem.Item
 
                     viewBinding.imageViewIcon.setImageDrawable(item.drawable)
@@ -50,10 +50,9 @@ class ConfigurationAdapter(private val currentList: ArrayList<AdapterItem>, priv
                     }
                 }
                 ViewType.List -> {
-                    viewBinding as ListItemBinding
+                    viewBinding as MultiSelectListPreferenceBinding
 
                     if (adapterItem is AdapterItem.ListItem) {
-                        viewBinding.image.setImageDrawable(adapterItem.drawable)
                         viewBinding.recyclerView.apply {
                             adapter = adapterItem.adapter
                             layoutManager = LinearLayoutManagerWrapper(viewBinding.root.context)
@@ -109,7 +108,7 @@ class ConfigurationAdapter(private val currentList: ArrayList<AdapterItem>, priv
         }
 
         fun updateSummary(summary: String) {
-            if (viewBinding is PreferenceScreenBinding)
+            if (viewBinding is PreferenceBinding)
                 viewBinding.textViewSummary.text = summary
         }
 
@@ -117,8 +116,8 @@ class ConfigurationAdapter(private val currentList: ArrayList<AdapterItem>, priv
             fun from(layoutInflater: LayoutInflater, parent: ViewGroup, viewType: Int): ViewHolder {
                 val viewBinding = when(viewType) {
                     ViewType.Divider -> DividerItemBinding.inflate(layoutInflater, parent, false)
-                    ViewType.Item -> PreferenceScreenBinding.inflate(layoutInflater, parent, false)
-                    ViewType.List -> ListItemBinding.inflate(layoutInflater, parent, false)
+                    ViewType.Item -> PreferenceBinding.inflate(layoutInflater, parent, false)
+                    ViewType.List -> MultiSelectListPreferenceBinding.inflate(layoutInflater, parent, false)
                     ViewType.Subtitle -> SubtitleItemBinding.inflate(layoutInflater, parent, false)
                     ViewType.Switch -> SwitchItemBinding.inflate(layoutInflater, parent, false)
                     else -> throw InvalidParameterException("Invalid viewType")
@@ -216,7 +215,7 @@ sealed class AdapterItem {
             override var isEnabled: Boolean = true,
             val description: String,
             val drawable: Drawable?,
-            val onClick: (PreferenceScreenBinding, Item) -> Unit,
+            val onClick: (PreferenceBinding, Item) -> Unit,
             val title: String
     ): AdapterItem()
 
@@ -225,7 +224,7 @@ sealed class AdapterItem {
             override var isEnabled: Boolean = true,
             val adapter: RecyclerView.Adapter<*>,
             val drawable: Drawable?,
-            val onClick: (binding: ListItemBinding, item: ListItem) -> Unit,
+            val onClick: (MultiSelectListPreferenceBinding, ListItem) -> Unit,
             val title: String,
             var isExpanded: Boolean = false
     ): AdapterItem()

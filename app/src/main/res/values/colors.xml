@@ -92,6 +92,7 @@
     <color name="divider">#1F000000</color>
     <color name="icon">@color/black</color>
     <color name="shadow">@color/black</color>
+    <color name="status_bar">@color/background</color>
     <color name="text">@color/white</color>
     <color name="title">@color/black</color>
     <color name="toolbar">@color/white</color>

@@ -11,7 +11,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/height_preference_screen"
+        android:layout_height="@dimen/height_two_line"
         android:layout_marginStart="@dimen/margin_normal">
 
         <ImageView
@@ -19,7 +19,7 @@
             android:layout_width="@dimen/width_normal"
             android:layout_height="@dimen/height_normal"
             android:layout_marginEnd="@dimen/margin_extra_large"
-            android:layout_marginTop="@dimen/margin_normal"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/linear_layout"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -34,6 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/margin_normal"
             android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/image_view_icon"
             app:layout_constraintTop_toTopOf="parent">
@@ -41,8 +42,7 @@
             <TextView
                 android:id="@+id/text_view_title"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/height_large"
-                android:layout_marginTop="1dp"
+                android:layout_height="wrap_content"
                 android:gravity="bottom"
                 android:includeFontPadding="false"
                 android:maxLines="1"
@@ -53,8 +53,7 @@
             <TextView
                 android:id="@+id/text_view_summary"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/normal_125"
-                android:layout_marginTop="1dp"
+                android:layout_height="wrap_content"
                 android:gravity="bottom"
                 android:includeFontPadding="false"
                 android:maxLines="1"

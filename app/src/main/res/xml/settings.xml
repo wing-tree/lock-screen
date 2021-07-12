@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <Preference
+        app:fragment="com.flow.android.kotlin.lockscreen.configuration.calendar.view.CalendarConfigurationFragment"
+        app:icon="@drawable/ic_round_today_24"
+        app:summary="@string/settings_001"
+        app:title="@string/settings_000" />
+
+    <Preference
+        app:fragment="com.example.user.myapplication.MainActivity$PrefsFragment2"
+        app:icon="@drawable/ic_mobile_48px"
+
+        app:summary="@string/settings_003"
+        app:title="@string/settings_002" />
+
+    <Preference
+        app:fragment="com.example.user.myapplication.MainActivity$PrefsFragment2"
+        app:icon="@drawable/ic_round_screen_lock_portrait_24"
+        app:summary="@string/settings_005"
+        app:title="@string/settings_004" />
+
+</PreferenceScreen>

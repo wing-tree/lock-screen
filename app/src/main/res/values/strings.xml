@@ -90,6 +90,15 @@
     <string name="permission_rationale_dialog_fragment_004">Appear on top</string>
     <string name="permission_rationale_dialog_fragment_005"></string>
 
+    <!-- settings -->
+    <string name="settings_000">Calendar</string>
+    <string name="settings_001">Calendar to display</string>
+    <string name="settings_002">Display</string>
+    <string name="settings_003">Dark mode, Font size</string>
+    <string name="settings_004">Lock screen</string>
+    <string name="settings_005">Lock setting, Lock type</string>
+
     <!-- Util -->
     <string name="util_000">Share</string>
+
 </resources>

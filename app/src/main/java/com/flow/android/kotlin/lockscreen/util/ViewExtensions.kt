@@ -52,8 +52,6 @@ fun View.collapse(duration: Long) {
 
     visibility = View.VISIBLE
 
-    Timber.d("view id: ${this.id}")
-
     val animation = object : Animation() {
         override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
             if (interpolatedTime == 1F) {
@@ -75,37 +73,37 @@ fun View.collapse(duration: Long) {
     startAnimation(animation)
 }
 
-fun View.expand(duration: Long) {
+fun View.expand(duration: Long, onAnimationEnd: (() -> Unit)? = null) {
+    show()
     measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
 
-    val measuredHeight = this.measuredHeight
-    val height = this.height
+    val from = this.height
+    val to = this.measuredHeight
 
-    this.layoutParams.height = height
-    this.visibility = View.VISIBLE
+    layoutParams.height = from
 
-    val animation: Animation = object : Animation() {
-        override fun applyTransformation(
-            interpolatedTime: Float,
-            t: Transformation?
-        ) {
-            if (interpolatedTime == 1F)
-                layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
-            else
-                layoutParams.height =
-                        if ((measuredHeight * interpolatedTime).toInt() < height)
-                            height
-                        else
-                            (measuredHeight * interpolatedTime).toInt()
-            requestLayout()
-        }
+    val valueAnimator = ValueAnimator.ofInt(from, to)
 
-        override fun willChangeBounds(): Boolean = true
+    valueAnimator.addUpdateListener {
+        layoutParams.height = it.animatedValue as Int
+        alpha = it.animatedValue as Int / to.toFloat()
+        requestLayout()
     }
 
-    animation.duration = duration
-    animation.interpolator = DecelerateInterpolator()
-    startAnimation(animation)
+    valueAnimator.addListener(object : Animator.AnimatorListener {
+        override fun onAnimationStart(animation: Animator?) {}
+
+        override fun onAnimationEnd(animation: Animator?) {
+            onAnimationEnd?.invoke()
+        }
+
+        override fun onAnimationCancel(animation: Animator?) {}
+        override fun onAnimationRepeat(animation: Animator?) {}
+    })
+
+    valueAnimator.interpolator = DecelerateInterpolator()
+    valueAnimator.duration = duration
+    valueAnimator.start()
 }
 
 fun View.fadeIn(duration: Number, onAnimationEnd: (() -> Unit)? = null, alphaFrom: Float = 0F) {
@@ -191,10 +189,7 @@ fun View.show() {
 }
 
 fun View.expand(duration: Long, to: Int, onAnimationEnd: (() -> Unit)? = null) {
-    var from = this.height
-
-    if (from == 0)
-        from += 1
+    val from = this.height
 
     show()
 

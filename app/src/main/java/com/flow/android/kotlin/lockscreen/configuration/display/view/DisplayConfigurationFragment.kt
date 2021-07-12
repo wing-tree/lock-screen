@@ -8,9 +8,10 @@ import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.base.ConfigurationFragment
 import com.flow.android.kotlin.lockscreen.configuration.adapter.AdapterItem
 import com.flow.android.kotlin.lockscreen.configuration.adapter.ConfigurationAdapter
-import com.flow.android.kotlin.lockscreen.databinding.PreferenceScreenBinding
+import com.flow.android.kotlin.lockscreen.databinding.PreferenceBinding
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.dialog.MaterialDialogs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -59,7 +60,7 @@ class DisplayConfigurationFragment : ConfigurationFragment() {
                 AdapterItem.Item(
                         drawable = ContextCompat.getDrawable(context, R.drawable.ic_round_format_size_24),
                         description = "${oldFontSize.toInt()}sp",
-                        onClick = { viewBinding: PreferenceScreenBinding, _ ->
+                        onClick = { viewBinding: PreferenceBinding, _ ->
                             MaterialAlertDialogBuilder(requireContext()).setItems(fontSizes.map { "${it}sp" }.toTypedArray()) { _, i ->
                                 val text = "${fontSizes[i]}sp"
 

@@ -37,6 +37,7 @@ import com.flow.android.kotlin.lockscreen.permission._interface.OnPermissionAllo
 import com.flow.android.kotlin.lockscreen.permission.view.PermissionRationaleDialogFragment
 import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
+import com.flow.android.kotlin.lockscreen.settings.SettingsTestActivity
 import com.flow.android.kotlin.lockscreen.shortcut.viewmodel.ShortcutViewModel
 import com.flow.android.kotlin.lockscreen.util.*
 import com.karumi.dexter.Dexter

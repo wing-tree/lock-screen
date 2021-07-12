@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.activityViewModels
-import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.configuration.adapter.ConfigurationAdapter
 import com.flow.android.kotlin.lockscreen.configuration.view.ConfigurationActivity
 import com.flow.android.kotlin.lockscreen.configuration.viewmodel.ConfigurationViewModel

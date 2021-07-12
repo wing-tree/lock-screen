@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
-import com.flow.android.kotlin.lockscreen.databinding.CheckBoxItemBinding
+import com.flow.android.kotlin.lockscreen.databinding.CheckBoxPreferenceBinding
 
 class CheckBoxAdapter(private val arrayList: ArrayList<CheckBoxItem>): RecyclerView.Adapter<CheckBoxAdapter.ViewHolder>() {
 
@@ -16,7 +16,7 @@ class CheckBoxAdapter(private val arrayList: ArrayList<CheckBoxItem>): RecyclerV
 
     class ViewHolder(private val viewBinding: ViewBinding): RecyclerView.ViewHolder(viewBinding.root) {
         fun bind(item: CheckBoxItem) {
-            viewBinding as CheckBoxItemBinding
+            viewBinding as CheckBoxPreferenceBinding
 
             viewBinding.checkBox.isChecked = item.isChecked
             viewBinding.checkBox.text = item.text
@@ -28,7 +28,7 @@ class CheckBoxAdapter(private val arrayList: ArrayList<CheckBoxItem>): RecyclerV
 
         companion object {
             fun from(layoutInflater: LayoutInflater, parent: ViewGroup): ViewHolder {
-                val viewBinding = CheckBoxItemBinding.inflate(layoutInflater, parent, false)
+                val viewBinding = CheckBoxPreferenceBinding.inflate(layoutInflater, parent, false)
 
                 return ViewHolder(viewBinding)
             }
