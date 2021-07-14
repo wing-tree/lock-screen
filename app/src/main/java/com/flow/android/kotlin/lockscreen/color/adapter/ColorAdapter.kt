@@ -52,8 +52,8 @@ class ColorAdapter(private val items: IntArray, private val onColorSelected: (co
             if (colorSelectedPosition == position)
                 return@setOnClickListener
 
-            val dark = ContextCompat.getColor(holder.binding.root.context, R.color.dark)
-            val light = ContextCompat.getColor(holder.binding.root.context, R.color.light)
+            val dark = ContextCompat.getColor(holder.binding.root.context, R.color.black)
+            val light = ContextCompat.getColor(holder.binding.root.context, R.color.white)
 
             holder.binding.imageView.setColorFilter(
                 ColorCalculator.onBackgroundColor(color, dark, light, false),

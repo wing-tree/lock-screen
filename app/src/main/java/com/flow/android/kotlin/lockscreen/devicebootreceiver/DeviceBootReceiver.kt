@@ -5,11 +5,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import com.flow.android.kotlin.lockscreen.lockscreen.service.LockScreenService
-import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
+import com.flow.android.kotlin.lockscreen.preferences.Preference
 
 class DeviceBootReceiver : BroadcastReceiver()  {
     override fun onReceive(context: Context, intent: Intent) {
-        if (ConfigurationPreferences.getShowOnLockScreen(context))
+        if (Preference.getShowOnLockScreen(context))
             startService(context)
     }
 

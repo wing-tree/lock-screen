@@ -9,57 +9,82 @@
     app:cardBackgroundColor="@color/background"
     app:cardCornerRadius="0dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/height_two_line"
-        android:layout_marginStart="@dimen/margin_normal">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/image_view_icon"
-            android:layout_width="@dimen/width_normal"
-            android:layout_height="@dimen/height_normal"
-            android:layout_marginEnd="@dimen/margin_extra_large"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/linear_layout"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/icon"
-            tools:ignore="ContentDescription"
-            tools:srcCompat="@drawable/ic_round_settings_24"
-            tools:visibility="visible" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraint_layout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/height_two_line"
+            android:layout_marginStart="@dimen/margin_normal">
+
+            <ImageView
+                android:id="@+id/image_view_icon"
+                android:layout_width="@dimen/width_normal"
+                android:layout_height="@dimen/height_normal"
+                android:layout_marginEnd="@dimen/margin_extra_large"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/linear_layout"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/icon"
+                tools:ignore="ContentDescription"
+                tools:srcCompat="@drawable/ic_round_settings_24"
+                tools:visibility="visible" />
+
+            <LinearLayout
+                android:id="@+id/linear_layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/margin_normal"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/image_view_icon"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/text_view_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="bottom"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:textColor="@color/high_emphasis"
+                    android:textSize="@dimen/text_size_medium"
+                    tools:text="Title" />
+
+                <TextView
+                    android:id="@+id/text_view_summary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="bottom"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:textColor="@color/medium_emphasis"
+                    android:textSize="@dimen/text_size_medium_small"
+                    tools:text="Summary" />
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout
-            android:id="@+id/linear_layout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/margin_normal"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/image_view_icon"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/text_view_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="bottom"
-                android:includeFontPadding="false"
-                android:maxLines="1"
-                android:textColor="@color/high_emphasis"
-                android:textSize="@dimen/text_size_medium"
-                tools:text="Title" />
+            <View
+                android:id="@+id/view_padding"
+                android:layout_width="@dimen/large_225"
+                android:layout_height="1dp"
+                android:visibility="gone"/>
 
-            <TextView
-                android:id="@+id/text_view_summary"
+            <View
+                android:id="@+id/view_divider"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="bottom"
-                android:includeFontPadding="false"
-                android:maxLines="1"
-                android:textColor="@color/medium_emphasis"
-                android:textSize="@dimen/text_size_medium_small"
-                tools:text="Summary" />
+                android:layout_height="1dp"
+                android:background="@color/divider" />
         </LinearLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

@@ -12,11 +12,13 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.PopupWindow
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.transition.ChangeBounds
+import androidx.transition.TransitionManager
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.base.BaseDialogFragment
 import com.flow.android.kotlin.lockscreen.color.widget.ColorPickerLayout
@@ -87,13 +89,13 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
                     } ?: return
 
                     if (year != originalYear)
-                        setMemo(memoModified)
+                        setValue(memoModified)
 
                     if (month != originalMonth)
-                        setMemo(memoModified)
+                        setValue(memoModified)
 
                     if (dayOfMonth != originalDayOfMonth)
-                        setMemo(memoModified)
+                        setValue(memoModified)
                 }
             }
         }
@@ -120,32 +122,32 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val view = super.onCreateView(inflater, container, savedInstanceState)
+    ): View {
+        super.onCreateView(inflater, container, savedInstanceState)
 
         val memo = arguments?.getParcelable<Memo>(KEY_MEMO)
 
-        mode =
-            if (memo == null) {
-                setMemo(createEmptyMemo())
-                Mode.Add
-            } else {
-                originalMemo = memo
-                selectedColor = memo.color
-                setMemo(originalMemo?.deepCopy() ?: createEmptyMemo())
-                Mode.Edit
-            }
+        selectedColor = ContextCompat.getColor(requireContext(), R.color.ivory)
+
+        mode = if (memo == null) {
+            setValue(createEmptyMemo())
+            Mode.Add
+        } else {
+            originalMemo = memo
+            selectedColor = memo.color
+            setValue(originalMemo?.deepCopy() ?: createEmptyMemo())
+            Mode.Edit
+        }
 
         initializeView(memo)
         registerLifecycleObservers()
         localBroadcastManager.registerReceiver(localBroadcastReceiver, IntentFilter(Action.Date))
 
-        return view
+        return viewBinding.root
     }
 
     override fun onDestroyView() {
         localBroadcastManager.unregisterReceiver(localBroadcastReceiver)
-
         super.onDestroyView()
     }
 
@@ -154,6 +156,7 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
 
         viewBinding.recyclerViewChecklist.apply {
             adapter = checklistAdapter
+            itemAnimator = null
             layoutManager = LinearLayoutManagerWrapper(requireContext())
         }
 
@@ -192,18 +195,12 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 memo().also {
                     it?.content = s.toString()
-                    setMemo(it)
+                    setValue(it)
                 }
             }
 
             override fun afterTextChanged(s: Editable?) {}
         })
-
-        // recycler view item 마다 변화 감지.
-
-        viewBinding.imageViewDetail.setOnClickListener {
-            // todo show recyclerview.
-        }
 
         viewBinding.colorPickerLayout.select(selectedColor)
         viewBinding.colorPickerLayout.setOnColorSelectedListener(object :
@@ -217,18 +214,18 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
                 selectedColor = color
 
                 memo()?.let {
-                    setMemo(it.apply {
+                    setValue(it.apply {
                         this.color = selectedColor
                     })
                 }
             }
         })
 
-        viewBinding.materialButtonClose.setOnClickListener {
+        viewBinding.textViewCancel.setOnClickListener {
             dismiss()
         }
 
-        viewBinding.materialButtonSave.setOnClickListener {
+        viewBinding.textViewSave.setOnClickListener {
             if (checkForChanges()) {
                 if (mode == Mode.Add)
                     memo()?.let { memo -> viewModel.insert(memo) }
@@ -261,21 +258,26 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
 
         checklist.observe(viewLifecycleOwner, {
             memo()?.let { memo ->
-                setMemo(memo.apply {
-                    this.checklist = it.toTypedArray()
+                setValue(memo.apply {
+                    checklist = it.toTypedArray()
                 })
             }
+
+            TransitionManager.beginDelayedTransition(
+                    viewBinding.constraintLayout,
+                    ChangeBounds().apply { duration = this@MemoEditingDialogFragment.duration }
+            )
 
             checklistAdapter.submitList(it.toList())
         })
     }
 
     private fun enableSaveButton() {
-        viewBinding.materialButtonSave.isEnabled = true
+        viewBinding.textViewSave.isEnabled = true
     }
 
     private fun disableSaveButton() {
-        viewBinding.materialButtonSave.isEnabled = false
+        viewBinding.textViewSave.isEnabled = false
     }
 
     private fun isContentBlank() = viewBinding.editTextContent.text.isNullOrBlank()
@@ -300,7 +302,7 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
 
     private fun memo() = memo.value
 
-    private fun setMemo(value: Memo?) {
+    private fun setValue(value: Memo?) {
         value?.let { this.memo.value = it }
     }
 

@@ -12,7 +12,7 @@ import com.flow.android.kotlin.lockscreen.calendar.CalendarLoader
 import com.flow.android.kotlin.lockscreen.calendar.model.Model
 import com.flow.android.kotlin.lockscreen.main.view.MainActivity
 import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
-import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
+import com.flow.android.kotlin.lockscreen.preferences.Preference
 import com.flow.android.kotlin.lockscreen.repository.MemoRepository
 import com.flow.android.kotlin.lockscreen.util.BLANK
 import com.flow.android.kotlin.lockscreen.util.toDateString
@@ -111,7 +111,7 @@ object NotificationBuilder {
         val currentTimeMinute = gregorianCalendar.get(GregorianCalendar.MINUTE) + currentTimeHourOfDay * 60
 
         val calendars = CalendarLoader.calendars(contentResolver)
-        val uncheckedCalendarIds = ConfigurationPreferences.getUncheckedCalendarIds(context)
+        val uncheckedCalendarIds = Preference.getUncheckedCalendarIds(context)
 
         val events = CalendarLoader.calendarEvents(context.contentResolver, calendars.filter {
             uncheckedCalendarIds.contains(it.id.toString()).not()

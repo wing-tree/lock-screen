@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatDelegate
 
-object ConfigurationPreferences {
+object Preference {
 
     @Suppress("SpellCheckingInspection")
     private object Name {
@@ -33,12 +33,12 @@ object ConfigurationPreferences {
         sharedPreferences.edit().putBoolean(Key.ShowOnLockScreen, showOnLockScreen).apply()
     }
 
-    fun getDisplayAfterUnlocking(context: Context): Boolean {
+    fun getShowAfterUnlocking(context: Context): Boolean {
         val sharedPreferences = context.getSharedPreferences(Name.Configuration, Context.MODE_PRIVATE)
         return sharedPreferences.getBoolean(Key.DisplayAfterUnlocking, false)
     }
 
-    fun putDisplayAfterUnlocking(context: Context, displayAfterUnlocking: Boolean) {
+    fun putShowAfterUnlocking(context: Context, displayAfterUnlocking: Boolean) {
         val sharedPreferences = context.getSharedPreferences(Name.Configuration, Context.MODE_PRIVATE)
         sharedPreferences.edit().putBoolean(Key.DisplayAfterUnlocking, displayAfterUnlocking).apply()
     }
@@ -85,13 +85,13 @@ object ConfigurationPreferences {
         return context.getSharedPreferences(Name.Configuration, Context.MODE_PRIVATE).getBoolean(Key.FirstRun, true)
     }
 
-    fun putDarkMode(context: Context, darkMode: Boolean) {
+    fun putIsNightMode(context: Context, value: Boolean) {
         context.getSharedPreferences(Name.Configuration, Context.MODE_PRIVATE).apply {
-            edit().putBoolean(Key.DarkMode, darkMode).apply()
+            edit().putBoolean(Key.DarkMode, value).apply()
         }
     }
 
-    fun getDarkMode(context: Context): Boolean {
+    fun getIsNightMode(context: Context): Boolean {
         val defValue = when(context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
             AppCompatDelegate.MODE_NIGHT_YES, Configuration.UI_MODE_NIGHT_YES -> true
             AppCompatDelegate.MODE_NIGHT_NO, Configuration.UI_MODE_NIGHT_NO -> false
@@ -101,6 +101,13 @@ object ConfigurationPreferences {
 
         return context.getSharedPreferences(Name.Configuration, Context.MODE_PRIVATE)
                 .getBoolean(Key.DarkMode, defValue)
+    }
+
+    fun getNightMode(context: Context): Int {
+        return if (getIsNightMode(context))
+            AppCompatDelegate.MODE_NIGHT_YES
+        else
+            AppCompatDelegate.MODE_NIGHT_NO
     }
 
     fun putFontSize(context: Context, fontSize: Float) {

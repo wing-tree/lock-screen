@@ -28,19 +28,19 @@ class ChecklistAdapter(private val listener: Listener, private val isEditable: B
             binding.editText.text = item.content
 
             if (isEditable) {
-                binding.checkbox.hide()
-                binding.imageViewCancel.show()
+                binding.checkBox.hide()
+                binding.imageViewClear.show()
 
-                binding.imageViewCancel.setOnClickListener {
+                binding.imageViewClear.setOnClickListener {
                     listener.onCancelClick(item)
                 }
             } else {
-                binding.checkbox.show()
-                binding.imageViewCancel.hide()
+                binding.checkBox.show()
+                binding.imageViewClear.hide()
 
-                binding.checkbox.isChecked = item.done
+                binding.checkBox.isChecked = item.done
 
-                binding.checkbox.setOnCheckedChangeListener { _, isChecked ->
+                binding.checkBox.setOnCheckedChangeListener { _, isChecked ->
                     listener.onItemCheckedChange(item, isChecked)
                 }
             }
@@ -64,16 +64,6 @@ class ChecklistAdapter(private val listener: Listener, private val isEditable: B
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(getItem(position))
-    }
-
-    private fun sort(list: List<ChecklistItem>?) {
-        list?.let {
-            Collections.sort(list,
-                Comparator { o1: ChecklistItem, o2: ChecklistItem ->
-                    return@Comparator (o1.id - o2.id).toInt() // todo check.
-                }
-            )
-        }
     }
 }
 

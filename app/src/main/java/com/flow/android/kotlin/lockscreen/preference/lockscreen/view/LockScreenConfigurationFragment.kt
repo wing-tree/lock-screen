@@ -1,14 +1,14 @@
-package com.flow.android.kotlin.lockscreen.configuration.lockscreen.view
+package com.flow.android.kotlin.lockscreen.preference.lockscreen.view
 
 import android.content.Intent
 import android.os.Build
 import androidx.core.content.ContextCompat
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.base.ConfigurationFragment
-import com.flow.android.kotlin.lockscreen.configuration.adapter.AdapterItem
-import com.flow.android.kotlin.lockscreen.configuration.adapter.ConfigurationAdapter
+import com.flow.android.kotlin.lockscreen.preference.adapter.AdapterItem
+import com.flow.android.kotlin.lockscreen.preference.adapter.PreferenceAdapter
 import com.flow.android.kotlin.lockscreen.lockscreen.service.LockScreenService
-import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
+import com.flow.android.kotlin.lockscreen.preferences.Preference
 
 class LockScreenConfigurationFragment : ConfigurationFragment() {
     private object Id {
@@ -17,18 +17,18 @@ class LockScreenConfigurationFragment : ConfigurationFragment() {
 
     override val toolbarTitleResId: Int = R.string.configuration_activity_003
 
-    override fun createConfigurationAdapter(): ConfigurationAdapter {
+    override fun createConfigurationAdapter(): PreferenceAdapter {
         val context = requireContext()
 
-        return ConfigurationAdapter(arrayListOf(
+        return PreferenceAdapter(arrayListOf(
                 AdapterItem.SwitchItem(
                         drawable = ContextCompat.getDrawable(context, R.drawable.ic_round_lock_24),
-                        isChecked = ConfigurationPreferences.getShowOnLockScreen(context),
+                        isChecked = Preference.getShowOnLockScreen(context),
                         onCheckedChange = { isChecked ->
-                            ConfigurationPreferences.putShowOnLockScreen(context, isChecked)
+                            Preference.putShowOnLockScreen(context, isChecked)
 
                             if (isChecked) {
-                                configurationAdapter.showItem(Id.DisplayAfterUnlocking)
+                                preferenceAdapter.showItem(Id.DisplayAfterUnlocking)
 
                                 val intent = Intent(context, LockScreenService::class.java)
 
@@ -37,7 +37,7 @@ class LockScreenConfigurationFragment : ConfigurationFragment() {
                                 else
                                     context.startService(intent)
                             } else {
-                                configurationAdapter.hideItem(Id.DisplayAfterUnlocking)
+                                preferenceAdapter.hideItem(Id.DisplayAfterUnlocking)
                                 context.sendBroadcast(Intent(LockScreenService.Action.StopSelf))
                             }
                         },
@@ -46,9 +46,9 @@ class LockScreenConfigurationFragment : ConfigurationFragment() {
                 AdapterItem.SwitchItem(
                         drawable = null,
                         id = Id.DisplayAfterUnlocking,
-                        isChecked = ConfigurationPreferences.getDisplayAfterUnlocking(context),
+                        isChecked = Preference.getShowAfterUnlocking(context),
                         onCheckedChange = { isChecked ->
-                            ConfigurationPreferences.putDisplayAfterUnlocking(context, isChecked)
+                            Preference.putShowAfterUnlocking(context, isChecked)
                         },
                         title = getString(R.string.display_after_unlocking)
                 )

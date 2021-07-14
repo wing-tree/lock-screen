@@ -14,7 +14,7 @@ import com.flow.android.kotlin.lockscreen.memo.adapter.ItemTouchCallback
 import com.flow.android.kotlin.lockscreen.memo.adapter.MemoAdapter
 import com.flow.android.kotlin.lockscreen.memo.viewmodel.MemoViewModel
 import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
-import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
+import com.flow.android.kotlin.lockscreen.preferences.Preference
 import com.flow.android.kotlin.lockscreen.util.LinearLayoutManagerWrapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -40,7 +40,7 @@ class MemoFragment: BaseMainFragment<FragmentMemoBinding>() {
                 itemTouchHelper.startDrag(viewHolder)
             }
         }).apply {
-            setFontSize(ConfigurationPreferences.getFontSize(requireContext()))
+            setFontSize(Preference.getFontSize(requireContext()))
         }
     }
 
@@ -89,7 +89,7 @@ class MemoFragment: BaseMainFragment<FragmentMemoBinding>() {
 
     private fun registerLifecycleObservers() {
         viewModel.refresh.observe(viewLifecycleOwner, {
-            adapter.setFontSize(ConfigurationPreferences.getFontSize(requireContext()))
+            adapter.setFontSize(Preference.getFontSize(requireContext()))
             adapter.notifyDataSetChanged()
         })
 

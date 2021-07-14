@@ -7,7 +7,7 @@ import android.widget.TextView
 import androidx.viewpager2.widget.ViewPager2
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.main.adapter.FragmentStateAdapter
-import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
+import com.flow.android.kotlin.lockscreen.preferences.Preference
 import com.flow.android.kotlin.lockscreen.util.fadeIn
 import com.flow.android.kotlin.lockscreen.widget.animateSelectedTab
 import com.google.android.material.tabs.TabLayout
@@ -40,7 +40,7 @@ object TabLayoutInitializer {
             textView.text = tabTexts[position]
         }.attach()
 
-        val selectedTabIndex = ConfigurationPreferences.getSelectedTabIndex(context)
+        val selectedTabIndex = Preference.getSelectedTabIndex(context)
 
         Handler(Looper.getMainLooper()).postDelayed({
             if (selectedTabIndex == 0)

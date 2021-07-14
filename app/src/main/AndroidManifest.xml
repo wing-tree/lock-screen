@@ -35,7 +35,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".configuration.view.ConfigurationActivity"
+        <activity android:name=".preference.view.PreferenceActivity"
             android:excludeFromRecents="true"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"

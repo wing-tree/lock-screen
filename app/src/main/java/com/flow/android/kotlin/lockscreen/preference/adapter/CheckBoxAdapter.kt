@@ -1,4 +1,4 @@
-package com.flow.android.kotlin.lockscreen.configuration.adapter
+package com.flow.android.kotlin.lockscreen.preference.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

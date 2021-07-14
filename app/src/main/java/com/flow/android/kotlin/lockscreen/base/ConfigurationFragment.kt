@@ -6,26 +6,26 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.activityViewModels
-import com.flow.android.kotlin.lockscreen.configuration.adapter.ConfigurationAdapter
-import com.flow.android.kotlin.lockscreen.configuration.view.ConfigurationActivity
-import com.flow.android.kotlin.lockscreen.configuration.viewmodel.ConfigurationViewModel
+import com.flow.android.kotlin.lockscreen.preference.adapter.PreferenceAdapter
+import com.flow.android.kotlin.lockscreen.preference.view.PreferenceActivity
+import com.flow.android.kotlin.lockscreen.preference.viewmodel.PreferenceViewModel
 import com.flow.android.kotlin.lockscreen.databinding.FragmentConfigurationBinding
 import com.flow.android.kotlin.lockscreen.util.LinearLayoutManagerWrapper
 
 abstract class ConfigurationFragment : BaseFragment<FragmentConfigurationBinding>() {
-    abstract fun createConfigurationAdapter() : ConfigurationAdapter
+    abstract fun createConfigurationAdapter() : PreferenceAdapter
     abstract val toolbarTitleResId: Int
 
-    protected val viewModel by activityViewModels<ConfigurationViewModel>()
+    protected val viewModel by activityViewModels<PreferenceViewModel>()
 
-    protected val configurationAdapter : ConfigurationAdapter by lazy {
+    protected val preferenceAdapter : PreferenceAdapter by lazy {
         createConfigurationAdapter()
     }
 
     private fun initializeToolbar(toolbar: Toolbar) {
         val activity = requireActivity()
 
-        if (activity is ConfigurationActivity) {
+        if (activity is PreferenceActivity) {
             activity.setSupportActionBar(toolbar)
             activity.supportActionBar?.setHomeButtonEnabled(true)
             activity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -43,7 +43,7 @@ abstract class ConfigurationFragment : BaseFragment<FragmentConfigurationBinding
         initializeToolbar(viewBinding.toolbar)
 
         viewBinding.recyclerView.apply {
-            adapter = configurationAdapter
+            adapter = preferenceAdapter
             layoutManager = LinearLayoutManagerWrapper(requireContext())
         }
 

@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/rounded_corners"
-    android:backgroundTint="@color/surface">
+    android:backgroundTint="@color/background">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -21,44 +21,46 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <View
-                android:id="@+id/view_memo_color"
-                android:layout_width="8dp"
-                android:layout_height="8dp"
-                android:layout_marginStart="@dimen/margin_normal"
-                android:background="@drawable/background_memo_color"
-                android:backgroundTint="@color/unselected"
-                app:layout_constraintBottom_toBottomOf="@+id/text_view_date"
-                app:layout_constraintEnd_toStartOf="@+id/text_view_date"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/text_view_date" />
-
             <TextView
                 android:id="@+id/text_view_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_normal"
                 android:layout_marginTop="@dimen/margin_normal"
+                android:fontFamily="sans-serif-light"
                 android:textSize="@dimen/text_size_large"
                 android:textStyle="bold"
-                app:layout_constraintStart_toEndOf="@+id/view_memo_color"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="5월 2일" />
 
-            <ImageView
-                android:id="@+id/image_view_delete"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toStartOf="@id/image_view_edit"
-                android:layout_marginEnd="@dimen/margin_small"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                app:layout_constraintEnd_toStartOf="@+id/image_view_edit"
-                app:layout_constraintTop_toTopOf="@+id/image_view_edit"
-                app:srcCompat="@drawable/ic_round_delete_24"
-                tools:ignore="ContentDescription" />
+            <View
+                android:id="@+id/view_memo_color"
+                android:layout_width="@dimen/small_100"
+                android:layout_height="@dimen/small_100"
+                android:layout_marginBottom="1dp"
+                android:layout_marginStart="@dimen/margin_normal"
+                android:background="@drawable/background_memo_color"
+                android:backgroundTint="@color/unselected"
+                app:layout_constraintBottom_toBottomOf="@+id/text_view_date"
+                app:layout_constraintStart_toEndOf="@+id/text_view_date"
+                app:layout_constraintTop_toTopOf="@+id/text_view_date" />
 
             <ImageView
                 android:id="@+id/image_view_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toStartOf="@id/image_view_delete"
+                android:layout_marginEnd="@dimen/small_150"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:layout_constraintEnd_toStartOf="@+id/image_view_delete"
+                app:layout_constraintTop_toTopOf="@+id/image_view_delete"
+                app:srcCompat="@drawable/ic_round_edit_24"
+                app:tint="@color/icon"
+                tools:ignore="ContentDescription" />
+
+            <ImageView
+                android:id="@+id/image_view_delete"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
@@ -66,7 +68,8 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 app:layout_constraintEnd_toStartOf="@+id/image_view_more_vert"
                 app:layout_constraintTop_toTopOf="@+id/image_view_more_vert"
-                app:srcCompat="@drawable/ic_round_edit_24"
+                app:srcCompat="@drawable/ic_round_delete_24"
+                app:tint="@color/icon"
                 tools:ignore="ContentDescription" />
 
             <ImageView
@@ -80,6 +83,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_round_more_vert_24"
+                app:tint="@color/icon"
                 tools:ignore="ContentDescription" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -89,8 +93,14 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/margin_normal"
             android:autoLink="all"
-            android:maxHeight="@dimen/max_height_small"
-            android:padding="@dimen/padding_small"
+            android:background="@drawable/border"
+            android:maxHeight="@dimen/double_extra_large_100"
+            android:paddingBottom="@dimen/padding_small"
+            android:paddingEnd="@dimen/padding_normal"
+            android:paddingStart="@dimen/padding_normal"
+            android:paddingTop="@dimen/padding_small"
+            android:scrollbars="vertical"
+            android:textIsSelectable="true"
             android:textSize="@dimen/text_size_medium"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -103,44 +113,47 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/margin_normal"
             android:layout_marginStart="@dimen/margin_normal"
-            android:layout_marginTop="@dimen/margin_small"
+            android:layout_marginTop="@dimen/margin_extra_small"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_view_content"
             app:layout_constrainedHeight="true"
             app:layout_constraintHeight_max="@dimen/double_extra_large_100"
-            tools:visibility="gone" />
+            tools:visibility="visible" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/material_button_close"
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/text_view_close"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="1dp"
+            android:layout_marginBottom="@dimen/margin_normal"
             android:layout_marginTop="@dimen/margin_normal"
-            android:background="@drawable/rounded_corner_bottom_left"
+            android:layout_marginEnd="@dimen/margin_small"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:fontFamily="sans-serif-medium"
             android:insetTop="0dp"
             android:insetBottom="0dp"
+            android:padding="@dimen/padding_small"
             android:text="@string/memo_detail_dialog_fragment_000"
-            app:layout_constraintEnd_toStartOf="@+id/material_button_done"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
+            android:textSize="@dimen/text_size_medium"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/text_view_done"
             app:layout_constraintTop_toBottomOf="@+id/recycler_view_checklist" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/material_button_done"
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/text_view_done"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="1dp"
-            android:background="@drawable/rounded_corner_bottom_right"
+            android:layout_marginEnd="@dimen/margin_normal"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:fontFamily="sans-serif-medium"
             android:insetTop="0dp"
             android:insetBottom="0dp"
+            android:padding="@dimen/padding_small"
             android:text="@string/memo_detail_dialog_fragment_001"
-            app:layout_constraintBottom_toBottomOf="@+id/material_button_close"
+            android:textSize="@dimen/text_size_medium"
+            app:layout_constraintBottom_toBottomOf="@+id/text_view_close"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/material_button_close"
-            app:layout_constraintTop_toTopOf="@+id/material_button_close"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintTop_toTopOf="@+id/text_view_close" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </RelativeLayout>

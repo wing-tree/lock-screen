@@ -66,6 +66,7 @@
     <string name="memo_detail_dialog_fragment_002">Delete memo?</string>
     <string name="memo_detail_dialog_fragment_003">Cancel</string>
     <string name="memo_detail_dialog_fragment_004">Delete</string>
+    <string name="memo_detail_dialog_fragment_005">Delete memo</string>
 
     <string-array name="memo_detail_dialog_fragment_005">
         <item>Calendar</item>

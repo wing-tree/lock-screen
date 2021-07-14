@@ -3,8 +3,6 @@ package com.flow.android.kotlin.lockscreen.util
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
-import android.content.res.ColorStateList
-import android.graphics.ColorFilter
 import android.graphics.drawable.RippleDrawable
 import android.os.Handler
 import android.os.Looper
@@ -14,7 +12,6 @@ import android.view.ViewGroup
 import android.view.animation.*
 import android.widget.FrameLayout
 import androidx.annotation.ColorInt
-import timber.log.Timber
 
 
 fun FrameLayout.forceRippleAnimation() {
@@ -23,8 +20,8 @@ fun FrameLayout.forceRippleAnimation() {
         val rippleDrawable = foreground
 
         rippleDrawable.state = intArrayOf(
-            android.R.attr.state_pressed,
-            android.R.attr.state_enabled
+                android.R.attr.state_pressed,
+                android.R.attr.state_enabled
         )
         handler.postDelayed({ rippleDrawable.state = intArrayOf() }, 200)
     }
@@ -41,8 +38,8 @@ fun FrameLayout.showRipple(@ColorInt colorPressed: Int? = null) {
         val rippleDrawable = foreground
 
         rippleDrawable.state = intArrayOf(
-            android.R.attr.state_pressed,
-            android.R.attr.state_enabled
+                android.R.attr.state_pressed,
+                android.R.attr.state_enabled
         )
     }
 }
@@ -74,13 +71,22 @@ fun View.collapse(duration: Long) {
 }
 
 fun View.expand(duration: Long, onAnimationEnd: (() -> Unit)? = null) {
-    show()
-    measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+    val parent = this.parent
+    val widthMeasureSpec = if (parent is View)
+        MeasureSpec.makeMeasureSpec(parent.width, MeasureSpec.EXACTLY)
+    else
+        return
+
+    val heightMeasureSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
+
+    measure(widthMeasureSpec, heightMeasureSpec)
 
     val from = this.height
     val to = this.measuredHeight
 
     layoutParams.height = from
+
+    show()
 
     val valueAnimator = ValueAnimator.ofInt(from, to)
 
@@ -158,8 +164,8 @@ fun View.hideRipple() {
 }
 
 fun View.rotate(
-    degrees: Float, duration: Number,
-    animationListenerAdapter: AnimatorListenerAdapter? = null
+        degrees: Float, duration: Number,
+        animationListenerAdapter: AnimatorListenerAdapter? = null
 ) {
     this.animate().rotation(degrees)
             .setDuration(duration.toLong())

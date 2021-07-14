@@ -1,12 +1,11 @@
-package com.flow.android.kotlin.lockscreen.configuration.viewmodel
+package com.flow.android.kotlin.lockscreen.preference.viewmodel
 
 import android.app.Application
 import android.os.Parcelable
 import androidx.lifecycle.AndroidViewModel
-import com.flow.android.kotlin.lockscreen.util.DEFAULT_FONT_SIZE
 import kotlinx.android.parcel.Parcelize
 
-class ConfigurationViewModel(application: Application): AndroidViewModel(application) {
+class PreferenceViewModel(application: Application): AndroidViewModel(application) {
     val configurationChanged = ConfigurationChange()
 
     var calendarChanged: Boolean

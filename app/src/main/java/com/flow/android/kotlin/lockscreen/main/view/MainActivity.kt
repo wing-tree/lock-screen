@@ -20,8 +20,8 @@ import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.application.ApplicationUtil
 import com.flow.android.kotlin.lockscreen.base.BaseActivity
 import com.flow.android.kotlin.lockscreen.calendar.viewmodel.CalendarViewModel
-import com.flow.android.kotlin.lockscreen.configuration.view.ConfigurationActivity
-import com.flow.android.kotlin.lockscreen.configuration.viewmodel.ConfigurationChange
+import com.flow.android.kotlin.lockscreen.preference.view.PreferenceActivity
+import com.flow.android.kotlin.lockscreen.preference.viewmodel.ConfigurationChange
 import com.flow.android.kotlin.lockscreen.databinding.ActivityMainBinding
 import com.flow.android.kotlin.lockscreen.devicecredential.DeviceCredential
 import com.flow.android.kotlin.lockscreen.devicecredential.RequireDeviceCredential
@@ -36,8 +36,7 @@ import com.flow.android.kotlin.lockscreen.memo.viewmodel.MemoViewModel
 import com.flow.android.kotlin.lockscreen.permission._interface.OnPermissionAllowClickListener
 import com.flow.android.kotlin.lockscreen.permission.view.PermissionRationaleDialogFragment
 import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
-import com.flow.android.kotlin.lockscreen.preferences.ConfigurationPreferences
-import com.flow.android.kotlin.lockscreen.settings.SettingsTestActivity
+import com.flow.android.kotlin.lockscreen.preferences.Preference
 import com.flow.android.kotlin.lockscreen.shortcut.viewmodel.ShortcutViewModel
 import com.flow.android.kotlin.lockscreen.util.*
 import com.karumi.dexter.Dexter
@@ -99,7 +98,7 @@ class MainActivity : BaseActivity(),
         super.onCreate(savedInstanceState)
         setContentView(viewBinding.root)
 
-        if (ConfigurationPreferences.getShowOnLockScreen(this)) {
+        if (Preference.getShowOnLockScreen(this)) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
                 setShowWhenLocked(true)
 
@@ -148,7 +147,7 @@ class MainActivity : BaseActivity(),
 
     override fun onPause() {
         with(viewBinding.centerAlignedTabLayout.selectedTabPosition) {
-            ConfigurationPreferences.putSelectedTabIndex(this@MainActivity, this)
+            Preference.putSelectedTabIndex(this@MainActivity, this)
         }
 
         super.onPause()
@@ -253,10 +252,10 @@ class MainActivity : BaseActivity(),
         }
 
         viewBinding.imageViewSettings.setOnClickListener {
-            Intent(this, ConfigurationActivity::class.java).also {
+            Intent(this, PreferenceActivity::class.java).also {
                 it.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT)
 
-                getActivityResultLauncher(ConfigurationActivity.Name.ConfigurationChange)?.launch(it)
+                getActivityResultLauncher(PreferenceActivity.Name.ConfigurationChange)?.launch(it)
                 overridePendingTransition(R.anim.slide_in_left, R.anim.fade_out)
             }
         }
@@ -310,11 +309,11 @@ class MainActivity : BaseActivity(),
         )
 
         putActivityResultLauncher(
-                ConfigurationActivity.Name.ConfigurationChange,
+                PreferenceActivity.Name.ConfigurationChange,
                 registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                     if (result.resultCode == RESULT_OK) {
                         val configurationChange = result.data?.getParcelableExtra<ConfigurationChange>(
-                                ConfigurationActivity.Name.ConfigurationChange
+                                PreferenceActivity.Name.ConfigurationChange
                         ) ?: return@registerForActivityResult
 
                         viewModel.refresh(configurationChange)
@@ -379,7 +378,7 @@ class MainActivity : BaseActivity(),
     }
 
     private fun firstRun() {
-        if (ConfigurationPreferences.getFirstRun(this)) {
+        if (Preference.getFirstRun(this)) {
             memoViewModel.insert(
                     Memo(
                             content = getString(R.string.memo_fragment_000),
@@ -390,7 +389,7 @@ class MainActivity : BaseActivity(),
                     )
             )
 
-            ConfigurationPreferences.putFirstRun(this, false)
+            Preference.putFirstRun(this, false)
         }
     }
 

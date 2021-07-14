@@ -1,62 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/extra_small_100"
-    app:cardBackgroundColor="@color/edit_text_background"
-    app:cardElevation="0dp">
+    android:layout_marginBottom="@dimen/double_extra_small_100"
+    android:background="@drawable/border">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/edit_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/padding_small"
+        android:paddingEnd="@dimen/padding_normal"
+        android:paddingStart="@dimen/padding_normal"
+        android:paddingTop="@dimen/padding_small"
+        android:textSize="@dimen/text_size_medium"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/frame_layout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/edit_text"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:paddingBottom="@dimen/padding_small"
-            android:paddingEnd="@dimen/padding_normal"
-            android:paddingStart="@dimen/padding_normal"
-            android:paddingTop="@dimen/padding_small"
-            android:textSize="@dimen/text_size_small"
-            app:layout_constraintEnd_toStartOf="@id/frame_layout"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+    <FrameLayout
+        android:id="@+id/frame_layout"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginEnd="@dimen/margin_double_extra_small"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <FrameLayout
-            android:id="@+id/frame_layout"
-            android:layout_height="wrap_content"
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/check_box"
             android:layout_width="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:buttonTint="@color/icon"
+            android:minHeight="0dp"
+            android:minWidth="0dp" />
 
-            <com.google.android.material.checkbox.MaterialCheckBox
-                android:id="@+id/checkbox"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginEnd="1dp"
-                android:minHeight="0dp"
-                android:minWidth="0dp"
-                android:scaleX="0.90"
-                android:scaleY="0.90"
-                app:srcCompat="@drawable/ic_round_add_circle_24"/>
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/image_view_cancel"
-                android:layout_width="@dimen/width_normal"
-                android:layout_height="@dimen/height_normal"
-                android:layout_gravity="center"
-                android:layout_marginEnd="@dimen/margin_extra_small"
-                android:scaleX="0.90"
-                android:scaleY="0.90"
-                android:visibility="gone"
-                app:srcCompat="@drawable/ic_round_cancel_24" />
-
-        </FrameLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</com.google.android.material.card.MaterialCardView>
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/image_view_clear"
+            android:layout_width="@dimen/width_normal"
+            android:layout_height="@dimen/height_normal"
+            android:layout_gravity="center"
+            android:layout_marginEnd="@dimen/margin_double_extra_small"
+            android:visibility="gone"
+            app:srcCompat="@drawable/ic_round_clear_24"
+            app:tint="@color/icon"/>
+    </FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

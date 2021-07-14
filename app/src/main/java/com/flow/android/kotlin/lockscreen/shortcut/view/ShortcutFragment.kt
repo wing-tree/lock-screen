@@ -107,6 +107,8 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
 
     private fun registerLifecycleObservers() {
         viewModel.dataChanged.observe(viewLifecycleOwner, {
+            Timber.d("DataChanged<Model.Shortcut>! :$it")
+
             when(it.state) {
                 DataChangedState.Deleted -> { adapter.remove(it.data) }
                 DataChangedState.Inserted -> { adapter.add(it.data) }

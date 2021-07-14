@@ -8,7 +8,7 @@
     android:layout_marginBottom="1dp"
     android:outlineProvider="none"
     app:cardBackgroundColor="@color/card_background"
-    app:cardElevation="@dimen/double_extra_small_100"
+    app:cardCornerRadius="@dimen/default_rounded_corner"
     app:cardPreventCornerOverlap="false">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -65,7 +65,7 @@
                 android:layout_toStartOf="@id/text_view_checklist_count"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="@color/high_emphasis"
+                android:textColor="@color/high_emphasis_light"
                 android:textSize="@dimen/text_size_medium_small"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/text_view_checklist_count"
@@ -75,14 +75,16 @@
 
             <TextView
                 android:id="@+id/text_view_checklist_count"
-                android:layout_width="@dimen/normal_125"
-                android:layout_height="@dimen/normal_125"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/margin_small"
                 android:layout_weight="1"
+                android:textColor="@color/white"
                 app:layout_constraintBottom_toBottomOf="@+id/text_view_date"
                 app:layout_constraintEnd_toStartOf="@id/image_view_swap"
                 app:layout_constraintTop_toTopOf="@+id/text_view_date"
-                tools:ignore="ContentDescription" />
+                tools:ignore="ContentDescription"
+                tools:text="0/10"/>
 
             <ImageView
                 android:id="@+id/image_view_swap"

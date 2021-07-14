@@ -4,7 +4,7 @@ import android.app.Application
 import android.graphics.Color
 import androidx.annotation.ColorInt
 import androidx.lifecycle.*
-import com.flow.android.kotlin.lockscreen.configuration.viewmodel.ConfigurationChange
+import com.flow.android.kotlin.lockscreen.preference.viewmodel.ConfigurationChange
 import com.flow.android.kotlin.lockscreen.util.SingleLiveEvent
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {

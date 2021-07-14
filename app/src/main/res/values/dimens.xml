@@ -71,6 +71,16 @@
     <dimen name="double_extra_large_250">320dp</dimen>
     <dimen name="double_extra_large_275">352dp</dimen>
 
+    <dimen name="triple_extra_large_100">256dp</dimen>
+    <dimen name="triple_extra_large_125">320dp</dimen>
+    <dimen name="triple_extra_large_150">384dp</dimen>
+    <dimen name="triple_extra_large_175">448dp</dimen>
+    <dimen name="triple_extra_large_200">512dp</dimen>
+    <dimen name="triple_extra_large_225">576dp</dimen>
+    <dimen name="triple_extra_large_250">640dp</dimen>
+    <dimen name="triple_extra_large_275">704dp</dimen>
+
+    <dimen name="margin_double_extra_small">@dimen/double_extra_small_100</dimen>
     <dimen name="margin_extra_small">@dimen/extra_small_100</dimen>
     <dimen name="margin_small">@dimen/small_100</dimen>
     <dimen name="margin_normal">@dimen/normal_100</dimen>
@@ -78,8 +88,10 @@
     <dimen name="margin_extra_large">@dimen/large_100</dimen>
     <dimen name="margin_double_extra_large">@dimen/large_150</dimen>
 
+    <dimen name="padding_extra_small">@dimen/extra_small_100</dimen>
     <dimen name="padding_small">@dimen/small_100</dimen>
-    <dimen name="padding_normal">@dimen/normal_100</dimen>
+    <dimen name="padding_normal">@dimen/small_150</dimen>
+    <dimen name="padding_large">@dimen/normal_100</dimen>
 
     <dimen name="width_small">@dimen/normal_100</dimen>
     <dimen name="width_normal">@dimen/normal_150</dimen>
@@ -105,7 +117,7 @@
 
     <item name="line_spacing_multiplier" format="float" type="dimen">1.15</item>
 
-    <dimen name="default_rounded_corner">16dp</dimen>
+    <dimen name="default_rounded_corner">4dp</dimen>
 
     <dimen name="app_icon_width">48dp</dimen>
     <dimen name="app_icon_height">48dp</dimen>

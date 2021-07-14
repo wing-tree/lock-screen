@@ -4,6 +4,7 @@ import android.content.*
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.provider.CalendarContract
+import android.text.method.ScrollingMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -107,6 +108,7 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
     private fun initializeView(memo: Memo) {
         viewBinding.viewMemoColor.backgroundTintList = ColorStateList.valueOf(memo.color)
         viewBinding.textViewDate.text = memo.modifiedTime.toDateString(simpleDateFormat)
+        viewBinding.textViewContent.movementMethod = ScrollingMovementMethod()
         viewBinding.textViewContent.text = memo.content
 
         // todo change to list..
@@ -127,7 +129,7 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
 
         viewBinding.imageViewDelete.setOnClickListener {
             ConfirmationDialogFragment().also {
-                it.setTitle("Text for Title Test")
+                it.setTitle(getString(R.string.memo_detail_dialog_fragment_005))
                 it.setMessage(getString(R.string.memo_detail_dialog_fragment_002))
                 it.setNegativeButton(getString(R.string.memo_detail_dialog_fragment_003)) { dialogFragment ->
                     dialogFragment.dismiss()
@@ -161,11 +163,11 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
             }.show()
         }
 
-        viewBinding.materialButtonClose.setOnClickListener {
+        viewBinding.textViewClose.setOnClickListener {
             dismiss()
         }
 
-        viewBinding.materialButtonDone.setOnClickListener {
+        viewBinding.textViewDone.setOnClickListener {
             viewModel.update(memo.apply {
                 isDone = isDone.not()
             })
