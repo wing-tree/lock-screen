@@ -15,7 +15,7 @@ import com.flow.android.kotlin.lockscreen.databinding.FragmentCalendarBinding
 import com.flow.android.kotlin.lockscreen.calendar.adapter.EventsAdapter
 import com.flow.android.kotlin.lockscreen.calendar.contract.CalendarContract
 import com.flow.android.kotlin.lockscreen.calendar.viewmodel.CalendarViewModel
-import com.flow.android.kotlin.lockscreen.preferences.Preference
+import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -90,7 +90,7 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
 
     private fun registerLifecycleObservers() {
         viewModel.calendars.observe(viewLifecycleOwner, { calendarDisplays ->
-            val uncheckedCalendarIds = Preference.getUncheckedCalendarIds(requireContext())
+            val uncheckedCalendarIds = Preference.Calendar.getUncheckedCalendarIds(requireContext())
 
             viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
                 for (i in 0..itemCount) {
@@ -110,7 +110,7 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
 
         viewModel.refresh.observe(viewLifecycleOwner, {
             viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-                val uncheckedCalendarIds = Preference.getUncheckedCalendarIds(requireContext())
+                val uncheckedCalendarIds = Preference.Calendar.getUncheckedCalendarIds(requireContext())
 
                 eventsAdapter.clear()
 

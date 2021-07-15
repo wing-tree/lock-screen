@@ -16,32 +16,29 @@ class PreferenceAdapter(private val currentList: ArrayList<AdapterItem>): Recycl
     class ViewHolder(private val viewBinding: ViewBinding): RecyclerView.ViewHolder(viewBinding.root) {
         private val duration = 300L
 
-        fun bind(adapterItem: AdapterItem, viewType: Int) {
+        fun bind(adapterItem: AdapterItem) {
             when(viewBinding) {
-                is DividerItemBinding -> {
-                    // pass
-                }
                 is PreferenceBinding -> {
-                    val item = adapterItem as AdapterItem.Preference
+                    if (adapterItem is AdapterItem.Preference) {
+                        adapterItem.drawable?.let {
+                            viewBinding.imageViewIcon.show()
+                            viewBinding.imageViewIcon.setImageDrawable(it)
+                            viewBinding.viewPadding.show()
+                        } ?: let {
+                            viewBinding.imageViewIcon.hide()
+                            viewBinding.viewPadding.hide()
+                        }
 
-                    item.drawable?.let {
-                        viewBinding.imageViewIcon.show()
-                        viewBinding.imageViewIcon.setImageDrawable(it)
-                        viewBinding.viewPadding.show()
-                    } ?: let {
-                        viewBinding.imageViewIcon.hide()
-                        viewBinding.viewPadding.hide()
-                    }
+                        viewBinding.textViewSummary.text = adapterItem.description
+                        viewBinding.textViewTitle.text = adapterItem.title
 
-                    viewBinding.textViewSummary.text = item.description
-                    viewBinding.textViewTitle.text = item.title
-
-                    viewBinding.root.setOnClickListener {
-                        item.onClick.invoke(viewBinding, item)
+                        viewBinding.root.setOnClickListener {
+                            adapterItem.onClick.invoke(viewBinding, adapterItem)
+                        }
                     }
                 }
                 is MultiSelectListPreferenceBinding -> {
-                    if (adapterItem is AdapterItem.ListItem) {
+                    if (adapterItem is AdapterItem.MultiSelectListPreference) {
                         viewBinding.recyclerViewEntries.apply {
                             adapter = adapterItem.adapter
                             layoutManager = LinearLayoutManagerWrapper(viewBinding.root.context)
@@ -68,32 +65,35 @@ class PreferenceAdapter(private val currentList: ArrayList<AdapterItem>): Recycl
                     }
                 }
                 is SubtitleItemBinding -> {
-                    viewBinding as SubtitleItemBinding
-                    val subtitleItem = adapterItem as AdapterItem.SubtitleItem
-
-                    viewBinding.textSubtitle.text = subtitleItem.subtitle
+                    if (adapterItem is AdapterItem.SubtitleItem)
+                        viewBinding.textSubtitle.text = adapterItem.subtitle
                 }
                 is SwitchPreferenceBinding -> {
-                    viewBinding as SwitchPreferenceBinding
-                    val switchItem = adapterItem as AdapterItem.SwitchItem
+                    if (adapterItem is AdapterItem.SwitchPreference) {
+                        if (adapterItem.isVisible)
+                            viewBinding.root.expand(duration)
+                        else
+                            viewBinding.root.collapse(duration, 0)
 
-                    viewBinding.imageView.setImageDrawable(switchItem.drawable)
-                    viewBinding.switchMaterial.isChecked = switchItem.isChecked
-                    viewBinding.textTitle.text = switchItem.title
+                        viewBinding.imageViewIcon.setImageDrawable(adapterItem.drawable)
+                        viewBinding.switchMaterial.isChecked = adapterItem.isChecked
+                        viewBinding.textTitle.text = adapterItem.title
 
-                    viewBinding.switchMaterial.setOnCheckedChangeListener { _, isChecked ->
-                        switchItem.onCheckedChange(isChecked)
+                        adapterItem.drawable?.let {
+                            viewBinding.imageViewIcon.show()
+                            viewBinding.imageViewIcon.setImageDrawable(it)
+                            viewBinding.viewPadding.show()
+                        } ?: let {
+                            viewBinding.imageViewIcon.hide()
+                            viewBinding.viewPadding.hide()
+                        }
+
+                        viewBinding.switchMaterial.setOnCheckedChangeListener { _, isChecked ->
+                            adapterItem.onCheckedChange(isChecked)
+                        }
                     }
                 }
             }
-        }
-
-        fun hide() {
-            viewBinding.root.collapse(duration, 0)
-        }
-
-        fun show() {
-            viewBinding.root.expand(duration)
         }
 
         fun updateSummary(summary: String) {
@@ -104,11 +104,10 @@ class PreferenceAdapter(private val currentList: ArrayList<AdapterItem>): Recycl
         companion object {
             fun from(layoutInflater: LayoutInflater, parent: ViewGroup, viewType: Int): ViewHolder {
                 val viewBinding = when(viewType) {
-                    ViewType.Divider -> DividerItemBinding.inflate(layoutInflater, parent, false)
-                    ViewType.Item -> PreferenceBinding.inflate(layoutInflater, parent, false)
-                    ViewType.List -> MultiSelectListPreferenceBinding.inflate(layoutInflater, parent, false)
+                    ViewType.Preference -> PreferenceBinding.inflate(layoutInflater, parent, false)
+                    ViewType.MultiSelectListPreference -> MultiSelectListPreferenceBinding.inflate(layoutInflater, parent, false)
                     ViewType.Subtitle -> SubtitleItemBinding.inflate(layoutInflater, parent, false)
-                    ViewType.Switch -> SwitchPreferenceBinding.inflate(layoutInflater, parent, false)
+                    ViewType.SwitchPreference -> SwitchPreferenceBinding.inflate(layoutInflater, parent, false)
                     else -> throw InvalidParameterException("Invalid viewType")
                 }
 
@@ -129,38 +128,23 @@ class PreferenceAdapter(private val currentList: ArrayList<AdapterItem>): Recycl
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(currentList[position], getItemViewType(position))
+        holder.bind(currentList[position])
     }
 
     override fun getItemCount(): Int = currentList.count()
 
     override fun getItemViewType(position: Int): Int {
         return when(currentList[position]) {
-            is AdapterItem.DividerItem -> ViewType.Divider
-            is AdapterItem.Preference -> ViewType.Item
-            is AdapterItem.ListItem -> ViewType.List
+            is AdapterItem.Preference -> ViewType.Preference
+            is AdapterItem.MultiSelectListPreference -> ViewType.MultiSelectListPreference
             is AdapterItem.SubtitleItem -> ViewType.Subtitle
-            is AdapterItem.SwitchItem -> ViewType.Switch
+            is AdapterItem.SwitchPreference -> ViewType.SwitchPreference
         }
     }
 
-    fun hideItem(id: Long) {
-        val item = currentList.find { it.id == id } ?: return
-        val index = currentList.indexOf(item)
-        val viewHolder = recyclerView?.findViewHolderForAdapterPosition(index) ?: return
+    fun getItem(id: Long) = currentList.find { it.id == id }
 
-        if (viewHolder is ViewHolder)
-            viewHolder.hide()
-    }
-
-    fun showItem(id: Long) {
-        val item = currentList.find { it.id == id } ?: return
-        val index = currentList.indexOf(item)
-        val viewHolder = recyclerView?.findViewHolderForAdapterPosition(index) ?: return
-
-        if (viewHolder is ViewHolder)
-            viewHolder.show()
-    }
+    fun getPosition(id: Long) = currentList.indexOf(getItem(id))
 
     fun updateSummary(id: Long, description: String) {
         val item = currentList.find { it.id == id } ?: return
@@ -177,37 +161,34 @@ class PreferenceAdapter(private val currentList: ArrayList<AdapterItem>): Recycl
 }
 
 object ViewType {
-    const val Divider = 0
-    const val Item = 1
-    const val List = 2
-    const val Subtitle = 3
-    const val Switch = 4
+    const val Preference = 0
+    const val MultiSelectListPreference = 1
+    const val Subtitle = 2
+    const val SwitchPreference = 3
 }
 
 sealed class AdapterItem {
     abstract val id: Long
     abstract var isEnabled: Boolean
-
-    data class DividerItem(
-        override val id: Long = 0L,
-        override var isEnabled: Boolean = true
-    ): AdapterItem()
+    abstract var isVisible: Boolean
 
     data class Preference(
             override val id: Long = 0L,
             override var isEnabled: Boolean = true,
+            override var isVisible: Boolean = true,
             val description: String,
             val drawable: Drawable?,
             val onClick: (PreferenceBinding, Preference) -> Unit,
             val title: String
     ): AdapterItem()
 
-    data class ListItem(
+    data class MultiSelectListPreference(
             override val id: Long = 0L,
             override var isEnabled: Boolean = true,
+            override var isVisible: Boolean = true,
             val adapter: RecyclerView.Adapter<*>,
             val drawable: Drawable?,
-            val onClick: (MultiSelectListPreferenceBinding, ListItem) -> Unit,
+            val onClick: (MultiSelectListPreferenceBinding, MultiSelectListPreference) -> Unit,
             val title: String,
             var isExpanded: Boolean = false
     ): AdapterItem()
@@ -215,12 +196,14 @@ sealed class AdapterItem {
     data class SubtitleItem(
             override val id: Long = 0L,
             override var isEnabled: Boolean = true,
+            override var isVisible: Boolean = true,
             val subtitle: String
     ): AdapterItem()
 
-    data class SwitchItem(
+    data class SwitchPreference(
             override val id: Long = 0L,
             override var isEnabled: Boolean = true,
+            override var isVisible: Boolean = true,
             val drawable: Drawable?,
             val isChecked: Boolean,
             val onCheckedChange: (isChecked: Boolean) -> Unit,

@@ -113,7 +113,7 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
 
     private val currentTimeMillis = System.currentTimeMillis()
     private var mode = Mode.Add
-    private var selectedColor = Color.WHITE
+    private var selectedColor = 0
 
     private var originalMemo: Memo? = null
     private val memo = MutableLiveData<Memo>()
@@ -127,7 +127,7 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
 
         val memo = arguments?.getParcelable<Memo>(KEY_MEMO)
 
-        selectedColor = ContextCompat.getColor(requireContext(), R.color.ivory)
+        selectedColor = ContextCompat.getColor(requireContext(), R.color.white)
 
         mode = if (memo == null) {
             setValue(createEmptyMemo())
@@ -161,7 +161,7 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
         }
 
         memo?.let {
-            viewBinding.viewMemoColor.backgroundTintList = ColorStateList.valueOf(selectedColor)
+            viewBinding.viewColor.backgroundTintList = ColorStateList.valueOf(selectedColor)
             viewBinding.textViewDate.text = it.modifiedTime.toDateString(simpleDateFormat)
             viewBinding.editTextContent.setText(it.content)
 
@@ -183,7 +183,7 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
                 val value = checklist.value ?: arrayListOf()
                 val size = value.size
 
-                value.add(size, ChecklistItem(size.toLong(), content, false))
+                value.add(size, ChecklistItem(content, size.toLong(), false))
                 checklist.value = value
                 checklistHeader.editText.text?.clear()
             }
@@ -206,7 +206,7 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
         viewBinding.colorPickerLayout.setOnColorSelectedListener(object :
             ColorPickerLayout.OnColorSelectedListener {
             override fun onColorSelected(color: Int) {
-                viewBinding.viewMemoColor.backgroundTintList = ColorStateList.valueOf(color)
+                viewBinding.viewColor.backgroundTintList = ColorStateList.valueOf(color)
 
                 if (selectedColor == color)
                     return

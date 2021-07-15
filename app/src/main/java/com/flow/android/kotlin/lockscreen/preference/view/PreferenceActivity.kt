@@ -10,14 +10,14 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.calendar.CalendarLoader
-import com.flow.android.kotlin.lockscreen.preferences.Preference
+import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
 import com.flow.android.kotlin.lockscreen.preference.adapter.AdapterItem
 import com.flow.android.kotlin.lockscreen.preference.adapter.CheckBoxAdapter
 import com.flow.android.kotlin.lockscreen.preference.adapter.CheckBoxItem
 import com.flow.android.kotlin.lockscreen.preference.adapter.PreferenceAdapter
-import com.flow.android.kotlin.lockscreen.preference.calendar.view.CalendarConfigurationFragment
-import com.flow.android.kotlin.lockscreen.preference.display.view.DisplayConfigurationFragment
-import com.flow.android.kotlin.lockscreen.preference.lockscreen.view.LockScreenConfigurationFragment
+import com.flow.android.kotlin.lockscreen.preference.calendar.view.CalendarPreferenceFragment
+import com.flow.android.kotlin.lockscreen.preference.display.view.DisplayPreferenceFragment
+import com.flow.android.kotlin.lockscreen.preference.lockscreen.view.LockScreenPreferenceFragment
 import com.flow.android.kotlin.lockscreen.preference.viewmodel.PreferenceViewModel
 import com.flow.android.kotlin.lockscreen.databinding.ActivityConfigurationBinding
 
@@ -34,7 +34,7 @@ class PreferenceActivity: AppCompatActivity() {
                         drawable = ContextCompat.getDrawable(this, R.drawable.ic_round_today_24),
                         description = getString(R.string.configuration_activity_006),
                         onClick = { _, _ ->
-                            addFragment(CalendarConfigurationFragment())
+                            addFragment(CalendarPreferenceFragment())
                         },
                         title = getString(R.string.calendar)
                 ),
@@ -42,7 +42,7 @@ class PreferenceActivity: AppCompatActivity() {
                         drawable = ContextCompat.getDrawable(this, R.drawable.ic_mobile_48px),
                         description = getString(R.string.configuration_activity_002),
                         onClick = { _, _ ->
-                            addFragment(DisplayConfigurationFragment())
+                            addFragment(DisplayPreferenceFragment())
                         },
                         title = getString(R.string.configuration_activity_001)
                 ),
@@ -50,7 +50,7 @@ class PreferenceActivity: AppCompatActivity() {
                         drawable = ContextCompat.getDrawable(this, R.drawable.ic_round_screen_lock_portrait_24),
                         description = getString(R.string.configuration_activity_000),
                         onClick = { _, _ ->
-                            addFragment(LockScreenConfigurationFragment())
+                            addFragment(LockScreenPreferenceFragment())
                         },
                         title = getString(R.string.configuration_activity_003)
                 )
@@ -73,16 +73,16 @@ class PreferenceActivity: AppCompatActivity() {
             layoutManager = LinearLayoutManager(activity)
         }
 
-        val uncheckedCalendarIds = Preference.getUncheckedCalendarIds(this)
+        val uncheckedCalendarIds = Preference.Calendar.getUncheckedCalendarIds(this)
         val checkBoxItems = CalendarLoader.calendars(contentResolver).map {
             CheckBoxItem(
                     isChecked = uncheckedCalendarIds.contains(it.id.toString()).not(),
                     text = it.name,
                     onCheckedChange = { isChecked ->
                         if (isChecked)
-                            Preference.removeUncheckedCalendarId(this, it.id.toString())
+                            Preference.Calendar.removeUncheckedCalendarId(this, it.id.toString())
                         else
-                            Preference.addUncheckedCalendarId(this, it.id.toString())
+                            Preference.Calendar.addUncheckedCalendarId(this, it.id.toString())
                     }
             )
         }

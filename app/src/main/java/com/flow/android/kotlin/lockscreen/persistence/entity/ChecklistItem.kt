@@ -5,7 +5,7 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class ChecklistItem (
-    var id: Long,
     var content: String,
-    var done: Boolean
+    var id: Long,
+    var isDone: Boolean
 ) : Parcelable

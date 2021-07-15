@@ -42,7 +42,7 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/image_view_clear"
-            android:layout_width="@dimen/width_normal"
+            android:layout_width="@dimen/width_small"
             android:layout_height="@dimen/height_normal"
             android:layout_gravity="center"
             android:layout_marginEnd="@dimen/margin_double_extra_small"

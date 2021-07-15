@@ -12,12 +12,13 @@ import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.color.ColorCalculator
 import com.flow.android.kotlin.lockscreen.databinding.ColorBinding
 import com.flow.android.kotlin.lockscreen.util.*
+import timber.log.Timber
 
 class ColorAdapter(private val items: IntArray, private val onColorSelected: (color: Int) -> Unit) : RecyclerView.Adapter<ColorAdapter.ViewHolder>() {
     class ViewHolder(val binding: ColorBinding) : RecyclerView.ViewHolder(binding.root)
 
-    private val duration = 150
-    private var colorSelectedPosition = -1
+    private val duration = 50
+    private var selectedPosition = -1
     private var inflater: LayoutInflater? = null
     private var recyclerView: RecyclerView? = null
 
@@ -38,38 +39,38 @@ class ColorAdapter(private val items: IntArray, private val onColorSelected: (co
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val color = items[position]
+        val dark = ContextCompat.getColor(holder.binding.root.context, R.color.black)
+        val light = ContextCompat.getColor(holder.binding.root.context, R.color.white)
 
-        if (colorSelectedPosition == position)
-            holder.binding.imageView.fadeIn(0)
+        holder.binding.imageView.setColorFilter(
+                ColorCalculator.onBackgroundColor(color, dark, light, false),
+                PorterDuff.Mode.SRC_ATOP
+        )
+
+        if (selectedPosition == position)
+            holder.binding.imageView.fadeIn(duration)
         else
             holder.binding.imageView.fadeOut(duration)
 
         holder.binding.frameLayout.backgroundTintList = ColorStateList.valueOf(color)
 
         holder.binding.frameLayout.setOnClickListener {
-            it as FrameLayout
+            if (it is FrameLayout) {
+                if (selectedPosition == position)
+                    return@setOnClickListener
 
-            if (colorSelectedPosition == position)
-                return@setOnClickListener
-
-            val dark = ContextCompat.getColor(holder.binding.root.context, R.color.black)
-            val light = ContextCompat.getColor(holder.binding.root.context, R.color.white)
-
-            holder.binding.imageView.setColorFilter(
-                ColorCalculator.onBackgroundColor(color, dark, light, false),
-                PorterDuff.Mode.SRC_ATOP
-            )
-
-            holder.binding.imageView.fadeIn(duration)
-            onColorSelected(color)
-            notifyItemChanged(colorSelectedPosition)
-            colorSelectedPosition = position
+                onColorSelected(color)
+                notifyItemChanged(selectedPosition)
+                notifyItemChanged(position)
+                selectedPosition = position
+            }
         }
     }
 
     override fun getItemCount(): Int = items.count()
 
     fun setInitiallySelectedColor(@ColorInt color: Int) {
-        colorSelectedPosition = items.indexOf(color)
+        selectedPosition = items.indexOf(color)
+        Timber.d("selectedPosition :$selectedPosition")
     }
 }

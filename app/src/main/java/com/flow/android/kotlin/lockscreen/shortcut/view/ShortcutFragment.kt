@@ -13,7 +13,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.base.BaseMainFragment
 import com.flow.android.kotlin.lockscreen.base.DataChangedState
@@ -25,6 +24,9 @@ import com.flow.android.kotlin.lockscreen.shortcut.adapter.ItemTouchCallback
 import com.flow.android.kotlin.lockscreen.shortcut.model.Model
 import com.flow.android.kotlin.lockscreen.shortcut.viewmodel.ShortcutViewModel
 import com.flow.android.kotlin.lockscreen.util.BLANK
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -35,6 +37,7 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
     }
 
     private val viewModel by activityViewModels<ShortcutViewModel>()
+    private val compositeDisposable = CompositeDisposable()
 
     private val activityResultLauncherMap = mapOf(
             DeviceCredential.Key.ConfirmDeviceCredential to registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
@@ -80,7 +83,7 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
 
         itemTouchHelper.attachToRecyclerView(viewBinding.recyclerView)
         initializeData()
-        registerLifecycleObservers()
+        subscribeObservables()
 
         return view
     }
@@ -99,22 +102,33 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
         }
     }
 
+    override fun onDestroyView() {
+        compositeDisposable.dispose()
+        super.onDestroyView()
+    }
+
     private fun initializeData() {
         lifecycleScope.launch(Dispatchers.IO) {
             adapter.addAll(viewModel.getAll())
         }
     }
 
-    private fun registerLifecycleObservers() {
-        viewModel.dataChanged.observe(viewLifecycleOwner, {
-            Timber.d("DataChanged<Model.Shortcut>! :$it")
+    private fun subscribeObservables() {
+        compositeDisposable.add(viewModel.publishSubject
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe ({
+                    Timber.d("DataChanged<Model.Shortcut>! :$it")
 
-            when(it.state) {
-                DataChangedState.Deleted -> { adapter.remove(it.data) }
-                DataChangedState.Inserted -> { adapter.add(it.data) }
-                DataChangedState.Updated -> { adapter.update(it.data) }
-            }
-        })
+                    when(it.state) {
+                        DataChangedState.Deleted -> { adapter.remove(it.data) }
+                        DataChangedState.Inserted -> { adapter.add(it.data) }
+                        DataChangedState.Updated -> { adapter.update(it.data) }
+                    }
+                }) {
+                    Timber.e(it)
+                }
+        )
     }
 
     private fun launchApplication(packageName: String) {

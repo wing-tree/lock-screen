@@ -4,22 +4,22 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.flow.android.kotlin.lockscreen.R
-import com.flow.android.kotlin.lockscreen.base.ConfigurationFragment
+import com.flow.android.kotlin.lockscreen.base.PreferenceFragment
 import com.flow.android.kotlin.lockscreen.preference.adapter.AdapterItem
 import com.flow.android.kotlin.lockscreen.preference.adapter.PreferenceAdapter
 import com.flow.android.kotlin.lockscreen.databinding.PreferenceBinding
-import com.flow.android.kotlin.lockscreen.preferences.Preference
+import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class DisplayConfigurationFragment : ConfigurationFragment() {
+class DisplayPreferenceFragment : PreferenceFragment() {
     private val duration = 300L
     private val fontSizes by lazy { resources.getIntArray(R.array.font_size) }
 
-    private val oldFontSize by lazy { Preference.getFontSize(requireContext()) }
+    private val oldFontSize by lazy { Preference.Display.getFontSize(requireContext()) }
     private var newFontSize = -1F
 
     override val toolbarTitleResId: Int = R.string.configuration_activity_001
@@ -31,13 +31,13 @@ class DisplayConfigurationFragment : ConfigurationFragment() {
         super.onPause()
     }
 
-    override fun createConfigurationAdapter(): PreferenceAdapter {
+    override fun createPreferenceAdapter(): PreferenceAdapter {
         val context = requireContext()
 
         return PreferenceAdapter(arrayListOf(
-                AdapterItem.SwitchItem(
+                AdapterItem.SwitchPreference(
                         drawable = ContextCompat.getDrawable(context, R.drawable.ic_round_dark_mode_24),
-                        isChecked = Preference.getIsNightMode(context),
+                        isChecked = Preference.Display.getIsDarkMode(context),
                         onCheckedChange = { isChecked ->
                             lifecycleScope.launch {
                                 val darkMode = if (isChecked)
@@ -46,7 +46,7 @@ class DisplayConfigurationFragment : ConfigurationFragment() {
                                     AppCompatDelegate.MODE_NIGHT_NO
 
                                 withContext(Dispatchers.IO) {
-                                    Preference.putIsNightMode(requireContext(), isChecked)
+                                    Preference.Display.putIsDarkMode(requireContext(), isChecked)
                                     delay(duration)
                                 }
 
@@ -62,7 +62,7 @@ class DisplayConfigurationFragment : ConfigurationFragment() {
                             MaterialAlertDialogBuilder(requireContext()).setItems(fontSizes.map { "${it}sp" }.toTypedArray()) { _, i ->
                                 val text = "${fontSizes[i]}sp"
 
-                                Preference.putFontSize(requireContext(), fontSizes[i].toFloat())
+                                Preference.Display.putFontSize(requireContext(), fontSizes[i].toFloat())
                                 viewBinding.textViewSummary.text = text
                                 newFontSize = fontSizes[i].toFloat()
                             }.show()

@@ -17,7 +17,6 @@
     <color name="grey_900">#212121</color>
     <color name="yellow_A_200">#ffff00</color>
     <color name="yellow_200">#fff9c4</color>
-    <color name="ivory">#fffff0</color>
 
     <color name="light_blue_500">#03a9f4</color>
     <color name="light_blue_700">#0288d1</color>
@@ -41,8 +40,7 @@
     <color name="active">#DE000000</color>
     <color name="inactive">#99000000</color>
 
-    <color name="edit_text_background">@color/ivory</color>
-    <color name="card_background">#991b1b1b</color>
+    <color name="card_background">#99121212</color>
 
     <color name="red_400">#ef5350</color>
     <color name="pink_400">#ec407a</color>
@@ -62,7 +60,7 @@
     <color name="deep_orange_400">#ff7043</color>
 
     <integer-array name="colors">
-        <item>@color/ivory</item>
+        <item>@color/white</item>
         <item>@color/red_400</item>
         <item>@color/pink_400</item>
         <item>@color/purple_400</item>

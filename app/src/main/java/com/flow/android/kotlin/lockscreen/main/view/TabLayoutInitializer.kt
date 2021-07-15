@@ -7,7 +7,7 @@ import android.widget.TextView
 import androidx.viewpager2.widget.ViewPager2
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.main.adapter.FragmentStateAdapter
-import com.flow.android.kotlin.lockscreen.preferences.Preference
+import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
 import com.flow.android.kotlin.lockscreen.util.fadeIn
 import com.flow.android.kotlin.lockscreen.widget.animateSelectedTab
 import com.google.android.material.tabs.TabLayout

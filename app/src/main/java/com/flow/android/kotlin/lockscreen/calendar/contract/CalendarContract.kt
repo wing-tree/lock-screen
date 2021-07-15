@@ -22,7 +22,7 @@ class CalendarContract: ActivityResultContract<Model.CalendarEvent?, Int>() {
             val intent = Intent(Intent.ACTION_INSERT).setData(CalendarContract.Events.CONTENT_URI)
 
             output = CalendarLoader.RequestCode.InsertEvent
-            Intent.createChooser(intent, BLANK) // todo 보류.
+            intent
         }
     }
 

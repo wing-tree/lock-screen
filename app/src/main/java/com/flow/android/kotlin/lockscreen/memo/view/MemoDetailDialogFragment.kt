@@ -44,7 +44,7 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
             val checklistItem = memo?.checklist?.find { it.id == item.id } ?: return
             val index = memo?.checklist?.indexOf(checklistItem) ?: return
 
-            memo?.checklist?.set(index, checklistItem.apply { done = isChecked })
+            memo?.checklist?.set(index, checklistItem.apply { isDone = isChecked })
 
             memo?.let { viewModel.update(it) {
                 checklist.value?.set(index, checklistItem)

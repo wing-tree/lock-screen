@@ -36,7 +36,7 @@ import com.flow.android.kotlin.lockscreen.memo.viewmodel.MemoViewModel
 import com.flow.android.kotlin.lockscreen.permission._interface.OnPermissionAllowClickListener
 import com.flow.android.kotlin.lockscreen.permission.view.PermissionRationaleDialogFragment
 import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
-import com.flow.android.kotlin.lockscreen.preferences.Preference
+import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
 import com.flow.android.kotlin.lockscreen.shortcut.viewmodel.ShortcutViewModel
 import com.flow.android.kotlin.lockscreen.util.*
 import com.karumi.dexter.Dexter
@@ -98,7 +98,7 @@ class MainActivity : BaseActivity(),
         super.onCreate(savedInstanceState)
         setContentView(viewBinding.root)
 
-        if (Preference.getShowOnLockScreen(this)) {
+        if (Preference.LockScreen.getShowOnLockScreen(this)) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
                 setShowWhenLocked(true)
 

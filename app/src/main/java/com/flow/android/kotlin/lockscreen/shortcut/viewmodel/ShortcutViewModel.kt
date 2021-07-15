@@ -9,6 +9,7 @@ import com.flow.android.kotlin.lockscreen.persistence.entity.Shortcut
 import com.flow.android.kotlin.lockscreen.repository.ShortcutRepository
 import com.flow.android.kotlin.lockscreen.shortcut.model.Model
 import com.flow.android.kotlin.lockscreen.util.SingleLiveEvent
+import io.reactivex.subjects.PublishSubject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -16,6 +17,7 @@ import timber.log.Timber
 class ShortcutViewModel(application: Application): AndroidViewModel(application) {
     private val packageManager = application.packageManager
     private val repository = ShortcutRepository(application)
+    val publishSubject = PublishSubject.create<DataChanged<Model.Shortcut>>()
 
     override fun onCleared() {
         repository.clearCompositeDisposable()
@@ -23,10 +25,6 @@ class ShortcutViewModel(application: Application): AndroidViewModel(application)
     }
 
     suspend fun getAll() = repository.getAll().mapNotNull { it.toModel() }
-
-    private val _dataChanged = MutableLiveData<DataChanged<Model.Shortcut>>()
-    val dataChanged: LiveData<DataChanged<Model.Shortcut>>
-        get() = _dataChanged
 
     private val _refresh = SingleLiveEvent<Unit>()
     val refresh: LiveData<Unit>
@@ -55,7 +53,7 @@ class ShortcutViewModel(application: Application): AndroidViewModel(application)
         repository.insert(item) {
             item.toModel()?.let {
                 model -> onComplete(model)
-                _dataChanged.value = DataChanged(model, DataChangedState.Inserted)
+                publishSubject.onNext(DataChanged(model, DataChangedState.Inserted))
             }
         }
     }
@@ -63,7 +61,7 @@ class ShortcutViewModel(application: Application): AndroidViewModel(application)
     fun delete(item: Shortcut) {
         repository.delete(item) {
             it.toModel()?.let { model ->
-                _dataChanged.value = DataChanged(model, DataChangedState.Deleted)
+                publishSubject.onNext(DataChanged(model, DataChangedState.Deleted))
             }
         }
     }

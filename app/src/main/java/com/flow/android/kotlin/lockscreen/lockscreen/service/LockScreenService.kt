@@ -12,7 +12,7 @@ import android.view.WindowManager
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.flow.android.kotlin.lockscreen.lockscreen.blindscreen.BlindScreenPresenter
 import com.flow.android.kotlin.lockscreen.main.view.MainActivity
-import com.flow.android.kotlin.lockscreen.preferences.Preference
+import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -46,8 +46,8 @@ class LockScreenService : Service() {
 
     private val broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            val showOnLockScreen = Preference.getShowOnLockScreen(context)
-            val displayAfterUnlocking = Preference.getShowAfterUnlocking(context)
+            val showOnLockScreen = Preference.LockScreen.getShowOnLockScreen(context)
+            val displayAfterUnlocking = Preference.LockScreen.getShowAfterUnlocking(context)
 
             when (intent.action) {
                 Action.StopSelf -> {

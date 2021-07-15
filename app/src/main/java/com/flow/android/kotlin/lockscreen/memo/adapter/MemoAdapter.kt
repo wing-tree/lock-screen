@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.*
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.databinding.MemoBinding
 import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
+import com.flow.android.kotlin.lockscreen.util.BLANK
 import com.flow.android.kotlin.lockscreen.util.DEFAULT_FONT_SIZE
 import com.flow.android.kotlin.lockscreen.util.hide
 import com.flow.android.kotlin.lockscreen.util.show
@@ -87,6 +88,13 @@ class MemoAdapter(private val listener: Listener) : RecyclerView.Adapter<MemoAda
         @SuppressLint("ClickableViewAccessibility")
         fun bind(item: Memo) {
             val context = binding.root.context
+            val checklistCountText = if (item.checklist.isEmpty())
+                BLANK
+            else {
+                val checklistCount = item.checklist.count()
+                val checklistDoneCount = item.checklist.filter { it.isDone }.count()
+                "$checklistDoneCount/$checklistCount"
+            }
 
             binding.textViewContent.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize)
 
@@ -95,15 +103,21 @@ class MemoAdapter(private val listener: Listener) : RecyclerView.Adapter<MemoAda
 
             if (item.isDone) {
                 binding.textViewContent.apply {
-                    text = item.content
                     paintFlags = paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
                     setTextColor(getColor(context, R.color.disabled_light))
+                    text = item.content
                 }
 
                 binding.textViewDate.apply {
-                    text = item.modifiedTime.format(binding.root.context)
                     paintFlags = paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
                     setTextColor(getColor(context, R.color.disabled_light))
+                    text = item.modifiedTime.format(binding.root.context)
+                }
+
+                binding.textViewChecklistCount.apply {
+                    paintFlags = paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                    setTextColor(getColor(context, R.color.disabled_light))
+                    text = checklistCountText
                 }
 
                 binding.viewMemoColor.hide()
@@ -122,6 +136,12 @@ class MemoAdapter(private val listener: Listener) : RecyclerView.Adapter<MemoAda
                     text = item.modifiedTime.format(binding.root.context)
                     paintFlags = paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
                     setTextColor(getColor(context, R.color.high_emphasis_light))
+                }
+
+                binding.textViewChecklistCount.apply {
+                    paintFlags = paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                    setTextColor(getColor(context, R.color.high_emphasis_light))
+                    text = checklistCountText
                 }
 
                 binding.imageViewMemoColor.hide()

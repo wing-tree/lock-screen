@@ -14,11 +14,15 @@ import com.flow.android.kotlin.lockscreen.memo.adapter.ItemTouchCallback
 import com.flow.android.kotlin.lockscreen.memo.adapter.MemoAdapter
 import com.flow.android.kotlin.lockscreen.memo.viewmodel.MemoViewModel
 import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
-import com.flow.android.kotlin.lockscreen.preferences.Preference
+import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
 import com.flow.android.kotlin.lockscreen.util.LinearLayoutManagerWrapper
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.util.*
 
 class MemoFragment: BaseMainFragment<FragmentMemoBinding>() {
@@ -27,6 +31,7 @@ class MemoFragment: BaseMainFragment<FragmentMemoBinding>() {
     }
 
     private val viewModel by activityViewModels<MemoViewModel>()
+    private val compositeDisposable = CompositeDisposable()
 
     private val adapter: MemoAdapter by lazy {
         MemoAdapter(object : MemoAdapter.Listener {
@@ -40,7 +45,7 @@ class MemoFragment: BaseMainFragment<FragmentMemoBinding>() {
                 itemTouchHelper.startDrag(viewHolder)
             }
         }).apply {
-            setFontSize(Preference.getFontSize(requireContext()))
+            setFontSize(Preference.Display.getFontSize(requireContext()))
         }
     }
 
@@ -57,8 +62,14 @@ class MemoFragment: BaseMainFragment<FragmentMemoBinding>() {
         initializeViews()
         initializeData()
         registerLifecycleObservers()
+        subscribeObservables()
 
         return viewBinding.root
+    }
+
+    override fun onDestroyView() {
+        compositeDisposable.clear()
+        super.onDestroyView()
     }
 
     private fun initializeViews() {
@@ -89,20 +100,28 @@ class MemoFragment: BaseMainFragment<FragmentMemoBinding>() {
 
     private fun registerLifecycleObservers() {
         viewModel.refresh.observe(viewLifecycleOwner, {
-            adapter.setFontSize(Preference.getFontSize(requireContext()))
+            adapter.setFontSize(Preference.Display.getFontSize(requireContext()))
             adapter.notifyDataSetChanged()
         })
+    }
 
-        viewModel.dataChanged.observe(viewLifecycleOwner, {
-            when(it.state) {
-                DataChangedState.Deleted -> adapter.remove(it.data)
-                DataChangedState.Inserted -> {
-                    adapter.add(it.data)
-                    viewBinding.recyclerView.scrollToPosition(0)
+    private fun subscribeObservables() {
+        compositeDisposable.add(viewModel.publishSubject
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    when(it.state) {
+                        DataChangedState.Deleted -> adapter.remove(it.data)
+                        DataChangedState.Inserted -> {
+                            adapter.add(it.data)
+                            viewBinding.recyclerView.scrollToPosition(0)
+                        }
+                        DataChangedState.Updated -> adapter.update(it.data)
+                    }
+                }) {
+                    Timber.e(it)
                 }
-                DataChangedState.Updated -> adapter.update(it.data)
-            }
-        })
+        )
     }
 
     companion object {

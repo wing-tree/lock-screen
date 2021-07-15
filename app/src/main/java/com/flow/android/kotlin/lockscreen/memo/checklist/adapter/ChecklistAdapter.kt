@@ -9,9 +9,6 @@ import com.flow.android.kotlin.lockscreen.databinding.ChecklistItemBinding
 import com.flow.android.kotlin.lockscreen.persistence.entity.ChecklistItem
 import com.flow.android.kotlin.lockscreen.util.hide
 import com.flow.android.kotlin.lockscreen.util.show
-import kotlinx.coroutines.*
-import java.util.*
-import kotlin.Comparator
 
 class ChecklistAdapter(private val listener: Listener, private val isEditable: Boolean): ListAdapter<ChecklistItem, ChecklistAdapter.ViewHolder>(DiffCallback()) {
     interface Listener {
@@ -38,7 +35,7 @@ class ChecklistAdapter(private val listener: Listener, private val isEditable: B
                 binding.checkBox.show()
                 binding.imageViewClear.hide()
 
-                binding.checkBox.isChecked = item.done
+                binding.checkBox.isChecked = item.isDone
 
                 binding.checkBox.setOnCheckedChangeListener { _, isChecked ->
                     listener.onItemCheckedChange(item, isChecked)

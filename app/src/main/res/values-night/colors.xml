@@ -4,8 +4,6 @@
     <color name="on_background">@color/white</color>
     <color name="surface">@color/grey_800</color>
 
-    <color name="edit_text_background">@color/grey_800</color>
-
     <color name="unselected">@color/white</color>
 
     <color name="high_emphasis">#DEFFFFFF</color>

@@ -41,12 +41,6 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.ConfigurationActivity" />
 
-        <activity android:name=".settings.SettingsTestActivity"
-            android:excludeFromRecents="true"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.ConfigurationActivity" />
-
         <service android:name=".lockscreen.service.LockScreenService" />
 
         <receiver

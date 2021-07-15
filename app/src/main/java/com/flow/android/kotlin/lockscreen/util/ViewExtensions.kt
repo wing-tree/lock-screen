@@ -77,7 +77,7 @@ fun View.expand(duration: Long, onAnimationEnd: (() -> Unit)? = null) {
     else
         return
 
-    val heightMeasureSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
+    val heightMeasureSpec = MeasureSpec.makeMeasureSpec(1, MeasureSpec.UNSPECIFIED)
 
     measure(widthMeasureSpec, heightMeasureSpec)
 
@@ -246,6 +246,7 @@ fun View.collapse(duration: Long, to: Int, onAnimationEnd: (() -> Unit)? = null)
         override fun onAnimationRepeat(animation: Animator?) {}
     })
 
+    valueAnimator.interpolator = DecelerateInterpolator()
     valueAnimator.duration = duration
     valueAnimator.start()
 }

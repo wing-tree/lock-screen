@@ -12,14 +12,13 @@ import com.flow.android.kotlin.lockscreen.preference.viewmodel.PreferenceViewMod
 import com.flow.android.kotlin.lockscreen.databinding.FragmentConfigurationBinding
 import com.flow.android.kotlin.lockscreen.util.LinearLayoutManagerWrapper
 
-abstract class ConfigurationFragment : BaseFragment<FragmentConfigurationBinding>() {
-    abstract fun createConfigurationAdapter() : PreferenceAdapter
+abstract class PreferenceFragment : BaseFragment<FragmentConfigurationBinding>() {
+    abstract fun createPreferenceAdapter() : PreferenceAdapter
     abstract val toolbarTitleResId: Int
 
     protected val viewModel by activityViewModels<PreferenceViewModel>()
-
     protected val preferenceAdapter : PreferenceAdapter by lazy {
-        createConfigurationAdapter()
+        createPreferenceAdapter()
     }
 
     private fun initializeToolbar(toolbar: Toolbar) {
