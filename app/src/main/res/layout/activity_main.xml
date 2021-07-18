@@ -167,10 +167,10 @@
             android:foreground="?attr/selectableItemBackgroundBorderless"
             tools:ignore="UselessParent">
 
-            <androidx.appcompat.widget.AppCompatImageView
+            <ImageView
                 android:id="@+id/image_view_unlock"
-                android:layout_width="@dimen/width_double_extra_large"
-                android:layout_height="@dimen/height_double_extra_large"
+                android:layout_width="@dimen/width_triple_extra_large"
+                android:layout_height="@dimen/height_triple_extra_large"
                 android:layout_gravity="center"
                 android:background="@drawable/oval_border"
                 android:duplicateParentState="true"

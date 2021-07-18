@@ -53,13 +53,13 @@ class ConfirmationDialogFragment : BaseDialogFragment<FragmentConfirmationDialog
         else
             viewBinding.textViewMessage.text = message
 
-        viewBinding.materialButtonCancel.text = negativeButtonText
-        viewBinding.materialButtonCancel.setOnClickListener {
+        viewBinding.textViewCancel.text = negativeButtonText
+        viewBinding.textViewCancel.setOnClickListener {
             onNegativeButtonClick?.invoke(this@ConfirmationDialogFragment)
         }
 
-        viewBinding.materialButtonConfirm.text = positiveButtonText
-        viewBinding.materialButtonConfirm.setOnClickListener {
+        viewBinding.textViewConfirm.text = positiveButtonText
+        viewBinding.textViewConfirm.setOnClickListener {
             onPositiveButtonClick?.invoke(this@ConfirmationDialogFragment)
         }
 

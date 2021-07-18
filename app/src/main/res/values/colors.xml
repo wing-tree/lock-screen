@@ -3,27 +3,33 @@
     <!-- Text legibility
          https://material.io/design/color/text-legibility.html#color-theme-creation -->
 
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="dark_grey">#121212</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="grey_50">#FAFAFA</color>
     <color name="grey_500">#9E9E9E</color>
     <color name="grey_700">#616161</color>
     <color name="grey_800">#424242</color>
     <color name="grey_900">#212121</color>
-    <color name="yellow_A_200">#ffff00</color>
-    <color name="yellow_200">#fff9c4</color>
 
+    <color name="yellow_A_200">#ffff00</color>
+
+    <color name="indigo_500">#3f51b5</color>
+    <color name="indigo_700">#303f9f</color>
+
+    <color name="blue_500">#2196f3</color>
+    <color name="blue_700">#1976d2</color>
+
+    <color name="light_blue_200">#90caf9</color>
     <color name="light_blue_500">#03a9f4</color>
     <color name="light_blue_700">#0288d1</color>
 
     <color name="background">@color/white</color>
     <color name="on_background">@color/grey_900</color>
-    <color name="surface">@color/yellow_200</color>
+    <color name="surface">@color/white</color>
+
+    <color name="card_background">#99121212</color>
 
     <color name="high_emphasis">#DE000000</color>
     <color name="medium_emphasis">#99000000</color>
@@ -39,8 +45,6 @@
 
     <color name="active">#DE000000</color>
     <color name="inactive">#99000000</color>
-
-    <color name="card_background">#99121212</color>
 
     <color name="red_400">#ef5350</color>
     <color name="pink_400">#ec407a</color>
@@ -79,19 +83,11 @@
         <item>@color/deep_orange_400</item>
     </integer-array>
 
-    <color name="unselected">@color/grey_900</color>
-
-    <color name="header_background">@color/grey_800</color>
-
-    <color name="button_text_disabled">@color/disabled</color>
-    <color name="button_text_enabled">@color/high_emphasis</color>
-
     <color name="border">@color/medium_emphasis</color>
     <color name="divider">#1F000000</color>
     <color name="icon">@color/medium_emphasis</color>
     <color name="shadow">@color/black</color>
-    <color name="status_bar">@color/background</color>
-<!--    <color name="text">@color/grey_900</color>-->
+    <color name="status_bar">@color/grey_50</color>
     <color name="title">@color/black</color>
     <color name="toolbar">@color/white</color>
 </resources>

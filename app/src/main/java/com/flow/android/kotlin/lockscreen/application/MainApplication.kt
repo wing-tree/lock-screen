@@ -10,6 +10,8 @@ import com.flow.android.kotlin.lockscreen.BuildConfig
 import com.flow.android.kotlin.lockscreen.bottomnavigation.BottomNavigationItemPressedListener
 import com.flow.android.kotlin.lockscreen.bottomnavigation.NavigationBarWatcher
 import com.flow.android.kotlin.lockscreen.lockscreen.service.LockScreenService
+import com.flow.android.kotlin.lockscreen.main.notification.ManageOverlayPermissionNotificationBuilder
+import com.flow.android.kotlin.lockscreen.permission.PermissionChecker
 import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
 import timber.log.Timber
 import timber.log.Timber.DebugTree
@@ -21,6 +23,7 @@ class MainApplication: Application(), Application.ActivityLifecycleCallbacks {
 
     override fun onCreate() {
         super.onCreate()
+        instance = this
 
         AppCompatDelegate.setDefaultNightMode(Preference.Display.getDarkMode(this))
         registerActivityLifecycleCallbacks(this)
@@ -63,5 +66,9 @@ class MainApplication: Application(), Application.ActivityLifecycleCallbacks {
                 activity.finish()
             }
         }
+    }
+
+    companion object {
+        var instance: MainApplication? = null
     }
 }

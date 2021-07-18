@@ -1,5 +1,6 @@
 package com.flow.android.kotlin.lockscreen.calendar
 
+import android.Manifest
 import android.content.ContentResolver
 import android.content.ContentUris
 import android.graphics.Color
@@ -9,7 +10,9 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.core.database.getIntOrNull
 import androidx.core.database.getLongOrNull
 import androidx.core.database.getStringOrNull
+import com.flow.android.kotlin.lockscreen.application.MainApplication
 import com.flow.android.kotlin.lockscreen.calendar.model.Model
+import com.flow.android.kotlin.lockscreen.permission.PermissionChecker
 import com.flow.android.kotlin.lockscreen.util.BLANK
 import java.util.*
 
@@ -25,6 +28,7 @@ object CalendarLoader {
                 CalendarContract.Calendars.OWNER_ACCOUNT,
         )
 
+        @Suppress("unused")
         object Index {
             @Suppress("ObjectPropertyName")
             const val _ID = 0
@@ -70,6 +74,9 @@ object CalendarLoader {
     }
 
     fun calendars(contentResolver: ContentResolver): List<Model.Calendar> {
+        if (PermissionChecker.hasCalendarPermission().not())
+            return listOf(Model.PermissionDenied())
+
         val calendarDisplays = mutableListOf<Model.Calendar>()
         val contentUri = CalendarContract.Calendars.CONTENT_URI
         val cursor = contentResolver.query(
@@ -106,6 +113,9 @@ object CalendarLoader {
         val builder: Uri.Builder = CalendarContract.Instances.CONTENT_URI.buildUpon()
         ContentUris.appendId(builder, DTSTART.timeInMillis)
         ContentUris.appendId(builder, DTEND.timeInMillis)
+
+        if (PermissionChecker.hasCalendarPermission().not())
+            return null
 
         val cursor = contentResolver.query(
                 builder.build(),

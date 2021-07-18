@@ -13,7 +13,7 @@
 
         <ImageView
             android:id="@+id/image_view_icon"
-            android:layout_width="@dimen/width_small"
+            android:layout_width="@dimen/width_normal"
             android:layout_height="@dimen/height_normal"
             android:layout_marginStart="@dimen/margin_normal"
             app:layout_constraintBottom_toBottomOf="@+id/text_title"
@@ -29,7 +29,7 @@
             android:layout_marginEnd="@dimen/margin_normal"
             android:layout_marginStart="@dimen/margin_extra_large"
             android:gravity="center_vertical"
-            android:textSize="@dimen/text_size_medium"
+            android:textSize="@dimen/text_size_normal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/switch_material"
             app:layout_constraintStart_toEndOf="@+id/image_view_icon"

@@ -5,17 +5,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:animateLayoutChanges="true"
     android:background="@drawable/rounded_corners"
-    android:backgroundTint="@color/background">
+    android:backgroundTint="@color/surface">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/relative_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
             android:gravity="center_vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -25,7 +28,7 @@
                 android:id="@+id/text_view_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_normal"
+                android:layout_marginStart="@dimen/margin_large"
                 android:layout_marginTop="@dimen/margin_normal"
                 android:fontFamily="sans-serif-light"
                 android:textSize="@dimen/text_size_large"
@@ -35,10 +38,10 @@
                 tools:text="5월 2일" />
 
             <View
-                android:id="@+id/view_memo_color"
-                android:layout_width="@dimen/small_100"
-                android:layout_height="@dimen/small_100"
-                android:layout_marginBottom="1dp"
+                android:id="@+id/view_color"
+                android:layout_width="@dimen/width_double_extra_small"
+                android:layout_height="@dimen/height_double_extra_small"
+                android:layout_marginBottom="@dimen/margin_triple_extra_small"
                 android:layout_marginStart="@dimen/margin_normal"
                 android:background="@drawable/background_memo_color"
                 android:backgroundTint="@color/white"
@@ -92,21 +95,28 @@
             android:id="@+id/text_view_content"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/margin_normal"
+            android:layout_marginEnd="@dimen/margin_large"
+            android:layout_marginStart="@dimen/margin_large"
+            android:layout_marginTop="@dimen/margin_normal"
             android:autoLink="all"
-            android:background="@drawable/border"
-            android:maxHeight="@dimen/double_extra_large_100"
-            android:paddingBottom="@dimen/padding_small"
-            android:paddingEnd="@dimen/padding_normal"
-            android:paddingStart="@dimen/padding_normal"
-            android:paddingTop="@dimen/padding_small"
+            android:maxHeight="@dimen/height_max"
             android:scrollbars="vertical"
             android:textIsSelectable="true"
-            android:textSize="@dimen/text_size_medium"
+            android:textSize="@dimen/text_size_normal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/relative_layout"
             tools:text="Content" />
+
+        <View
+            android:id="@+id/view_divider_top"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/height_divider"
+            android:layout_marginTop="@dimen/margin_normal"
+            android:background="@color/divider"
+            android:visibility="invisible"
+            app:layout_constraintTop_toBottomOf="@+id/text_view_content"
+            tools:visibility="visible" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view_checklist"
@@ -114,16 +124,23 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/margin_normal"
             android:layout_marginStart="@dimen/margin_normal"
-            android:layout_marginTop="@dimen/margin_extra_small"
             android:background="@drawable/rounded_corners"
             android:backgroundTint="@android:color/transparent"
-            android:paddingTop="@dimen/triple_extra_small_100"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_view_content"
+            app:layout_constraintTop_toBottomOf="@+id/view_divider_top"
             app:layout_constrainedHeight="true"
             app:layout_constraintHeight_max="@dimen/double_extra_large_100"
+            tools:visibility="visible" />
+
+        <View
+            android:id="@+id/view_divider_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/height_divider"
+            android:background="@color/divider"
+            android:visibility="invisible"
+            app:layout_constraintTop_toBottomOf="@+id/recycler_view_checklist"
             tools:visibility="visible" />
 
         <TextView
@@ -139,10 +156,10 @@
             android:insetBottom="0dp"
             android:padding="@dimen/padding_small"
             android:text="@string/memo_detail_dialog_fragment_000"
-            android:textSize="@dimen/text_size_medium"
+            android:textSize="@dimen/text_size_normal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/text_view_done"
-            app:layout_constraintTop_toBottomOf="@+id/recycler_view_checklist" />
+            app:layout_constraintTop_toBottomOf="@+id/view_divider_bottom" />
 
         <TextView
             android:id="@+id/text_view_done"
@@ -155,7 +172,7 @@
             android:insetBottom="0dp"
             android:padding="@dimen/padding_small"
             android:text="@string/memo_detail_dialog_fragment_001"
-            android:textSize="@dimen/text_size_medium"
+            android:textSize="@dimen/text_size_normal"
             app:layout_constraintBottom_toBottomOf="@+id/text_view_close"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/text_view_close" />

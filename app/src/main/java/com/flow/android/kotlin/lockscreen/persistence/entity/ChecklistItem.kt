@@ -8,4 +8,6 @@ data class ChecklistItem (
     var content: String,
     var id: Long,
     var isDone: Boolean
-) : Parcelable
+) : Parcelable {
+    fun deepCopy() = ChecklistItem(content, id, isDone)
+}

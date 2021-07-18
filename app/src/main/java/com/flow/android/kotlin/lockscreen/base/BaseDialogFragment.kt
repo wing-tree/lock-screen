@@ -12,7 +12,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.viewbinding.ViewBinding
 import com.flow.android.kotlin.lockscreen.R
 
-abstract class BaseDialogFragment<VB: ViewBinding> : DialogFragment() {
+abstract class BaseDialogFragment<VB : ViewBinding> : DialogFragment() {
     private var _viewBinding: VB? = null
     protected val viewBinding: VB
         get() = _viewBinding!!
@@ -37,5 +37,10 @@ abstract class BaseDialogFragment<VB: ViewBinding> : DialogFragment() {
         super.onStart()
 
         dialog?.window?.setWindowAnimations(R.style.WindowAnimation_DialogFragment)
+    }
+
+    override fun onDestroyView() {
+        _viewBinding = null
+        super.onDestroyView()
     }
 }

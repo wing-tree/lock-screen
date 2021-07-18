@@ -29,6 +29,11 @@ abstract class BaseFragment<VB: ViewBinding>: Fragment() {
         return viewBinding.root
     }
 
+    override fun onDestroyView() {
+        _viewBinding = null
+        super.onDestroyView()
+    }
+
     protected fun showToast(text: String, duration: Int = Toast.LENGTH_SHORT) {
         Toast.makeText(requireContext(), text, duration).show()
     }

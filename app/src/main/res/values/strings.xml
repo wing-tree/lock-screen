@@ -12,9 +12,10 @@
     <string name="notification_content_text">This is a notification for stable execution.</string>
 
     <!-- fragment_permission_rationale_dialog -->
-    <string name="fragment_permission_rationale_dialog_000">App permissions</string>
-    <string name="fragment_permission_rationale_dialog_001">Deny</string>
-    <string name="fragment_permission_rationale_dialog_002">Allow</string>
+    <string name="fragment_permission_rationale_dialog_000">Request app permissions</string>
+    <string name="fragment_permission_rationale_dialog_001">To use the app normally, you must allow the following permissions.</string>
+    <string name="fragment_permission_rationale_dialog_002">Deny</string>
+    <string name="fragment_permission_rationale_dialog_003">Allow</string>
 
     <!-- home -->
     <string name="blind_screen_000">Unlocking with the home button is not allowed as per security policy.</string>
@@ -60,10 +61,13 @@
     <string name="main_activity_002">Memo</string>
     <string name="main_activity_003">Notifications</string>
 
+    <string name="manage_overlay_permission_notification_builder_000">Request app permissions</string>
+    <string name="manage_overlay_permission_notification_builder_001">Please allow appear on top permission.</string>
+
     <!-- MemoDetailDialogFragment -->
     <string name="memo_detail_dialog_fragment_000">Close</string>
     <string name="memo_detail_dialog_fragment_001">Done</string>
-    <string name="memo_detail_dialog_fragment_002">Delete memo?</string>
+    <string name="memo_detail_dialog_fragment_002">Delete the memo.</string>
     <string name="memo_detail_dialog_fragment_003">Cancel</string>
     <string name="memo_detail_dialog_fragment_004">Delete</string>
     <string name="memo_detail_dialog_fragment_005">Delete memo</string>
@@ -77,8 +81,8 @@
     <!-- MemoEditingDialogFragment -->
     <string name="memo_editing_dialog_fragment_000">Cancel</string>
     <string name="memo_editing_dialog_fragment_001">Save</string>
-    <string name="memo_editing_dialog_fragment_002">Enter your memos</string>
-    <string name="memo_editing_dialog_fragment_003">Enter your checklist</string>
+    <string name="memo_editing_dialog_fragment_002">Enter your memo.</string>
+    <string name="memo_editing_dialog_fragment_003">Enter your checklist.</string>
 
     <!-- MemoFragment -->
     <string name="memo_fragment_000">You may delay, but time will not. (Benjamin Franklin)</string>

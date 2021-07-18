@@ -4,6 +4,8 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.app.KeyguardManager
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
 import android.graphics.PorterDuff
 import android.net.Uri
@@ -27,12 +29,14 @@ import com.flow.android.kotlin.lockscreen.devicecredential.DeviceCredential
 import com.flow.android.kotlin.lockscreen.devicecredential.RequireDeviceCredential
 import com.flow.android.kotlin.lockscreen.lockscreen.service.LockScreenService
 import com.flow.android.kotlin.lockscreen.main.adapter.FragmentStateAdapter
+import com.flow.android.kotlin.lockscreen.main.notification.ManageOverlayPermissionNotificationBuilder
 import com.flow.android.kotlin.lockscreen.main.torch.Torch
 import com.flow.android.kotlin.lockscreen.main.view.MainActivity.Unlock.endRange
 import com.flow.android.kotlin.lockscreen.main.view.MainActivity.Unlock.outOfEndRange
 import com.flow.android.kotlin.lockscreen.main.viewmodel.MainViewModel
 import com.flow.android.kotlin.lockscreen.main.viewmodel.Refresh
 import com.flow.android.kotlin.lockscreen.memo.viewmodel.MemoViewModel
+import com.flow.android.kotlin.lockscreen.permission.PermissionChecker
 import com.flow.android.kotlin.lockscreen.permission._interface.OnPermissionAllowClickListener
 import com.flow.android.kotlin.lockscreen.permission.view.PermissionRationaleDialogFragment
 import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
@@ -66,26 +70,9 @@ class MainActivity : BaseActivity(),
     private val memoViewModel: MemoViewModel by viewModels()
     private val shortcutViewModel: ShortcutViewModel by viewModels()
 
-    private val delayMillis = 1000L
-    private val handler by lazy { Handler(mainLooper) }
-    private val checkManageOverlayPermission: Runnable = object : Runnable {
-        @TargetApi(23)
-        override fun run() {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
-                return
-
-            if (Settings.canDrawOverlays(this@MainActivity)) {
-                val intent = Intent(this@MainActivity, MainActivity::class.java)
-
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                startActivity(intent)
-
-                return
-            }
-
-            handler.postDelayed(this, delayMillis)
-        }
-    }
+    private val delayMillis = 800L
+    private val notificationManager by lazy { getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager }
+    private var handler: Handler? = null
 
     private object Unlock {
         var x = 0F
@@ -118,19 +105,18 @@ class MainActivity : BaseActivity(),
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
         )
 
+        notificationManager.cancel(ManageOverlayPermissionNotificationBuilder.ID)
+        startService()
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (PermissionRationaleDialogFragment.permissionsGranted(this).not()) {
                 PermissionRationaleDialogFragment().also {
                     it.show(supportFragmentManager, it.tag)
                 }
-            } else {
-                startService()
+            } else
                 calendarViewModel.postValue()
-            }
-        } else {
-            startService()
+        } else
             calendarViewModel.postValue()
-        }
 
         initializeViews()
         registerLifecycleObservers()
@@ -138,11 +124,18 @@ class MainActivity : BaseActivity(),
         firstRun()
     }
 
-    override fun onBackPressed() {
-        if (onBackPressedDispatcher.hasEnabledCallbacks())
-            onBackPressedDispatcher.onBackPressed()
-        else
-            viewBinding.frameLayoutRipple.forceRippleAnimation()
+    override fun onStart() {
+        super.onStart()
+
+        handler = null
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (PermissionChecker.hasManageOverlayPermission().not()) {
+                PermissionRationaleDialogFragment().also {
+                    it.show(supportFragmentManager, it.tag)
+                }
+            }
+        }
     }
 
     override fun onPause() {
@@ -151,6 +144,18 @@ class MainActivity : BaseActivity(),
         }
 
         super.onPause()
+    }
+
+    override fun onDestroy() {
+        sendBroadcast(Intent(LockScreenService.Action.MainActivityDestroyed))
+        super.onDestroy()
+    }
+
+    override fun onBackPressed() {
+        if (onBackPressedDispatcher.hasEnabledCallbacks())
+            onBackPressedDispatcher.onBackPressed()
+        else
+            viewBinding.frameLayoutRipple.forceRippleAnimation()
     }
 
     override fun finish() {
@@ -166,7 +171,7 @@ class MainActivity : BaseActivity(),
 
     @SuppressLint("ClickableViewAccessibility")
     private fun initializeViews() {
-        viewBinding.linearLayoutUnlock.setOnTouchListener { v, event ->
+        viewBinding.linearLayoutUnlock.setOnTouchListener { _, event ->
             when(event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     Unlock.x = event.x
@@ -227,16 +232,8 @@ class MainActivity : BaseActivity(),
                                 intent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
                                 startActivity(intent)
                             } ?: run {
-                                // 커스텀 카메라 실행. 권한 요청 여기서 필요. ㄴㄴ 그냥 꺼지라고 하셈.
+                                // 꺼지라고 하셈. 못찾앗으니 꺼지렴.
                             }
-
-//                            val mIntent = Intent()
-//                            mIntent.setPackage("com.google.android.camera") // 이게 아닐가능성도 있네.
-//                            val f = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "IMG_" + SimpleDateFormat("yyyyMMdd_HHmmss").format(Date()).toString() + ".jpg")
-//                            mIntent.action = MediaStore.ACTION_IMAGE_CAPTURE
-//                            val uri = FileProvider.getUriForFile(this@MainActivity,"com.flow.android.kotlin.lockscreen.fileprovider" , f)
-//                            mIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
-//                            startActivity(mIntent)
                         }
                     }
 
@@ -255,7 +252,7 @@ class MainActivity : BaseActivity(),
             Intent(this, PreferenceActivity::class.java).also {
                 it.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT)
 
-                getActivityResultLauncher(PreferenceActivity.Name.ConfigurationChange)?.launch(it)
+                getActivityResultLauncher(PreferenceActivity.Name.PreferenceChange)?.launch(it)
                 overridePendingTransition(R.anim.slide_in_left, R.anim.fade_out)
             }
         }
@@ -309,32 +306,51 @@ class MainActivity : BaseActivity(),
         )
 
         putActivityResultLauncher(
-                PreferenceActivity.Name.ConfigurationChange,
+                PreferenceActivity.Name.PreferenceChange,
                 registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                     if (result.resultCode == RESULT_OK) {
-                        val configurationChange = result.data?.getParcelableExtra<ConfigurationChange>(
-                                PreferenceActivity.Name.ConfigurationChange
+                        val preferenceChange = result.data?.getParcelableExtra<ConfigurationChange>(
+                                PreferenceActivity.Name.PreferenceChange
                         ) ?: return@registerForActivityResult
 
-                        viewModel.refresh(configurationChange)
+                        viewModel.refresh(preferenceChange)
                     }
                 }
         )
     }
 
     private fun checkManageOverlayPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!Settings.canDrawOverlays(this)) {
-                // todo show alert message for permission. rational
-                val uri = Uri.fromParts("package", packageName, null)
-                val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, uri)
-
-                startActivity(intent)
-                handler.postDelayed(checkManageOverlayPermission, delayMillis)
-            } else
-                startService()
-        } else
+        if (PermissionChecker.hasManageOverlayPermission())
             startService()
+        else {
+            val uri = Uri.fromParts("package", packageName, null)
+            @SuppressLint("InlinedApi")
+            val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, uri)
+
+            startActivity(intent)
+
+            handler = Handler(mainLooper)
+
+            handler?.postDelayed(object : Runnable {
+                @TargetApi(23)
+                override fun run() {
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
+                        return
+
+                    if (Settings.canDrawOverlays(this@MainActivity)) {
+                        Intent(this@MainActivity, MainActivity::class.java).run {
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                            startActivity(this)
+                        }
+
+                        handler = null
+                        return
+                    }
+
+                    handler?.postDelayed(this, delayMillis)
+                }
+            }, delayMillis)
+        }
     }
 
     private fun startService() {
@@ -348,19 +364,20 @@ class MainActivity : BaseActivity(),
 
     private fun checkPermission() {
         Dexter.withContext(this)
-                .withPermissions(
-                        Manifest.permission.READ_CALENDAR
-                ).withListener(object : MultiplePermissionsListener {
+                .withPermissions(Manifest.permission.WRITE_CALENDAR, Manifest.permission.READ_CALENDAR)
+                .withListener(object : MultiplePermissionsListener {
                     override fun onPermissionsChecked(report: MultiplePermissionsReport) {
                         for (grantedPermissionResponse in report.grantedPermissionResponses) {
                             when (grantedPermissionResponse.permissionName) {
-                                Manifest.permission.READ_CALENDAR -> calendarViewModel.postValue()
+                                Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR ->
+                                    calendarViewModel.postValue()
                             }
                         }
 
                         for (deniedPermissionResponse in report.deniedPermissionResponses) {
                             when (deniedPermissionResponse.permissionName) {
-                                Manifest.permission.READ_CALENDAR -> {/* todo 캘린더 프래그먼트에 권한 허용해야한다고 보이기. */
+                                Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR -> {
+                                /* todo 캘린더 프래그먼트에 권한 허용해야한다고 보이기. */
                                 }
                             }
                         }
@@ -382,7 +399,7 @@ class MainActivity : BaseActivity(),
             memoViewModel.insert(
                     Memo(
                             content = getString(R.string.memo_fragment_000),
-                            color = ContextCompat.getColor(this, R.color.unselected),
+                            color = ContextCompat.getColor(this, R.color.white),
                             id = -20210513L,
                             modifiedTime = System.currentTimeMillis(),
                             priority = System.currentTimeMillis()
@@ -395,7 +412,13 @@ class MainActivity : BaseActivity(),
 
     override fun onPermissionAllowClick() {
         checkPermission()
-        //checkManageOverlayPermission()
+    }
+
+    override fun onPermissionDenyClick() {
+        if (PermissionChecker.hasManageOverlayPermission())
+            startService()
+        else
+            finish()
     }
 
     override fun confirmDeviceCredential(value: Unit) {

@@ -10,9 +10,10 @@
     <string name="notification_content_text">안정적인 실행을 위한 알림입니다</string>
 
     <!-- fragment_permission_rationale_dialog -->
-    <string name="fragment_permission_rationale_dialog_000">앱 권한</string>
-    <string name="fragment_permission_rationale_dialog_001">거부</string>
-    <string name="fragment_permission_rationale_dialog_002">허용</string>
+    <string name="fragment_permission_rationale_dialog_000">앱 권한 요청</string>
+    <string name="fragment_permission_rationale_dialog_001">앱을 정상적으로 사용하기 위해서는 다음 권한을 허용해야 합니다.</string>
+    <string name="fragment_permission_rationale_dialog_002">거부</string>
+    <string name="fragment_permission_rationale_dialog_003">허용</string>
 
     <!-- bline_screen -->
     <string name="blind_screen_000">보안정책에 따라 홈 버튼으로 잠금 해제 할 수 없습니다.</string>
@@ -66,10 +67,14 @@
     <string name="main_activity_002">메모</string>
     <string name="main_activity_003">알림</string>
 
+    <!-- ManageOverlayPermissionNotificationBuilder -->
+    <string name="manage_overlay_permission_notification_builder_000">앱 권한 요청</string>
+    <string name="manage_overlay_permission_notification_builder_001">다른 앱 위에 표시 권한을 허용하세요.</string>
+
     <!-- MemoDetailDialogFragment -->
     <string name="memo_detail_dialog_fragment_000">닫기</string>
     <string name="memo_detail_dialog_fragment_001">완료</string>
-    <string name="memo_detail_dialog_fragment_002">메모를 삭제할까요?</string>
+    <string name="memo_detail_dialog_fragment_002">메모를 삭제합니다.</string>
     <string name="memo_detail_dialog_fragment_003">취소</string>
     <string name="memo_detail_dialog_fragment_004">삭제</string>
     <string name="memo_detail_dialog_fragment_005">메모 삭제</string>
@@ -83,8 +88,8 @@
     <!-- MemoEditingDialogFragment -->
     <string name="memo_editing_dialog_fragment_000">취소</string>
     <string name="memo_editing_dialog_fragment_001">저장</string>
-    <string name="memo_editing_dialog_fragment_002">메모를 입력하세요</string>
-    <string name="memo_editing_dialog_fragment_003">체크리스트를 입력하세요</string>
+    <string name="memo_editing_dialog_fragment_002">메모를 입력하세요.</string>
+    <string name="memo_editing_dialog_fragment_003">체크리스트를 입력하세요.</string>
 
     <!-- MemoFragment -->
     <string name="memo_fragment_000">당신은 지체할 수도 있지만 시간은 그러하지 않을 것이다. (벤자민 프랭클린)</string>

@@ -47,7 +47,9 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
             memo?.checklist?.set(index, checklistItem.apply { isDone = isChecked })
 
             memo?.let { viewModel.update(it) {
-                checklist.value?.set(index, checklistItem)
+                val value = checklist.value ?: return@update
+
+                checklist.value = value.apply { set(index, checklistItem) }
             } }
         }
     }, isEditable = false)
@@ -62,8 +64,8 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
             intent ?: return
 
             if (intent.action == Action.Memo) {
-                memo = intent.getParcelableExtra<Memo>(Name.Memo) ?: return
-                memo?.let { initializeView(it) }
+                memo = intent.getParcelableExtra(Name.Memo) ?: return
+                memo?.let { initializeViews(it) }
             }
         }
     }
@@ -88,7 +90,7 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
         memo = arguments?.getParcelable(KEY_MEMO)
 
         memo?.let {
-            initializeView(it)
+            initializeViews(it)
             registerLifecycleObservers()
         } ?: run {
             // show error.
@@ -101,12 +103,11 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
 
     override fun onDestroyView() {
         localBroadcastManager.unregisterReceiver(localBroadcastReceiver)
-
         super.onDestroyView()
     }
 
-    private fun initializeView(memo: Memo) {
-        viewBinding.viewMemoColor.backgroundTintList = ColorStateList.valueOf(memo.color)
+    private fun initializeViews(memo: Memo) {
+        viewBinding.viewColor.backgroundTintList = ColorStateList.valueOf(memo.color)
         viewBinding.textViewDate.text = memo.modifiedTime.toDateString(simpleDateFormat)
         viewBinding.textViewContent.movementMethod = ScrollingMovementMethod()
         viewBinding.textViewContent.text = memo.content
@@ -123,6 +124,9 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
                 adapter = checklistAdapter
                 layoutManager = LinearLayoutManagerWrapper(requireContext())
             }
+
+            viewBinding.viewDividerBottom.show()
+            viewBinding.viewDividerTop.show()
 
             checklist.value = ArrayList(memo.checklist.toList())
         }
@@ -177,8 +181,9 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
     }
 
     private fun registerLifecycleObservers() {
-        checklist.observe(viewLifecycleOwner, {
-            checklistAdapter.submitList(it)
+        checklist.observe(viewLifecycleOwner, { list ->
+            println("????: $list")
+            checklistAdapter.submitList(list.map { it.deepCopy() })
         })
     }
 
@@ -221,8 +226,9 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
     }
 
     companion object {
-        private const val KEY_MEMO = "com.flow.android.kotlin.lockscreen.memo.view" +
-                ".MemoDetailDialogFragment.companion.KEY_MEMO"
+        private const val PREFIX = "com.flow.android.kotlin.lockscreen.memo.view" +
+                ".MemoDetailDialogFragment.companion"
+        private const val KEY_MEMO = "$PREFIX.KEY_MEMO"
 
         fun getInstance(memo: Memo): MemoDetailDialogFragment {
             val instance = MemoDetailDialogFragment()

@@ -16,53 +16,61 @@
             android:id="@+id/text_view_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_normal"
+            android:layout_marginStart="@dimen/margin_large"
             android:layout_marginTop="@dimen/margin_normal"
+            android:fontFamily="sans-serif-light"
             android:textSize="@dimen/text_size_large"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="메모를 삭제합니다." />
+            tools:text="메모 삭제" />
 
         <TextView
             android:id="@+id/text_view_message"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_normal"
+            android:layout_marginEnd="@dimen/margin_large"
+            android:layout_marginStart="@dimen/margin_large"
             android:layout_marginTop="@dimen/margin_normal"
-            android:textSize="@dimen/text_size_medium"
+            android:textSize="@dimen/text_size_normal"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/text_view_title"
-            tools:text="선택한 메모를 삭제하시겠습니까?" />
+            tools:text="메모를 삭제합니다." />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/material_button_cancel"
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/text_view_cancel"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="1dp"
+            android:layout_marginBottom="@dimen/margin_normal"
             android:layout_marginTop="@dimen/margin_normal"
-            android:background="@drawable/rounded_corner_bottom_left"
+            android:layout_marginEnd="@dimen/margin_small"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:fontFamily="sans-serif-medium"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="@string/memo_editing_dialog_fragment_000"
-            app:layout_constraintEnd_toStartOf="@+id/material_button_confirm"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_view_message" />
+            android:padding="@dimen/padding_small"
+            android:textSize="@dimen/text_size_normal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/text_view_confirm"
+            app:layout_constraintTop_toBottomOf="@+id/text_view_message"
+            tools:text="취소" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/material_button_confirm"
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/text_view_confirm"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="1dp"
-            android:background="@drawable/rounded_corner_bottom_right"
+            android:layout_marginEnd="@dimen/margin_normal"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:fontFamily="sans-serif-medium"
             android:insetTop="0dp"
             android:insetBottom="0dp"
+            android:padding="@dimen/padding_small"
             android:text="@string/memo_editing_dialog_fragment_001"
-            app:layout_constraintBottom_toBottomOf="@+id/material_button_cancel"
+            android:textSize="@dimen/text_size_normal"
+            app:layout_constraintBottom_toBottomOf="@+id/text_view_cancel"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/material_button_cancel"
-            app:layout_constraintTop_toTopOf="@+id/material_button_cancel" />
+            app:layout_constraintTop_toTopOf="@+id/text_view_cancel"
+            tools:text="삭제" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </RelativeLayout>

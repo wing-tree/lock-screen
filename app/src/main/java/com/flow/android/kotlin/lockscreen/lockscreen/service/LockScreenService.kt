@@ -8,10 +8,11 @@ import android.content.IntentFilter
 import android.os.Build
 import android.os.IBinder
 import android.provider.Settings
-import android.view.WindowManager
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.flow.android.kotlin.lockscreen.lockscreen.blindscreen.BlindScreenPresenter
+import com.flow.android.kotlin.lockscreen.main.notification.ManageOverlayPermissionNotificationBuilder
 import com.flow.android.kotlin.lockscreen.main.view.MainActivity
+import com.flow.android.kotlin.lockscreen.permission.PermissionChecker
 import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -20,22 +21,18 @@ import timber.log.Timber
 
 class LockScreenService : Service() {
     object Action {
-        const val HomeKeyPressed = "com.flow.android.kotlin.lockscreen.lockscreen" +
-                ".LockScreenService.Action.HomePressed"
-        const val RecentAppsPressed = "com.flow.android.kotlin.lockscreen.lockscreen" +
-                ".LockScreenService.Action.RecentAppsPressed"
-        const val StopSelf = "com.flow.android.kotlin.lockscreen.lockscreen" +
-                ".LockScreenService.Action.StopSelf"
+        private const val Prefix = "com.flow.android.kotlin.lockscreen.lockscreen" +
+                ".LockScreenService.Action"
+        const val HomeKeyPressed = "$Prefix.HomePressed"
+        const val MainActivityDestroyed = "$Prefix.MainActivityDestroyed"
+        const val RecentAppsPressed = "$Prefix.RecentAppsPressed"
+        const val StopSelf = "$Prefix.StopSelf"
     }
 
     private val blindScreenPresenter by lazy { BlindScreenPresenter(this) }
 
     private val localBroadcastManager: LocalBroadcastManager by lazy {
         LocalBroadcastManager.getInstance(this)
-    }
-
-    private val windowManager: WindowManager by lazy {
-        getSystemService(WINDOW_SERVICE) as WindowManager
     }
 
     private val notificationManager: NotificationManager by lazy {
@@ -50,9 +47,16 @@ class LockScreenService : Service() {
             val displayAfterUnlocking = Preference.LockScreen.getShowAfterUnlocking(context)
 
             when (intent.action) {
+                Action.MainActivityDestroyed -> {
+                    if (PermissionChecker.hasManageOverlayPermission().not()) {
+                        ManageOverlayPermissionNotificationBuilder.create(context).build().run {
+                            notificationManager.notify(ManageOverlayPermissionNotificationBuilder.ID, this)
+                        }
+                    }
+                }
                 Action.StopSelf -> {
                     stopSelf()
-                    notificationManager.cancelAll()
+                    notificationManager.cancel(NotificationBuilder.ID)
                 }
                 Intent.ACTION_SCREEN_OFF -> {
                     if (showOnLockScreen.not() || displayAfterUnlocking)
@@ -73,7 +77,7 @@ class LockScreenService : Service() {
                     }
                 }
                 else -> {
-
+                    // pass
                 }
             }
         }
@@ -108,6 +112,7 @@ class LockScreenService : Service() {
         registerReceiver(
                 broadcastReceiver,
                 IntentFilter().apply {
+                    addAction(Action.MainActivityDestroyed)
                     addAction(Action.StopSelf)
                     addAction(Intent.ACTION_SCREEN_OFF)
                     addAction(Intent.ACTION_USER_PRESENT)
@@ -120,7 +125,7 @@ class LockScreenService : Service() {
                 .observeOn(Schedulers.io())
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe { it ->
-                    startForeground(1, it.build())
+                    startForeground(NotificationBuilder.ID, it.build())
                 }
 
         return START_STICKY

@@ -1,14 +1,15 @@
 package com.flow.android.kotlin.lockscreen.calendar.adapter
 
 import android.content.res.ColorStateList
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewbinding.ViewBinding
 import com.flow.android.kotlin.lockscreen.calendar.model.Model
-import com.flow.android.kotlin.lockscreen.databinding.EventItemBinding
+import com.flow.android.kotlin.lockscreen.databinding.CalendarEventBinding
+import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -21,14 +22,14 @@ class CalendarEventAdapter(private val onItemClick: (item: Model.CalendarEvent) 
         submitList(list)
     }
 
-    inner class ViewHolder(private val viewBinding: ViewBinding) : RecyclerView.ViewHolder(viewBinding.root) {
+    inner class ViewHolder(private val viewBinding: CalendarEventBinding) : RecyclerView.ViewHolder(viewBinding.root) {
 
         fun bind(item: Model.CalendarEvent) {
-            viewBinding as EventItemBinding
-
             val begin = "${item.begin.format()} - "
+            val fontSize = Preference.Display.getFontSize(viewBinding.root.context)
 
             viewBinding.textViewBegin.text = begin
+            viewBinding.textViewTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, fontSize)
             viewBinding.textViewTitle.text = item.title
             viewBinding.textViewEnd.text = item.end.format()
             viewBinding.viewCalendarColor.backgroundTintList = ColorStateList.valueOf(item.calendarColor)
@@ -43,7 +44,7 @@ class CalendarEventAdapter(private val onItemClick: (item: Model.CalendarEvent) 
 
     private fun from(parent: ViewGroup): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val viewBinding = EventItemBinding.inflate(inflater, parent, false)
+        val viewBinding = CalendarEventBinding.inflate(inflater, parent, false)
 
         return ViewHolder(viewBinding)
     }

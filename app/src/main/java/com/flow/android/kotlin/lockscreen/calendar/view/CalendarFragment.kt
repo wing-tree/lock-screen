@@ -12,7 +12,7 @@ import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.base.BaseMainFragment
 import com.flow.android.kotlin.lockscreen.calendar.CalendarLoader
 import com.flow.android.kotlin.lockscreen.databinding.FragmentCalendarBinding
-import com.flow.android.kotlin.lockscreen.calendar.adapter.EventsAdapter
+import com.flow.android.kotlin.lockscreen.calendar.adapter.CalendarEventListAdapter
 import com.flow.android.kotlin.lockscreen.calendar.contract.CalendarContract
 import com.flow.android.kotlin.lockscreen.calendar.viewmodel.CalendarViewModel
 import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
@@ -43,7 +43,7 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
         }
     }
 
-    private val eventsAdapter = EventsAdapter(arrayListOf()) {
+    private val adapter = CalendarEventListAdapter(arrayListOf()) {
         CalendarLoader.editEvent(activityResultLauncher, it)
     }
 
@@ -101,7 +101,7 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
                             }, i
                     ).also { events ->
                         withContext(Dispatchers.Main) {
-                            events.let { eventsAdapter.add(it) }
+                            events.let { adapter.add(it) }
                         }
                     }
                 }
@@ -112,7 +112,7 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
             viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
                 val uncheckedCalendarIds = Preference.Calendar.getUncheckedCalendarIds(requireContext())
 
-                eventsAdapter.clear()
+                adapter.clear()
 
                 for (i in 0..itemCount) {
                     CalendarLoader.calendarEvents(
@@ -121,12 +121,12 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
                                 uncheckedCalendarIds.contains(it.id.toString()).not()
                             } ?: emptyList(), i
                     ).also { events ->
-                        events.let { eventsAdapter.add(it, false) }
+                        events.let { adapter.add(it, false) }
                     }
                 }
 
                 withContext(Dispatchers.Main) {
-                    eventsAdapter.notifyDataSetChanged()
+                    adapter.notifyDataSetChanged()
                 }
             }
         })
@@ -137,7 +137,7 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
             CalendarLoader.insertEvent(activityResultLauncher)
         }
 
-        viewBinding.viewPager2.adapter = eventsAdapter
+        viewBinding.viewPager2.adapter = adapter
         viewBinding.viewPager2.registerOnPageChangeCallback(onPageChangeCallback)
 
         viewBinding.imageViewBack.setOnClickListener {

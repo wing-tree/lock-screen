@@ -1,16 +1,18 @@
 package com.flow.android.kotlin.lockscreen.preference.view
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.view.View
+import android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.calendar.CalendarLoader
-import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
+import com.flow.android.kotlin.lockscreen.databinding.ActivityPreferenceBinding
 import com.flow.android.kotlin.lockscreen.preference.adapter.AdapterItem
 import com.flow.android.kotlin.lockscreen.preference.adapter.CheckBoxAdapter
 import com.flow.android.kotlin.lockscreen.preference.adapter.CheckBoxItem
@@ -18,11 +20,12 @@ import com.flow.android.kotlin.lockscreen.preference.adapter.PreferenceAdapter
 import com.flow.android.kotlin.lockscreen.preference.calendar.view.CalendarPreferenceFragment
 import com.flow.android.kotlin.lockscreen.preference.display.view.DisplayPreferenceFragment
 import com.flow.android.kotlin.lockscreen.preference.lockscreen.view.LockScreenPreferenceFragment
+import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
 import com.flow.android.kotlin.lockscreen.preference.viewmodel.PreferenceViewModel
-import com.flow.android.kotlin.lockscreen.databinding.ActivityConfigurationBinding
+import com.flow.android.kotlin.lockscreen.util.LinearLayoutManagerWrapper
 
 class PreferenceActivity: AppCompatActivity() {
-    private val viewBinding by lazy { ActivityConfigurationBinding.inflate(layoutInflater) }
+    private val viewBinding by lazy { ActivityPreferenceBinding.inflate(layoutInflater) }
     private val viewModel: PreferenceViewModel by viewModels()
 
     private val activity = this
@@ -58,34 +61,54 @@ class PreferenceActivity: AppCompatActivity() {
     }
 
     object Name {
-        private const val Prefix = "com.flow.android.kotlin.lockscreen.configuration.view" +
-                ".ConfigurationActivity.Name"
-        const val ConfigurationChange = "$Prefix.ConfigurationChange"
+        private const val Prefix = "com.flow.android.kotlin.lockscreen.preference.view" +
+                ".PreferenceActivity.Name"
+        const val PreferenceChange = "$Prefix.PreferenceChange"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(viewBinding.root)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                window?.decorView?.windowInsetsController?.let {
+                    if (Preference.Display.getIsDarkMode(this))
+                        it.setSystemBarsAppearance(0, APPEARANCE_LIGHT_STATUS_BARS)
+                    else
+                        it.setSystemBarsAppearance(APPEARANCE_LIGHT_STATUS_BARS, APPEARANCE_LIGHT_STATUS_BARS)
+                }
+            } else {
+                window?.decorView?.let {
+                    @Suppress("DEPRECATION")
+                    if (Preference.Display.getIsDarkMode(this))
+                        it.systemUiVisibility = 0
+                    else
+                        it.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+                }
+            }
+        }
+
         initializeToolbar(viewBinding.toolbar)
 
         viewBinding.recyclerView.apply {
             adapter = this@PreferenceActivity.adapter
-            layoutManager = LinearLayoutManager(activity)
+            layoutManager = LinearLayoutManagerWrapper(activity)
         }
 
         val uncheckedCalendarIds = Preference.Calendar.getUncheckedCalendarIds(this)
         val checkBoxItems = CalendarLoader.calendars(contentResolver).map {
-            CheckBoxItem(
-                    isChecked = uncheckedCalendarIds.contains(it.id.toString()).not(),
-                    text = it.name,
-                    onCheckedChange = { isChecked ->
-                        if (isChecked)
-                            Preference.Calendar.removeUncheckedCalendarId(this, it.id.toString())
-                        else
-                            Preference.Calendar.addUncheckedCalendarId(this, it.id.toString())
-                    }
-            )
-        }
+                CheckBoxItem(
+                        isChecked = uncheckedCalendarIds.contains(it.id.toString()).not(),
+                        text = it.name,
+                        onCheckedChange = { isChecked ->
+                            if (isChecked)
+                                Preference.Calendar.removeUncheckedCalendarId(this, it.id.toString())
+                            else
+                                Preference.Calendar.addUncheckedCalendarId(this, it.id.toString())
+                        }
+                )
+            }
 
         checkBoxAdapter.addAll(checkBoxItems)
     }
@@ -97,7 +120,7 @@ class PreferenceActivity: AppCompatActivity() {
         }
 
         val intent = Intent().apply {
-            putExtra(Name.ConfigurationChange, viewModel.configurationChanged)
+            putExtra(Name.PreferenceChange, viewModel.configurationChanged)
         }
 
         setResult(RESULT_OK, intent)

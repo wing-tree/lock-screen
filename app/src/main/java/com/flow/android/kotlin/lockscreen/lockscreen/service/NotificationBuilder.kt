@@ -25,6 +25,13 @@ import java.util.*
 import kotlin.Comparator
 
 object NotificationBuilder {
+    const val ID = 5337800
+
+    private const val PREFIX = "com.flow.android.kotlin.lockscreen.lockscreen.service.NotificationBuilder"
+    private const val CHANNEL_ID = "$PREFIX.CHANNEL_ID"
+    private const val CHANNEL_NAME = "$PREFIX.CHANNEL_NAME"
+    private const val CHANNEL_DESCRIPTION = "com.flow.android.kotlin.lockscreen.lock_screen.channel_description" // todo change real des.
+
     fun single(context: Context, notificationManager: NotificationManager): Single<NotificationCompat.Builder> {
         return Single.create {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -45,7 +52,7 @@ object NotificationBuilder {
             )
 
             GlobalScope.launch(Dispatchers.IO) {
-                val eventForNotification = eventForNotification(context)
+                val eventForNotification = calendarEventForNotification(context)
                 val memos = todayMemos(context)
                 val memoForNotification = memoForNotification(memos)
 
@@ -71,8 +78,6 @@ object NotificationBuilder {
                 }
 
                 val builder = NotificationCompat.Builder(context, CHANNEL_ID)
-                    .setStyle(NotificationCompat.BigPictureStyle()
-                    )
                         .setSmallIcon(R.drawable.ic_round_lock_open_24)
                         .setContentTitle(contentTitle)
                         .setContentText(contentText)
@@ -81,26 +86,12 @@ object NotificationBuilder {
                         .setShowWhen(false)
                         .setSubText(subText)
 
-                // todo remove..
-                /*Notification notif = new Notification.Builder(mContext)
-                *     .setContentTitle(&quot;5 New mails from &quot; + sender.toString())
-                *     .setContentText(subject)
-                *     .setSmallIcon(R.drawable.new_mail)
-                *     .setLargeIcon(aBitmap)
-                *     .setStyle(new Notification.InboxStyle()
-                *         .addLine(str1)
-                *         .addLine(str2)
-                *         .setContentTitle(&quot;&quot;)
-                *         .setSummaryText(&quot;+3 more&quot;))
-                *     .build();
-                 */
-
                 it.onSuccess(builder)
             }
         }
     }
 
-    private fun eventForNotification(context: Context): Model.CalendarEvent? {
+    private fun calendarEventForNotification(context: Context): Model.CalendarEvent? {
         val contentResolver = context.contentResolver
 
         val gregorianCalendar = GregorianCalendar().apply {
@@ -108,7 +99,6 @@ object NotificationBuilder {
         }
 
         val currentTimeHourOfDay = gregorianCalendar.get(GregorianCalendar.HOUR_OF_DAY)
-        val currentTimeMinute = gregorianCalendar.get(GregorianCalendar.MINUTE) + currentTimeHourOfDay * 60
 
         val calendars = CalendarLoader.calendars(contentResolver)
         val uncheckedCalendarIds = Preference.Calendar.getUncheckedCalendarIds(context)
@@ -118,15 +108,12 @@ object NotificationBuilder {
         }, 0)
 
         for (event in events) {
-            gregorianCalendar.timeInMillis = event.begin
+            val beginHourOfDay = gregorianCalendar.apply { timeInMillis = event.begin }
+                    .get(GregorianCalendar.HOUR_OF_DAY)
+            val endHourOfDay = gregorianCalendar.apply { timeInMillis = event.end }
+                    .get(GregorianCalendar.HOUR_OF_DAY)
 
-            val beginHourOfDay = gregorianCalendar.get(GregorianCalendar.HOUR_OF_DAY)
-
-            gregorianCalendar.timeInMillis = event.end
-
-            val endHourOfDay = gregorianCalendar.get(GregorianCalendar.HOUR_OF_DAY)
-
-            if (beginHourOfDay - 3 <= currentTimeMinute && currentTimeMinute <= endHourOfDay + 3) {
+            if (beginHourOfDay - 3 <= currentTimeHourOfDay && currentTimeHourOfDay <= endHourOfDay + 3) {
                 return event
             }
         }
@@ -163,8 +150,4 @@ object NotificationBuilder {
 
         return null
     }
-
-    private const val CHANNEL_NAME = "com.flow.android.kotlin.lockscreen.lock_screen.channel_name"
-    private const val CHANNEL_DESCRIPTION = "com.flow.android.kotlin.lockscreen.lock_screen.channel_description" // todo change real des.
-    private const val CHANNEL_ID = "com.flow.android.kotlin.lockscreen.lock_screen.channel_id"
 }

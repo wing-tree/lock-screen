@@ -4,11 +4,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="@dimen/height_min"
     android:layout_marginBottom="@dimen/margin_extra_small"
     android:background="@drawable/border">
 
-    <androidx.appcompat.widget.AppCompatEditText
+    <EditText
         android:id="@+id/edit_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -21,7 +21,7 @@
         android:paddingEnd="@dimen/padding_normal"
         android:paddingStart="@dimen/padding_normal"
         android:paddingTop="@dimen/padding_small"
-        android:textSize="@dimen/text_size_medium"
+        android:textSize="@dimen/text_size_normal"
         app:layout_constraintEnd_toStartOf="@id/frame_layout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -35,13 +35,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <ImageView
             android:id="@+id/image_view"
-            android:layout_width="@dimen/width_small"
+            android:layout_width="@dimen/width_normal"
             android:layout_height="@dimen/height_normal"
             android:layout_marginEnd="@dimen/margin_extra_small"
             android:elevation="@dimen/extra_small_100"
             app:srcCompat="@drawable/ic_round_add_circle_24"
-            app:tint="@color/icon"/>
+            app:tint="@color/icon"
+            tools:ignore="ContentDescription" />
     </FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

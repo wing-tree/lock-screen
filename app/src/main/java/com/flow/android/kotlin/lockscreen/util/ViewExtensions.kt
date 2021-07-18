@@ -10,8 +10,11 @@ import android.view.View
 import android.view.View.MeasureSpec
 import android.view.ViewGroup
 import android.view.animation.*
+import android.widget.CheckBox
 import android.widget.FrameLayout
 import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
+import androidx.core.content.ContextCompat
 
 
 fun FrameLayout.forceRippleAnimation() {
@@ -112,7 +115,11 @@ fun View.expand(duration: Long, onAnimationEnd: (() -> Unit)? = null) {
     valueAnimator.start()
 }
 
-fun View.fadeIn(duration: Number, onAnimationEnd: (() -> Unit)? = null, alphaFrom: Float = 0F) {
+fun View.fadeIn(
+        duration: Number,
+        onAnimationEnd: (() -> Unit)? = null,
+        alphaFrom: Float = 0F,
+) {
     this.apply {
         alpha = alphaFrom
         visibility = View.VISIBLE
@@ -129,7 +136,7 @@ fun View.fadeIn(duration: Number, onAnimationEnd: (() -> Unit)? = null, alphaFro
     }
 }
 
-fun View.fadeOut(duration: Number, onAnimationEnd: (() -> Unit)? = null) {
+fun View.fadeOut(duration: Number, invisible: Boolean = false, onAnimationEnd: (() -> Unit)? = null) {
     this.apply {
         alpha = 1F
 
@@ -138,7 +145,11 @@ fun View.fadeOut(duration: Number, onAnimationEnd: (() -> Unit)? = null) {
             .setDuration(duration.toLong())
             .setListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator?) {
-                    this@fadeOut.visibility = View.GONE
+                    this@fadeOut.visibility = if (invisible)
+                        View.INVISIBLE
+                    else
+                        View.GONE
+
                     onAnimationEnd?.invoke()
                     super.onAnimationEnd(animation)
                 }
@@ -183,11 +194,10 @@ fun View.scale(scale: Float, duration: Number = 200, alpha: Float = 1F) {
 }
 
 fun View.hide(invisible: Boolean = false) {
-    visibility =
-        if (invisible)
-            View.INVISIBLE
-        else
-            View.GONE
+    visibility = if (invisible)
+        View.INVISIBLE
+    else
+        View.GONE
 }
 
 fun View.show() {
@@ -223,7 +233,7 @@ fun View.expand(duration: Long, to: Int, onAnimationEnd: (() -> Unit)? = null) {
     valueAnimator.start()
 }
 
-fun View.collapse(duration: Long, to: Int, onAnimationEnd: (() -> Unit)? = null) {
+fun View.collapse(duration: Long, to: Int, hide: Boolean = true, onAnimationEnd: (() -> Unit)? = null) {
     val from = height
     val valueAnimator = ValueAnimator.ofInt(from, to)
 
@@ -238,7 +248,9 @@ fun View.collapse(duration: Long, to: Int, onAnimationEnd: (() -> Unit)? = null)
         override fun onAnimationStart(animation: Animator?) {}
 
         override fun onAnimationEnd(animation: Animator?) {
-            hide()
+            if (hide)
+                hide()
+
             onAnimationEnd?.invoke()
         }
 
@@ -258,4 +270,12 @@ fun View.measuredHeight(view: View): Int {
     measure(widthMeasureSpec, heightMeasureSpec)
 
     return measuredHeight
+}
+
+fun View.setBackgroundTint(@ColorRes id: Int) {
+    backgroundTintList = ContextCompat.getColorStateList(this.context, id)
+}
+
+fun CheckBox.setButtonTint(@ColorRes id: Int) {
+    buttonTintList = ContextCompat.getColorStateList(this.context, id)
 }

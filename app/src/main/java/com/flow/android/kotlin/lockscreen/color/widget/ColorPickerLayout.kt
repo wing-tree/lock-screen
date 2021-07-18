@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.color.adapter.ColorAdapter
+import com.flow.android.kotlin.lockscreen.util.LinearLayoutManagerWrapper
 
 class ColorPickerLayout : LinearLayout {
     constructor(context: Context) : super(context) {
@@ -44,7 +45,7 @@ class ColorPickerLayout : LinearLayout {
         recyclerView = RecyclerView(context)
         recyclerView.apply {
             this.layoutParams = layoutParams
-            layoutManager = LinearLayoutManager(context).apply { orientation = LinearLayoutManager.HORIZONTAL }
+            layoutManager = LinearLayoutManagerWrapper(context).apply { orientation = LinearLayoutManager.HORIZONTAL }
             adapter = colorAdapter
         }
 

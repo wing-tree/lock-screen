@@ -9,7 +9,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraint_layout"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/height_extra_large"
+        android:layout_height="@dimen/height_double_extra_large"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -20,7 +20,7 @@
             android:layout_marginStart="@dimen/margin_normal"
             android:layout_marginEnd="@dimen/margin_normal"
             android:gravity="center_vertical"
-            android:textSize="@dimen/text_size_medium"
+            android:textSize="@dimen/text_size_normal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/image_view_arrow_down"
             app:layout_constraintStart_toStartOf="parent"
@@ -29,7 +29,7 @@
 
         <ImageView
             android:id="@+id/image_view_arrow_down"
-            android:layout_width="@dimen/width_small"
+            android:layout_width="@dimen/width_normal"
             android:layout_height="@dimen/height_normal"
             android:layout_marginEnd="@dimen/margin_normal"
             app:layout_constraintBottom_toBottomOf="@+id/text_title"
@@ -72,7 +72,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <include
-        layout="@layout/divider_item"
+        layout="@layout/divider"
         android:layout_width="0dp"
         android:layout_height="@dimen/height_divider"
         app:layout_constraintBottom_toBottomOf="parent"

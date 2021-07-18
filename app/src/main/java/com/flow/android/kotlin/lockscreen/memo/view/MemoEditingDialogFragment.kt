@@ -1,11 +1,11 @@
 package com.flow.android.kotlin.lockscreen.memo.view
 
+import android.animation.LayoutTransition
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -29,9 +30,11 @@ import com.flow.android.kotlin.lockscreen.memo.viewmodel.MemoViewModel
 import com.flow.android.kotlin.lockscreen.persistence.entity.ChecklistItem
 import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.util.*
+import jp.wasabeef.recyclerview.animators.SlideInDownAnimator
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+
 
 class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBinding>() {
     override fun inflate(inflater: LayoutInflater, container: ViewGroup?): FragmentMemoEditingDialogBinding {
@@ -39,14 +42,14 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
     }
 
     private val viewModel by activityViewModels<MemoViewModel>()
-
-    private val duration = 200L
+    private val duration = 150L
 
     private val simpleDateFormat by lazy {
         SimpleDateFormat(getString(R.string.format_date_001), Locale.getDefault())
     }
 
-    private val checklistAdapter : ChecklistAdapter by lazy { ChecklistAdapter(object : ChecklistAdapter.Listener {
+    private val checklistAdapter : ChecklistAdapter by lazy { ChecklistAdapter(object :
+        ChecklistAdapter.Listener {
         override fun onCancelClick(item: ChecklistItem) {
             val value = checklist.value ?: return
 
@@ -58,7 +61,6 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
     }, isEditable = true) }
 
     private val checklist = MutableLiveData<ArrayList<ChecklistItem>>()
-
     private val localBroadcastManager by lazy { LocalBroadcastManager.getInstance(requireContext()) }
     private val localBroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -139,7 +141,7 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
             Mode.Edit
         }
 
-        initializeView(memo)
+        initializeViews(memo)
         registerLifecycleObservers()
         localBroadcastManager.registerReceiver(localBroadcastReceiver, IntentFilter(Action.Date))
 
@@ -151,12 +153,11 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
         super.onDestroyView()
     }
 
-    private fun initializeView(memo: Memo?) {
+    private fun initializeViews(memo: Memo?) {
         val checklistHeader = viewBinding.checklistHeader
 
         viewBinding.recyclerViewChecklist.apply {
             adapter = checklistAdapter
-            itemAnimator = null
             layoutManager = LinearLayoutManagerWrapper(requireContext())
         }
 
@@ -243,6 +244,9 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
 
             dismiss()
         }
+
+        viewBinding.constraintLayout.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
+        viewBinding.root.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
     }
 
     private fun registerLifecycleObservers() {
@@ -263,12 +267,21 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
                 })
             }
 
-            TransitionManager.beginDelayedTransition(
-                    viewBinding.constraintLayout,
-                    ChangeBounds().apply { duration = this@MemoEditingDialogFragment.duration }
-            )
+            if (it.isNullOrEmpty()) {
+                viewBinding.viewDividerBottom.fadeOut(duration, true)
+                viewBinding.viewDividerTop.fadeOut(duration, true)
+            } else {
+                if (viewBinding.viewDividerBottom.isVisible.not())
+                    viewBinding.viewDividerBottom.fadeIn(duration)
+
+                if (viewBinding.viewDividerTop.isVisible.not())
+                    viewBinding.viewDividerTop.fadeIn(duration)
+            }
 
             checklistAdapter.submitList(it.toList())
+//            TransitionManager.beginDelayedTransition(
+//                viewBinding.root, ChangeBounds().apply { duration = mediumDuration }
+//            )
         })
     }
 

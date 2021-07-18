@@ -96,7 +96,7 @@ class MemoAdapter(private val listener: Listener) : RecyclerView.Adapter<MemoAda
                 "$checklistDoneCount/$checklistCount"
             }
 
-            binding.textViewContent.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize)
+            binding.textViewContent.setTextSize(TypedValue.COMPLEX_UNIT_DIP, fontSize)
 
             binding.textViewContent.text = item.content
             binding.textViewDate.text = item.modifiedTime.format(binding.root.context)
@@ -120,9 +120,9 @@ class MemoAdapter(private val listener: Listener) : RecyclerView.Adapter<MemoAda
                     text = checklistCountText
                 }
 
-                binding.viewMemoColor.hide()
-                binding.imageViewMemoColor.show()
-                binding.imageViewMemoColor.setColorFilter(item.color, PorterDuff.Mode.SRC_IN)
+                binding.viewColor.hide()
+                binding.imageViewDone.show()
+                binding.imageViewDone.setColorFilter(item.color, PorterDuff.Mode.SRC_IN)
 
                 binding.root.setCardBackgroundColor(getColor(context, R.color.disabled_dark))
             } else {
@@ -144,9 +144,9 @@ class MemoAdapter(private val listener: Listener) : RecyclerView.Adapter<MemoAda
                     text = checklistCountText
                 }
 
-                binding.imageViewMemoColor.hide()
-                binding.viewMemoColor.show()
-                binding.viewMemoColor.backgroundTintList = ColorStateList.valueOf(item.color)
+                binding.imageViewDone.hide()
+                binding.viewColor.show()
+                binding.viewColor.backgroundTintList = ColorStateList.valueOf(item.color)
 
                 binding.root.setCardBackgroundColor(getColor(context, R.color.card_background))
             }

@@ -11,8 +11,8 @@
 
     <ImageView
         android:id="@+id/image_view"
-        android:layout_width="@dimen/width_small"
-        android:layout_height="@dimen/width_small"
+        android:layout_width="@dimen/width_normal"
+        android:layout_height="@dimen/width_normal"
         android:layout_gravity="center"
         android:visibility="gone"
         app:srcCompat="@drawable/ic_round_check_24"

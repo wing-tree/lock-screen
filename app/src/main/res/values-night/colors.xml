@@ -2,9 +2,7 @@
 <resources>
     <color name="background">@color/grey_900</color>
     <color name="on_background">@color/white</color>
-    <color name="surface">@color/grey_800</color>
-
-    <color name="unselected">@color/white</color>
+    <color name="surface">#2e2e2e</color>
 
     <color name="high_emphasis">#DEFFFFFF</color>
     <color name="medium_emphasis">#99FFFFFF</color>
@@ -13,15 +11,10 @@
     <color name="active">#DEFFFFFF</color>
     <color name="inactive">#99FFFFFF</color>
 
-    <color name="header_background">@color/grey_800</color>
-
-    <color name="button_text_disabled">@color/disabled</color>
-    <color name="button_text_enabled">@color/white</color>
-
     <color name="border">@color/high_emphasis</color>
     <color name="divider">#33FFFFFF</color>
     <color name="icon">@color/high_emphasis</color>
-<!--    <color name="text">@color/white</color>-->
+    <color name="status_bar">@color/black</color>
     <color name="title">@color/white</color>
-    <color name="toolbar">@color/black</color>
+    <color name="toolbar">@color/dark_grey</color>
 </resources>

@@ -2,17 +2,17 @@
     <!-- Base application theme. -->
     <style name="Theme.LockScreen" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/light_blue_500</item>
-        <item name="colorPrimaryVariant">@color/light_blue_700</item>
+        <item name="colorPrimary">@color/blue_500</item>
+        <item name="colorPrimaryVariant">@color/blue_700</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorSecondary">@color/high_emphasis</item>
+        <item name="colorSecondaryVariant">@color/medium_emphasis</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">@android:color/transparent</item>
 
-        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:editTextStyle">@style/EditTextStyle</item>
         <item name="android:textViewStyle">@style/TextViewStyle</item>
         <item name="android:windowAnimationStyle">@style/WindowAnimation</item>
         <item name="android:windowBackground">@android:color/transparent</item>
@@ -22,21 +22,20 @@
         <item name="materialButtonStyle">@style/MaterialButton</item>
     </style>
 
-    <style name="Theme.ConfigurationActivity" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.PreferenceActivity" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/light_blue_500</item>
-        <item name="colorPrimaryVariant">@color/light_blue_700</item>
+        <item name="colorPrimary">@color/blue_500</item>
+        <item name="colorPrimaryVariant">@color/blue_700</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorSecondary">@color/light_blue_200</item>
+        <item name="colorSecondaryVariant">@color/light_blue_700</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">@color/status_bar</item>
+        <item name="android:statusBarColor">@color/status_bar</item>
 
-        <item name="android:backgroundDimEnabled">false</item>
         <item name="android:textViewStyle">@style/TextViewStyle</item>
-        <item name="android:windowAnimationStyle">@style/WindowAnimation.ConfigurationActivity</item>
+        <item name="android:windowAnimationStyle">@style/WindowAnimation.PreferenceActivity</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowDisablePreview">true</item>
         <item name="android:windowIsTranslucent">false</item>
@@ -44,7 +43,7 @@
     </style>
 
     <style name="TextAppearance.Tab" parent="TextAppearance.Design.Tab">
-        <item name="android:textSize">@dimen/text_size_medium</item>
+        <item name="android:textSize">@dimen/text_size_normal</item>
         <item name="android:textStyle">bold</item>
     </style>
 
@@ -58,7 +57,7 @@
         <item name="android:windowExitAnimation">@anim/short_fade_out</item>
     </style>
 
-    <style name="WindowAnimation.ConfigurationActivity">
+    <style name="WindowAnimation.PreferenceActivity">
         <item name="android:windowEnterAnimation">@android:anim/slide_in_left</item>
         <item name="android:windowExitAnimation">@android:anim/slide_out_right</item>
     </style>
@@ -73,9 +72,15 @@
         <item name="backgroundTint">@color/surface</item>
     </style>
 
+    <style name="EditTextStyle" parent="android:Widget.EditText">
+        <item name="android:includeFontPadding">true</item>
+        <item name="android:lineSpacingMultiplier">@dimen/line_spacing_multiplier</item>
+    </style>
+
     <style name="TextViewStyle" parent="@android:style/Widget.DeviceDefault.TextView">
-        <item name="android:includeFontPadding">false</item>
+        <item name="android:includeFontPadding">true</item>
         <item name="android:textColor">@color/text</item>
+        <item name="android:textSize">@dimen/text_size_small</item>
         <item name="android:lineSpacingMultiplier">@dimen/line_spacing_multiplier</item>
     </style>
 

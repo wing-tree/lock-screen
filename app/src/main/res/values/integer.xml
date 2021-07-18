@@ -1,12 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="short_anim_duration">100</integer>
-
-    <integer-array name="font_size">
-        <item>12</item>
-        <item>14</item>
-        <item>16</item>
-        <item>18</item>
-        <item>20</item>
-    </integer-array>
 </resources>

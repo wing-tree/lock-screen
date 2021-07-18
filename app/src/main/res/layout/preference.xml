@@ -23,7 +23,7 @@
 
             <ImageView
                 android:id="@+id/image_view_icon"
-                android:layout_width="@dimen/width_small"
+                android:layout_width="@dimen/width_normal"
                 android:layout_height="@dimen/height_normal"
                 android:layout_marginEnd="@dimen/margin_extra_large"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -54,7 +54,7 @@
                     android:includeFontPadding="false"
                     android:maxLines="1"
                     android:textColor="@color/high_emphasis"
-                    android:textSize="@dimen/text_size_medium"
+                    android:textSize="@dimen/text_size_normal"
                     tools:text="Title" />
 
                 <TextView
@@ -65,7 +65,7 @@
                     android:includeFontPadding="false"
                     android:maxLines="1"
                     android:textColor="@color/medium_emphasis"
-                    android:textSize="@dimen/text_size_medium_small"
+                    android:textSize="@dimen/text_size_small"
                     tools:text="Summary" />
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,8 +7,8 @@
 
     <ImageView
         android:id="@+id/app_compat_image_view"
-        android:layout_width="@dimen/width_extra_large"
-        android:layout_height="@dimen/height_extra_large"
+        android:layout_width="@dimen/width_double_extra_large"
+        android:layout_height="@dimen/height_double_extra_large"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:elevation="@dimen/small_100"
         app:layout_constraintEnd_toEndOf="parent"
@@ -46,8 +46,8 @@
 
         <ImageView
             android:id="@+id/image_view_back"
-            android:layout_width="@dimen/large_100"
-            android:layout_height="@dimen/large_100"
+            android:layout_width="@dimen/width_large"
+            android:layout_height="@dimen/height_large"
             android:layout_alignParentStart="true"
             app:srcCompat="@drawable/ic_round_arrow_back_ios_48"
             app:tint="@color/white"
@@ -68,8 +68,8 @@
         android:id="@+id/view_pager2"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="@dimen/margin_double_extra_large"
-        android:layout_marginEnd="@dimen/margin_double_extra_large"
+        android:layout_marginStart="@dimen/margin_extra_large"
+        android:layout_marginEnd="@dimen/margin_extra_large"
         android:layout_marginTop="@dimen/margin_normal"
         android:layoutAnimation="@anim/layout_animation"
         app:layout_constraintBottom_toBottomOf="parent"

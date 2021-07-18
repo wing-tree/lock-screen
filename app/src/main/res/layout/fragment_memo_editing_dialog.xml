@@ -6,21 +6,23 @@
     android:id="@+id/relative_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:animateLayoutChanges="true"
     android:background="@drawable/rounded_corners"
-    android:backgroundTint="@color/background">
+    android:backgroundTint="@color/surface">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraint_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true">
 
         <TextView
             android:id="@+id/text_view_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_normal"
+            android:layout_marginStart="@dimen/margin_large"
             android:layout_marginTop="@dimen/margin_normal"
-            android:textColor="@color/text"
+            android:fontFamily="sans-serif-light"
             android:textSize="@dimen/text_size_large"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
@@ -29,7 +31,7 @@
 
         <View
             android:id="@+id/view_color"
-            android:layout_width="@dimen/width_triple_extra_small"
+            android:layout_width="@dimen/width_double_extra_small"
             android:layout_height="@dimen/small_100"
             android:layout_marginBottom="1dp"
             android:layout_marginStart="@dimen/margin_normal"
@@ -42,7 +44,7 @@
 
         <EditText
             android:id="@+id/edit_text_content"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_normal"
             android:layout_marginTop="@dimen/margin_normal"
@@ -52,16 +54,16 @@
             android:hint="@string/memo_editing_dialog_fragment_002"
             android:importantForAutofill="no"
             android:inputType="textMultiLine"
-            android:maxHeight="@dimen/max_height_small"
+            android:maxHeight="@dimen/height_max"
             android:paddingBottom="@dimen/padding_small"
             android:paddingEnd="@dimen/padding_normal"
             android:paddingStart="@dimen/padding_normal"
             android:paddingTop="@dimen/padding_small"
-            android:textSize="@dimen/text_size_medium"
+            android:textSize="@dimen/text_size_normal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_view_date" />
+            app:layout_constraintTop_toBottomOf="@+id/text_view_date"/>
 
         <include
             android:id="@+id/checklist_header"
@@ -76,32 +78,48 @@
             app:layout_constraintTop_toBottomOf="@+id/edit_text_content"
             app:layout_constrainedHeight="true"/>
 
+        <View
+            android:id="@+id/view_divider_top"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/height_divider"
+            android:layout_marginTop="@dimen/margin_small"
+            android:background="@color/divider"
+            android:visibility="invisible"
+            app:layout_constraintTop_toBottomOf="@+id/checklist_header"
+            tools:visibility="visible" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view_checklist"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/margin_normal"
             android:layout_marginStart="@dimen/margin_normal"
-            android:layout_marginTop="@dimen/margin_double_extra_small"
-            android:background="@drawable/rounded_corners"
-            android:backgroundTint="@android:color/transparent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/checklist_header"
+            app:layout_constraintTop_toBottomOf="@+id/view_divider_top"
             app:layout_constrainedHeight="true"
-            app:layout_constraintHeight_max="@dimen/double_extra_large_100"
+            app:layout_constraintHeight_max="@dimen/height_constrained"
+            tools:visibility="visible" />
+
+        <View
+            android:id="@+id/view_divider_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/height_divider"
+            android:background="@color/divider"
+            android:visibility="invisible"
+            app:layout_constraintTop_toBottomOf="@+id/recycler_view_checklist"
             tools:visibility="visible" />
 
         <com.flow.android.kotlin.lockscreen.color.widget.ColorPickerLayout
             android:id="@+id/color_picker_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/height_double_extra_large"
             android:layout_marginEnd="@dimen/margin_normal"
             android:layout_marginStart="@dimen/margin_normal"
             android:layout_marginTop="@dimen/margin_small"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/recycler_view_checklist" />
+            app:layout_constraintTop_toBottomOf="@+id/view_divider_bottom" />
 
         <TextView
             android:id="@+id/text_view_cancel"
@@ -116,7 +134,7 @@
             android:insetBottom="0dp"
             android:padding="@dimen/padding_small"
             android:text="@string/memo_editing_dialog_fragment_000"
-            android:textSize="@dimen/text_size_medium"
+            android:textSize="@dimen/text_size_normal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/text_view_save"
             app:layout_constraintTop_toBottomOf="@+id/color_picker_layout" />
@@ -132,7 +150,7 @@
             android:insetBottom="0dp"
             android:padding="@dimen/padding_small"
             android:text="@string/memo_editing_dialog_fragment_001"
-            android:textSize="@dimen/text_size_medium"
+            android:textSize="@dimen/text_size_normal"
             app:layout_constraintBottom_toBottomOf="@+id/text_view_cancel"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/text_view_cancel" />

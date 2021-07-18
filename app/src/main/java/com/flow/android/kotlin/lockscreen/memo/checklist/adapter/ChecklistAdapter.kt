@@ -1,16 +1,21 @@
 package com.flow.android.kotlin.lockscreen.memo.checklist.adapter
 
+import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.databinding.ChecklistItemBinding
 import com.flow.android.kotlin.lockscreen.persistence.entity.ChecklistItem
 import com.flow.android.kotlin.lockscreen.util.hide
 import com.flow.android.kotlin.lockscreen.util.show
 
-class ChecklistAdapter(private val listener: Listener, private val isEditable: Boolean): ListAdapter<ChecklistItem, ChecklistAdapter.ViewHolder>(DiffCallback()) {
+class ChecklistAdapter(private val listener: Listener, private val isEditable: Boolean) :
+        ListAdapter<ChecklistItem, ChecklistAdapter.ViewHolder>(DiffCallback())
+{
     interface Listener {
         fun onCancelClick(item: ChecklistItem)
         fun onItemCheckedChange(item: ChecklistItem, isChecked: Boolean)
@@ -22,7 +27,21 @@ class ChecklistAdapter(private val listener: Listener, private val isEditable: B
         private val isEditable: Boolean
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: ChecklistItem) {
-            binding.editText.text = item.content
+            val context = binding.root.context
+
+            binding.textView.text = item.content
+
+            if (item.isDone) {
+                binding.textView.apply {
+                    paintFlags = paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                    setTextColor(ContextCompat.getColor(context, R.color.disabled))
+                }
+            } else {
+                binding.textView.apply {
+                    paintFlags = paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                    setTextColor(ContextCompat.getColor(context, R.color.text))
+                }
+            }
 
             if (isEditable) {
                 binding.checkBox.hide()
@@ -35,28 +54,31 @@ class ChecklistAdapter(private val listener: Listener, private val isEditable: B
                 binding.checkBox.show()
                 binding.imageViewClear.hide()
 
-                binding.checkBox.isChecked = item.isDone
+                binding.checkBox.apply {
+                    setOnCheckedChangeListener(null)
 
-                binding.checkBox.setOnCheckedChangeListener { _, isChecked ->
-                    listener.onItemCheckedChange(item, isChecked)
+                    isChecked = item.isDone
+
+                    setOnCheckedChangeListener { _, isChecked ->
+                        listener.onItemCheckedChange(item, isChecked)
+                    }
                 }
             }
         }
 
         companion object {
-            fun from(parent: ViewGroup, listener: Listener, isEditable: Boolean): ViewHolder {
-                return ViewHolder(
-                    ChecklistItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-                    listener,
-                    isEditable
-                )
+            fun from(binding: ChecklistItemBinding, listener: Listener, isEditable: Boolean): ViewHolder {
+                return ViewHolder(binding, listener, isEditable)
             }
         }
     }
 
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder.from(parent, listener, isEditable)
+        return ViewHolder.from(
+                ChecklistItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+                listener,
+                isEditable
+        )
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {

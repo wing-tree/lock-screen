@@ -9,6 +9,7 @@ import com.flow.android.kotlin.lockscreen.preference.adapter.AdapterItem
 import com.flow.android.kotlin.lockscreen.preference.adapter.PreferenceAdapter
 import com.flow.android.kotlin.lockscreen.databinding.PreferenceBinding
 import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
+import com.flow.android.kotlin.lockscreen.preference.view.FontSizeSelectionListDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -17,7 +18,7 @@ import kotlinx.coroutines.withContext
 
 class DisplayPreferenceFragment : PreferenceFragment() {
     private val duration = 300L
-    private val fontSizes by lazy { resources.getIntArray(R.array.font_size) }
+    private val fontSizes = arrayOf(12F, 14F, 16F, 20F, 24F, 32F)
 
     private val oldFontSize by lazy { Preference.Display.getFontSize(requireContext()) }
     private var newFontSize = -1F
@@ -57,15 +58,20 @@ class DisplayPreferenceFragment : PreferenceFragment() {
                 ),
                 AdapterItem.Preference(
                         drawable = ContextCompat.getDrawable(context, R.drawable.ic_round_format_size_24),
-                        description = "${oldFontSize.toInt()}sp",
+                        description = "${oldFontSize}dp",
                         onClick = { viewBinding: PreferenceBinding, _ ->
-                            MaterialAlertDialogBuilder(requireContext()).setItems(fontSizes.map { "${it}sp" }.toTypedArray()) { _, i ->
-                                val text = "${fontSizes[i]}sp"
+                            FontSizeSelectionListDialogFragment(fontSizes) { dialogFragment, item ->
+                                val text = "${item}dp"
 
-                                Preference.Display.putFontSize(requireContext(), fontSizes[i].toFloat())
+                                Preference.Display.putFontSize(requireContext(), item)
+
                                 viewBinding.textViewSummary.text = text
-                                newFontSize = fontSizes[i].toFloat()
-                            }.show()
+                                newFontSize = item
+
+                                dialogFragment.dismiss()
+                            }.also {
+                                it.show(childFragmentManager, it.tag)
+                            }
                         },
                         title = getString(R.string.display_configuration_fragment_001)
                 ),

@@ -16,11 +16,12 @@ import com.flow.android.kotlin.lockscreen.base.BaseDialogFragment
 import com.flow.android.kotlin.lockscreen.databinding.FragmentPermissionRationaleDialogBinding
 import com.flow.android.kotlin.lockscreen.permission.PermissionChecker
 import com.flow.android.kotlin.lockscreen.permission._interface.OnPermissionAllowClickListener
-import com.flow.android.kotlin.lockscreen.permission.adapter.PermissionRationaleAdapter
+import com.flow.android.kotlin.lockscreen.permission.adapter.PermissionAdapter
+import com.flow.android.kotlin.lockscreen.util.LinearLayoutManagerWrapper
 
 @RequiresApi(Build.VERSION_CODES.M)
 class PermissionRationaleDialogFragment: BaseDialogFragment<FragmentPermissionRationaleDialogBinding>() {
-    private val permissionsDenied = mutableListOf<PermissionRationale>()
+    private val permissionsDenied = mutableListOf<Permission>()
     private var onPermissionAllowClickListener: OnPermissionAllowClickListener? = null
 
     override fun inflate(inflater: LayoutInflater, container: ViewGroup?): FragmentPermissionRationaleDialogBinding {
@@ -44,45 +45,49 @@ class PermissionRationaleDialogFragment: BaseDialogFragment<FragmentPermissionRa
         val view = super.onCreateView(inflater, container, savedInstanceState)
 
         val permissions = arrayOf(
-                PermissionRationale(
-                        icon = R.drawable.ic_round_today_24,
-                        permission = Manifest.permission.READ_CALENDAR,
-                        permissionName = getString(R.string.permission_rationale_dialog_fragment_000),
-                        rationale = getString(R.string.permission_rationale_dialog_fragment_001)
-                ),
-                PermissionRationale(
-                        icon = 0,
-                        permission = Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                Permission(
+                        icon = R.drawable.ic_mobile_48px,
+                        isRequired = true,
+                        permissions = arrayOf(Settings.ACTION_MANAGE_OVERLAY_PERMISSION),
                         permissionName = getString(R.string.permission_rationale_dialog_fragment_004),
-                        rationale = getString(R.string.permission_rationale_dialog_fragment_005)
+                ),
+                Permission(
+                        icon = R.drawable.ic_round_calendar_today_24,
+                        isRequired = false,
+                        permissions = arrayOf(
+                                Manifest.permission.READ_CALENDAR,
+                                Manifest.permission.WRITE_CALENDAR
+                        ),
+                        permissionName = getString(R.string.permission_rationale_dialog_fragment_000)
                 )
         )
 
         for (permission in permissions) {
-            if (permission.permission == Settings.ACTION_MANAGE_OVERLAY_PERMISSION) {
+            if (permission.permissions.contains(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)) {
                 if (Settings.canDrawOverlays(requireContext()).not())
                     permissionsDenied.add(permission)
 
                 continue
             }
 
-            if (PermissionChecker.checkPermission(requireContext(), permission.permission))
+            if (PermissionChecker.checkPermissions(requireContext(), permission.permissions))
                 continue
 
             permissionsDenied.add(permission)
         }
 
         viewBinding.recyclerView.apply {
-            adapter = PermissionRationaleAdapter(permissionsDenied)
-            layoutManager = LinearLayoutManager(requireContext())
+            adapter = PermissionAdapter(permissionsDenied)
+            layoutManager = LinearLayoutManagerWrapper(requireContext())
         }
 
-        viewBinding.materialButtonAllow.setOnClickListener {
+        viewBinding.textViewAllow.setOnClickListener {
             onPermissionAllowClickListener?.onPermissionAllowClick()
             dismiss()
         }
 
-        viewBinding.materialButtonDeny.setOnClickListener {
+        viewBinding.textViewDeny.setOnClickListener {
+            onPermissionAllowClickListener?.onPermissionDenyClick()
             dismiss()
         }
 
@@ -105,10 +110,30 @@ class PermissionRationaleDialogFragment: BaseDialogFragment<FragmentPermissionRa
     }
 }
 
-data class PermissionRationale(
+data class Permission(
         @DrawableRes
         val icon: Int,
-        val permission: String,
+        val isRequired: Boolean,
+        val permissions: Array<String>,
         val permissionName: String,
-        val rationale: String
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Permission
+
+        if (icon != other.icon) return false
+        if (!permissions.contentEquals(other.permissions)) return false
+        if (permissionName != other.permissionName) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = icon
+        result = 31 * result + permissions.contentHashCode()
+        result = 31 * result + permissionName.hashCode()
+        return result
+    }
+}

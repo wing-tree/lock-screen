@@ -5,22 +5,25 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/double_extra_small_100"
+    android:layout_marginTop="@dimen/margin_triple_extra_small"
+    android:layout_marginBottom="@dimen/margin_triple_extra_small"
     android:background="@drawable/border">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/edit_text"
+    <TextView
+        android:id="@+id/text_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:gravity="center_vertical"
         android:paddingBottom="@dimen/padding_small"
         android:paddingEnd="@dimen/padding_normal"
         android:paddingStart="@dimen/padding_normal"
         android:paddingTop="@dimen/padding_small"
-        android:textSize="@dimen/text_size_medium"
+        android:textSize="@dimen/text_size_normal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/frame_layout"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Checklist"/>
 
     <FrameLayout
         android:id="@+id/frame_layout"
@@ -40,14 +43,15 @@
             android:minHeight="0dp"
             android:minWidth="0dp" />
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <ImageView
             android:id="@+id/image_view_clear"
-            android:layout_width="@dimen/width_small"
+            android:layout_width="@dimen/width_normal"
             android:layout_height="@dimen/height_normal"
             android:layout_gravity="center"
             android:layout_marginEnd="@dimen/margin_double_extra_small"
             android:visibility="gone"
             app:srcCompat="@drawable/ic_round_clear_24"
-            app:tint="@color/icon"/>
+            app:tint="@color/icon"
+            tools:ignore="ContentDescription" />
     </FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

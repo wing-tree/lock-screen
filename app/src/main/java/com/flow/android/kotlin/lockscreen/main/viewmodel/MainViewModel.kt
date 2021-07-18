@@ -17,7 +17,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val refresh: LiveData<Refresh>
         get() = _refreshEvent
 
-    fun callRefresh(refresh: Refresh) {
+    private fun callRefresh(refresh: Refresh) {
         _refreshEvent.value = refresh
     }
 
@@ -25,8 +25,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if (configurationChange.calendarChanged)
             callRefresh(Refresh.Calendar)
 
-        if (configurationChange.fondSizeChanged)
+        if (configurationChange.fondSizeChanged) {
+            callRefresh(Refresh.Calendar)
             callRefresh(Refresh.Memo)
+        }
     }
 }
 

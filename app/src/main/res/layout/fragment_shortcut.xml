@@ -6,8 +6,8 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/app_compat_image_view"
-        android:layout_width="@dimen/width_extra_large"
-        android:layout_height="@dimen/height_extra_large"
+        android:layout_width="@dimen/width_double_extra_large"
+        android:layout_height="@dimen/height_double_extra_large"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:elevation="@dimen/small_100"
         app:layout_constraintEnd_toEndOf="parent"

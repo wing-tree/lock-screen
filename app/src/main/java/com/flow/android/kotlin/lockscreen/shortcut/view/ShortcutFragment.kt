@@ -29,6 +29,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDeviceCredential<ShortcutFragment.Value> {
@@ -109,7 +110,11 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
 
     private fun initializeData() {
         lifecycleScope.launch(Dispatchers.IO) {
-            adapter.addAll(viewModel.getAll())
+            viewModel.getAll().run {
+                withContext(Dispatchers.Main) {
+                    adapter.addAll(this@run)
+                }
+            }
         }
     }
 

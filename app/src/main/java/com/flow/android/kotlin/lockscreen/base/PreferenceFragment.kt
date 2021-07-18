@@ -9,10 +9,10 @@ import androidx.fragment.app.activityViewModels
 import com.flow.android.kotlin.lockscreen.preference.adapter.PreferenceAdapter
 import com.flow.android.kotlin.lockscreen.preference.view.PreferenceActivity
 import com.flow.android.kotlin.lockscreen.preference.viewmodel.PreferenceViewModel
-import com.flow.android.kotlin.lockscreen.databinding.FragmentConfigurationBinding
+import com.flow.android.kotlin.lockscreen.databinding.FragmentPreferenceBinding
 import com.flow.android.kotlin.lockscreen.util.LinearLayoutManagerWrapper
 
-abstract class PreferenceFragment : BaseFragment<FragmentConfigurationBinding>() {
+abstract class PreferenceFragment : BaseFragment<FragmentPreferenceBinding>() {
     abstract fun createPreferenceAdapter() : PreferenceAdapter
     abstract val toolbarTitleResId: Int
 
@@ -33,8 +33,8 @@ abstract class PreferenceFragment : BaseFragment<FragmentConfigurationBinding>()
         }
     }
 
-    override fun inflate(inflater: LayoutInflater, container: ViewGroup?): FragmentConfigurationBinding {
-        return FragmentConfigurationBinding.inflate(inflater, container, false)
+    override fun inflate(inflater: LayoutInflater, container: ViewGroup?): FragmentPreferenceBinding {
+        return FragmentPreferenceBinding.inflate(inflater, container, false)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
