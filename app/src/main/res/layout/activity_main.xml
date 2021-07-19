@@ -27,7 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_extra_large"
-            android:layout_marginTop="@dimen/large_175"
+            android:layout_marginTop="@dimen/margin_triple_extra_large"
             android:orientation="vertical"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -70,7 +70,7 @@
             android:id="@+id/constraint_layout_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/large_175"
+            android:layout_marginTop="@dimen/margin_triple_extra_large"
             android:layout_marginEnd="@dimen/margin_normal"
             android:orientation="horizontal"
             android:clipChildren="false"
@@ -161,8 +161,8 @@
 
         <FrameLayout
             android:id="@+id/frame_layout_ripple"
-            android:layout_width="@dimen/large_175"
-            android:layout_height="@dimen/large_175"
+            android:layout_width="@dimen/width_triple_extra_large"
+            android:layout_height="@dimen/height_triple_extra_large"
             android:layout_marginTop="@dimen/margin_normal"
             android:foreground="?attr/selectableItemBackgroundBorderless"
             tools:ignore="UselessParent">

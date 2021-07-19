@@ -10,46 +10,39 @@
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent">
 
-    <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
+    <ImageView
+        android:id="@+id/image_view_icon"
+        android:layout_width="@dimen/width_normal"
+        android:layout_height="@dimen/height_normal"
+        android:layout_marginStart="@dimen/margin_normal"
         app:layout_constraintBottom_toTopOf="@id/view_divider"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="UseCompoundDrawables">
+        app:tint="@color/icon"
+        tools:ignore="ContentDescription"
+        tools:srcCompat="@drawable/ic_round_settings_24" />
 
-        <ImageView
-            android:id="@+id/image_view_icon"
-            android:layout_width="@dimen/width_normal"
-            android:layout_height="@dimen/height_normal"
-            android:layout_marginStart="@dimen/margin_normal"
-            app:tint="@color/icon"
-            tools:ignore="ContentDescription"
-            tools:srcCompat="@drawable/ic_round_settings_24" />
-
-        <TextView
-            android:id="@+id/text_view_permission"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_extra_large"
-            android:layout_marginEnd="@dimen/margin_normal"
-            android:gravity="center_vertical"
-            android:textColor="@color/high_emphasis"
-            android:textSize="@dimen/text_size_normal"
-            tools:text="Title" />
-    </LinearLayout>
+    <TextView
+        android:id="@+id/text_view_permission"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_extra_large"
+        android:layout_marginEnd="@dimen/margin_normal"
+        android:gravity="center_vertical"
+        android:textColor="@color/high_emphasis"
+        android:textSize="@dimen/text_size_normal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/image_view_icon"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Title" />
 
     <View
         android:id="@+id/view_divider"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="@dimen/height_divider"
         android:background="@color/divider"
-        android:layout_marginStart="@dimen/margin_triple_extra_large"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="@+id/text_view_permission" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -112,12 +112,6 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
         viewBinding.textViewContent.movementMethod = ScrollingMovementMethod()
         viewBinding.textViewContent.text = memo.content
 
-        // todo change to list..
-//        if (memo.detail.isNotBlank()) {
-//            viewBinding.textViewDetail.show()
-//            viewBinding.textViewDetail.text = memo.detail
-//        }
-
         if (memo.checklist.isNotEmpty()) {
             viewBinding.recyclerViewChecklist.show()
             viewBinding.recyclerViewChecklist.apply {

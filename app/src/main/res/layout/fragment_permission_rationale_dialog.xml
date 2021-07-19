@@ -67,6 +67,7 @@
             tools:visibility="visible" />
 
         <TextView
+            style="@style/TextViewStyle.Button"
             android:id="@+id/text_view_deny"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -74,28 +75,19 @@
             android:layout_marginTop="@dimen/margin_normal"
             android:layout_marginEnd="@dimen/margin_small"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:fontFamily="sans-serif-medium"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:padding="@dimen/padding_small"
             android:text="@string/fragment_permission_rationale_dialog_002"
-            android:textSize="@dimen/text_size_normal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/text_view_allow"
             app:layout_constraintTop_toBottomOf="@+id/view_divider_bottom" />
 
         <TextView
+            style="@style/TextViewStyle.Button"
             android:id="@+id/text_view_allow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/margin_normal"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:fontFamily="sans-serif-medium"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:padding="@dimen/padding_small"
             android:text="@string/fragment_permission_rationale_dialog_003"
-            android:textSize="@dimen/text_size_normal"
             app:layout_constraintBottom_toBottomOf="@+id/text_view_deny"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/text_view_deny" />
