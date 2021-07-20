@@ -151,7 +151,7 @@
     <LinearLayout
         android:id="@+id/linear_layout_unlock"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/extra_large_275"
+        android:layout_height="@dimen/height_unlock_layout"
         android:clipChildren="false"
         android:clipToPadding="false"
         android:gravity="center_horizontal"
@@ -174,7 +174,7 @@
                 android:layout_gravity="center"
                 android:background="@drawable/oval_border"
                 android:duplicateParentState="true"
-                android:padding="@dimen/small_125"
+                android:padding="@dimen/padding_unlock_icon"
                 android:scaleType="centerInside"
                 app:srcCompat="@drawable/ic_unlock_90px"
                 app:tint="@color/white"

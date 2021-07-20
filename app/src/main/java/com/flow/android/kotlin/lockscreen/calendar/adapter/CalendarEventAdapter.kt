@@ -14,7 +14,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class CalendarEventAdapter(private val onItemClick: (item: Model.CalendarEvent) -> Unit): ListAdapter<Model.CalendarEvent, CalendarEventAdapter.ViewHolder>(DiffCallback()) {
-    val simpleDateFormat = SimpleDateFormat("a hh:mm", Locale.getDefault())
+    private val simpleDateFormat = SimpleDateFormat("a hh:mm", Locale.getDefault())
 
     fun add(item: Model.CalendarEvent) {
         val list = currentList.toMutableList()
@@ -32,7 +32,7 @@ class CalendarEventAdapter(private val onItemClick: (item: Model.CalendarEvent) 
             viewBinding.textViewTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, fontSize)
             viewBinding.textViewTitle.text = item.title
             viewBinding.textViewEnd.text = item.end.format()
-            viewBinding.viewCalendarColor.backgroundTintList = ColorStateList.valueOf(item.calendarColor)
+            viewBinding.viewColor.backgroundTintList = ColorStateList.valueOf(item.calendarColor)
 
             viewBinding.root.setOnClickListener {
                 onItemClick(item)

@@ -19,13 +19,6 @@ class CalendarPreferenceFragment: PreferenceFragment() {
 
     private val uncheckedCalendarIds = arrayListOf<String>()
 
-    override fun onPause() {
-        if (uncheckedCalendarIds != Preference.Calendar.getUncheckedCalendarIds(requireContext()).toList())
-            viewModel.calendarChanged = true
-
-        super.onPause()
-    }
-
     override val toolbarTitleResId: Int = R.string.configuration_activity_005
 
     override fun createPreferenceAdapter(): PreferenceAdapter {

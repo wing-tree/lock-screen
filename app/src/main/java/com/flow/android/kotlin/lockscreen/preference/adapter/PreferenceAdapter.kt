@@ -23,10 +23,8 @@ class PreferenceAdapter(private val currentList: ArrayList<AdapterItem>): Recycl
                         adapterItem.drawable?.let {
                             viewBinding.imageViewIcon.show()
                             viewBinding.imageViewIcon.setImageDrawable(it)
-                            viewBinding.viewPadding.show()
                         } ?: let {
                             viewBinding.imageViewIcon.hide()
-                            viewBinding.viewPadding.hide()
                         }
 
                         viewBinding.textViewSummary.text = adapterItem.description
@@ -64,9 +62,9 @@ class PreferenceAdapter(private val currentList: ArrayList<AdapterItem>): Recycl
                         }
                     }
                 }
-                is SubtitleItemBinding -> {
-                    if (adapterItem is AdapterItem.SubtitleItem)
-                        viewBinding.textSubtitle.text = adapterItem.subtitle
+                is PreferenceCategoryBinding -> {
+                    if (adapterItem is AdapterItem.PreferenceCategory)
+                        viewBinding.textViewCategory.text = adapterItem.subtitle
                 }
                 is SwitchPreferenceBinding -> {
                     if (adapterItem is AdapterItem.SwitchPreference) {
@@ -106,7 +104,7 @@ class PreferenceAdapter(private val currentList: ArrayList<AdapterItem>): Recycl
                 val viewBinding = when(viewType) {
                     ViewType.Preference -> PreferenceBinding.inflate(layoutInflater, parent, false)
                     ViewType.MultiSelectListPreference -> MultiSelectListPreferenceBinding.inflate(layoutInflater, parent, false)
-                    ViewType.Subtitle -> SubtitleItemBinding.inflate(layoutInflater, parent, false)
+                    ViewType.PreferenceCategory -> PreferenceCategoryBinding.inflate(layoutInflater, parent, false)
                     ViewType.SwitchPreference -> SwitchPreferenceBinding.inflate(layoutInflater, parent, false)
                     else -> throw InvalidParameterException("Invalid viewType")
                 }
@@ -137,7 +135,7 @@ class PreferenceAdapter(private val currentList: ArrayList<AdapterItem>): Recycl
         return when(currentList[position]) {
             is AdapterItem.Preference -> ViewType.Preference
             is AdapterItem.MultiSelectListPreference -> ViewType.MultiSelectListPreference
-            is AdapterItem.SubtitleItem -> ViewType.Subtitle
+            is AdapterItem.PreferenceCategory -> ViewType.PreferenceCategory
             is AdapterItem.SwitchPreference -> ViewType.SwitchPreference
         }
     }
@@ -161,9 +159,9 @@ class PreferenceAdapter(private val currentList: ArrayList<AdapterItem>): Recycl
 }
 
 object ViewType {
-    const val Preference = 0
-    const val MultiSelectListPreference = 1
-    const val Subtitle = 2
+    const val MultiSelectListPreference = 0
+    const val Preference = 1
+    const val PreferenceCategory = 2
     const val SwitchPreference = 3
 }
 
@@ -193,7 +191,7 @@ sealed class AdapterItem {
             var isExpanded: Boolean = false
     ): AdapterItem()
 
-    data class SubtitleItem(
+    data class PreferenceCategory(
             override val id: Long = 0L,
             override var isEnabled: Boolean = true,
             override var isVisible: Boolean = true,

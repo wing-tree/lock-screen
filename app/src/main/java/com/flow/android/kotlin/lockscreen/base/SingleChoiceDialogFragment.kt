@@ -4,8 +4,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.flow.android.kotlin.lockscreen.databinding.SingleChoiceListItemBinding
 
-abstract class SingleChoiceListDialogFragment<T>(items: Array<T>) :
-    BaseListDialogFragment<SingleChoiceListItemBinding, T>(items) {
+abstract class SingleChoiceDialogFragment<T>(singleChoiceItems: Array<T>) :
+    BaseListDialogFragment<SingleChoiceListItemBinding, T>(singleChoiceItems) {
     override fun inflateItemView(
         inflater: LayoutInflater,
         container: ViewGroup

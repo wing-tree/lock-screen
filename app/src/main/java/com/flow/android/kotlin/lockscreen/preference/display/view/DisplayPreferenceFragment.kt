@@ -5,35 +5,42 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.base.PreferenceFragment
+import com.flow.android.kotlin.lockscreen.base.SingleStringChoiceDialogFragment
 import com.flow.android.kotlin.lockscreen.preference.adapter.AdapterItem
 import com.flow.android.kotlin.lockscreen.preference.adapter.PreferenceAdapter
 import com.flow.android.kotlin.lockscreen.databinding.PreferenceBinding
 import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
-import com.flow.android.kotlin.lockscreen.preference.view.FontSizeSelectionListDialogFragment
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.flow.android.kotlin.lockscreen.preference.view.SingleFontSizeChoiceDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.*
 
 class DisplayPreferenceFragment : PreferenceFragment() {
+    private val date = Date()
     private val duration = 300L
     private val fontSizes = arrayOf(12F, 14F, 16F, 20F, 24F, 32F)
-
-    private val oldFontSize by lazy { Preference.Display.getFontSize(requireContext()) }
-    private var newFontSize = -1F
+    private val timeFormats by lazy {
+        arrayOf(
+                getString(R.string.display_preference_fragment_000),
+                format(getString(R.string.format_date_001), date),
+                format(getString(R.string.format_date_002), date)
+        )
+    }
 
     override val toolbarTitleResId: Int = R.string.configuration_activity_001
 
-    override fun onPause() {
-        if (newFontSize != oldFontSize)
-            viewModel.fondSizeChanged = true
-
-        super.onPause()
-    }
+    private fun format(pattern: String, date: Date) =
+        SimpleDateFormat(pattern, Locale.getDefault()).format(date)
 
     override fun createPreferenceAdapter(): PreferenceAdapter {
         val context = requireContext()
+        var timeFormat = Preference.Display.getTimeFormat(requireContext())
+
+        if (timeFormat.isBlank())
+            timeFormat = getString(R.string.display_preference_fragment_000)
 
         return PreferenceAdapter(arrayListOf(
                 AdapterItem.SwitchPreference(
@@ -54,27 +61,38 @@ class DisplayPreferenceFragment : PreferenceFragment() {
                                 AppCompatDelegate.setDefaultNightMode(darkMode)
                             }
                         },
-                        title = getString(R.string.display_configuration_fragment_000)
+                        title = getString(R.string.display_preference_fragment_001)
                 ),
                 AdapterItem.Preference(
                         drawable = ContextCompat.getDrawable(context, R.drawable.ic_round_format_size_24),
-                        description = "${oldFontSize}dp",
+                        description = "${Preference.Display.getFontSize(requireContext())}dp",
                         onClick = { viewBinding: PreferenceBinding, _ ->
-                            FontSizeSelectionListDialogFragment(fontSizes) { dialogFragment, item ->
+                            SingleFontSizeChoiceDialogFragment(fontSizes) { dialogFragment, item ->
                                 val text = "${item}dp"
 
                                 Preference.Display.putFontSize(requireContext(), item)
 
                                 viewBinding.textViewSummary.text = text
-                                newFontSize = item
 
                                 dialogFragment.dismiss()
-                            }.also {
-                                it.show(childFragmentManager, it.tag)
-                            }
+                            }.also { it.show(childFragmentManager, it.tag) }
                         },
-                        title = getString(R.string.display_configuration_fragment_001)
+                        title = getString(R.string.display_preference_fragment_002)
                 ),
+                AdapterItem.Preference(
+                        drawable = ContextCompat.getDrawable(context, R.drawable.ic_round_access_time_24),
+                        description = format(timeFormat, date),
+                        onClick = { viewBinding: PreferenceBinding, _ ->
+                            SingleStringChoiceDialogFragment(timeFormats) { dialogFragment, timeFormat ->
+                                Preference.Display.putTimeFormat(requireContext(), timeFormat)
+
+                                viewBinding.textViewSummary.text = timeFormat
+
+                                dialogFragment.dismiss()
+                            }.also { it.show(childFragmentManager, it.tag) }
+                        },
+                        title = getString(R.string.display_preference_fragment_003)
+                )
         ))
     }
 }

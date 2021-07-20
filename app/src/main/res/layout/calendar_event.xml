@@ -15,10 +15,10 @@
         android:layout_height="match_parent">
 
         <View
-            android:id="@+id/view_calendar_color"
-            android:layout_width="@dimen/extra_small_225"
-            android:layout_height="@dimen/extra_small_225"
-            android:layout_marginStart="@dimen/normal_100"
+            android:id="@+id/view_color"
+            android:layout_width="@dimen/width_color_small"
+            android:layout_height="@dimen/height_color_small"
+            android:layout_marginStart="@dimen/margin_normal"
             android:background="@drawable/background_calendar_event_color"
             app:layout_constraintBottom_toBottomOf="@+id/text_view_title"
             app:layout_constraintEnd_toStartOf="@+id/text_view_title"
@@ -36,7 +36,7 @@
             android:textColor="@color/white"
             android:textSize="@dimen/text_size_normal"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/view_calendar_color"
+            app:layout_constraintStart_toEndOf="@id/view_color"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Title" />
 

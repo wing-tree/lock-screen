@@ -12,7 +12,7 @@ class LockScreenPreferenceFragment : PreferenceFragment() {
         const val ShowAfterUnlocking = 2249L
     }
 
-    override val toolbarTitleResId: Int = R.string.configuration_activity_003
+    override val toolbarTitleResId: Int = R.string.lock_screen_preference_fragment_000
 
     override fun createPreferenceAdapter(): PreferenceAdapter {
         val context = requireContext()
@@ -41,7 +41,7 @@ class LockScreenPreferenceFragment : PreferenceFragment() {
                                     preferenceAdapter.notifyItemChanged(position)
                             }
                         },
-                        title = getString(R.string.show_on_lock_screen)
+                        title = getString(R.string.lock_screen_preference_fragment_001)
                 ),
                 AdapterItem.SwitchPreference(
                         drawable = null,
@@ -52,7 +52,15 @@ class LockScreenPreferenceFragment : PreferenceFragment() {
                         onCheckedChange = { isChecked ->
                             Preference.LockScreen.putShowAfterUnlocking(context, isChecked)
                         },
-                        title = getString(R.string.display_after_unlocking)
+                        title = getString(R.string.lock_screen_preference_fragment_002)
+                ),
+                AdapterItem.SwitchPreference(
+                        drawable = null,
+                        isChecked = Preference.LockScreen.getUnlockWithBackKey(context),
+                        onCheckedChange = { isChecked ->
+                            Preference.LockScreen.putUnlockWithBackKey(context, isChecked)
+                        },
+                        title = getString(R.string.lock_screen_preference_fragment_003)
                 )
         ))
     }

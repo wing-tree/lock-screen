@@ -101,6 +101,7 @@ class MemoFragment: BaseMainFragment<FragmentMemoBinding>() {
     private fun registerLifecycleObservers() {
         viewModel.refresh.observe(viewLifecycleOwner, {
             adapter.setFontSize(Preference.Display.getFontSize(requireContext()))
+            adapter.setTimeFormat(Preference.Display.getTimeFormat(requireContext()))
             adapter.notifyDataSetChanged()
         })
     }
@@ -122,11 +123,5 @@ class MemoFragment: BaseMainFragment<FragmentMemoBinding>() {
                     Timber.e(it)
                 }
         )
-    }
-
-    companion object {
-        private const val PREFIX = "com.flow.android.kotlin.lockscreen.memo.view" +
-                ".MemoFragment.companion"
-        const val KEY_PROCESSOR = "$PREFIX.KEY_PROCESSOR"
     }
 }

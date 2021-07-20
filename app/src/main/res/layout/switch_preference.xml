@@ -53,9 +53,10 @@
 
         <View
             android:id="@+id/view_padding"
-            android:layout_width="@dimen/large_225"
+            android:layout_width="@dimen/width_triple_extra_large"
             android:layout_height="@dimen/height_divider"
-            android:visibility="gone"/>
+            android:layout_marginEnd="@dimen/margin_normal"
+            android:visibility="invisible"/>
 
         <View
             android:id="@+id/view_divider"

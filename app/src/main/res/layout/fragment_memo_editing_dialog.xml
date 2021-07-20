@@ -31,13 +31,13 @@
 
         <View
             android:id="@+id/view_color"
-            android:layout_width="@dimen/width_double_extra_small"
-            android:layout_height="@dimen/small_100"
-            android:layout_marginBottom="1dp"
+            android:layout_width="@dimen/width_color_small"
+            android:layout_height="@dimen/height_color_small"
+            android:layout_marginBottom="@dimen/margin_triple_extra_small"
             android:layout_marginStart="@dimen/margin_normal"
             android:background="@drawable/background_memo_color"
             android:backgroundTint="@color/white"
-            android:elevation="@dimen/extra_small_100"
+            android:elevation="@dimen/elevation_small"
             app:layout_constraintBottom_toBottomOf="@+id/text_view_date"
             app:layout_constraintStart_toEndOf="@+id/text_view_date"
             app:layout_constraintTop_toTopOf="@+id/text_view_date" />

@@ -95,7 +95,7 @@
     </style>
 
     <style name="TextViewStyle.Preference" parent="@android:style/Widget.DeviceDefault.TextView">
-        <item name="android:includeFontPadding">false</item>
+        <item name="android:includeFontPadding">true</item>
         <item name="android:textColor">@color/text</item>
         <item name="android:lineSpacingMultiplier">@dimen/line_spacing_multiplier</item>
     </style>

@@ -5,6 +5,7 @@
 
     <string name="format_date_000">EEE, MMMM d</string>
     <string name="format_date_001">MMMM d</string>
+    <string name="format_date_002" translatable="false">yy/M/dd</string>
     <string name="format_time_000" translatable="false">a h:mm</string>
     <string name="format_time_001" translatable="false">h:mm</string>
     <string name="format_time_002" translatable="false">h:mm a</string>
@@ -37,11 +38,13 @@
     <string name="device_credential_helper_000">Draw unlock pattern</string>
     <string name="device_credential_helper_001">Enter password or PIN</string>
 
-    <!-- DisplayConfigurationFragment -->
-    <string name="display_configuration_fragment_000">Dark mode</string>
-    <string name="display_configuration_fragment_001">Font size</string>
+    <!-- DisplayPreferenceFragment -->
+    <string name="display_preference_fragment_000">Hide time</string>
+    <string name="display_preference_fragment_001">Dark mode</string>
+    <string name="display_preference_fragment_002">Font size</string>
+    <string name="display_preference_fragment_003">Time format</string>
 
-    <!-- LockScreenConfigurationFragment -->
+    <!-- LockScreenConfigurationFragment todo 바꿔야할듯.-->
     <string name="lock_screen_configuration_fragment_000">Lock setting</string>
     <string name="lock_screen_configuration_fragment_001">Lock type</string>
 
@@ -51,9 +54,13 @@
 
     <!-- Settings -->
     <string name="calendar">Calendar</string>
-    <string name="display_after_unlocking">Display after unlocking</string>
     <string name="lock_screen">Lock Screen</string>
-    <string name="show_on_lock_screen">Show on lock screen</string>
+
+    <!-- LockScreenPreferenceFragment -->
+    <string name="lock_screen_preference_fragment_000">Lock screen</string>
+    <string name="lock_screen_preference_fragment_001">Show on lock screen</string>
+    <string name="lock_screen_preference_fragment_002">Display after unlocking</string>
+    <string name="lock_screen_preference_fragment_003">Unlock with back button</string>
 
     <!-- MainActivity -->
     <string name="main_activity_000">Calendar</string>
@@ -103,7 +110,8 @@
     <string name="settings_004">Lock screen</string>
     <string name="settings_005">Lock setting, Lock type</string>
 
-    <!-- Util -->
+    <!-- Util todo 000 은 메모의 공유, 바꾸는게 나을듯.-->
     <string name="util_000">Share</string>
+    <string name="util_001">Share the app</string>
 
 </resources>

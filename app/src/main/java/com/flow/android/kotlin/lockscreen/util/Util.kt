@@ -1,10 +1,14 @@
 package com.flow.android.kotlin.lockscreen.util
 
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.RippleDrawable
 import androidx.annotation.ColorInt
+import com.flow.android.kotlin.lockscreen.R
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -33,4 +37,25 @@ fun rippleDrawable(@ColorInt colorPressed: Int, drawable: Drawable): RippleDrawa
     val colorStateList = ColorStateList(arrayOf(intArrayOf()), intArrayOf(colorPressed))
 
     return RippleDrawable(colorStateList, drawable, null)
+}
+
+fun shareApplication(context: Context) {
+    val intent = Intent(Intent.ACTION_SEND)
+    val text = "https://play.google.com/store/apps/details?id=${context.packageName}"
+
+    intent.type = "text/plain"
+    intent.putExtra(Intent.EXTRA_TEXT, text)
+
+    Intent.createChooser(intent, context.getString(R.string.util_001)).run {
+        context.startActivity(this)
+    }
+}
+
+fun versionName(context: Context): String {
+    return try {
+        context.packageManager.getPackageInfo(context.packageName, 0).versionName
+    } catch (e: PackageManager.NameNotFoundException) {
+        e.printStackTrace()
+        return BLANK
+    }
 }

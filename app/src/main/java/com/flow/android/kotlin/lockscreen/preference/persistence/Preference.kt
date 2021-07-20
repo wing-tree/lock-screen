@@ -2,7 +2,10 @@ package com.flow.android.kotlin.lockscreen.preference.persistence
 
 import android.content.Context
 import android.content.res.Configuration
+import android.os.Parcelable
 import androidx.appcompat.app.AppCompatDelegate
+import com.flow.android.kotlin.lockscreen.R
+import kotlinx.android.parcel.Parcelize
 
 object Preference {
     private const val Prefix = "com.flow.android.kotlin.lockscreen.preference.persistence.Preference.Prefix"
@@ -14,6 +17,26 @@ object Preference {
     private object Key {
         const val FirstRun = "$Prefix.Key.FirstRun"
         const val SelectedTabIndex = "$Prefix.Key.SelectedTabIndex"
+    }
+
+    private object Old {
+        var fontSize: Float? = null
+        var timeFormat: String? = null
+        var uncheckedCalendarIds: Set<String>? = null
+    }
+
+    fun initializeOldValues(context: Context) {
+        Old.fontSize = Display.getFontSize(context)
+        Old.timeFormat = Display.getTimeFormat(context)
+        Old.uncheckedCalendarIds = Calendar.getUncheckedCalendarIds(context)
+    }
+
+    fun getPreferenceChanged(context: Context): PreferenceChanged {
+        return PreferenceChanged(
+                fondSize = Old.fontSize != Display.getFontSize(context),
+                timeFormat = Old.timeFormat != Display.getTimeFormat(context),
+                uncheckedCalendarIds = Old.uncheckedCalendarIds != Calendar.getUncheckedCalendarIds(context)
+        )
     }
 
     fun putSelectedTabIndex(context: Context, index: Int) {
@@ -44,17 +67,17 @@ object Preference {
         }
 
         private object Key {
-            const val UncheckedCalendarIDs = "$Prefix.Key.UncheckedCalendarIDs"
+            const val UncheckedCalendarIds = "$Prefix.Key.UncheckedCalendarIDs"
         }
 
         fun getUncheckedCalendarIds(context: Context): Set<String> {
             return context.getSharedPreferences(Name.Preference, Context.MODE_PRIVATE)
-                    .getStringSet(Key.UncheckedCalendarIDs, setOf()) ?: setOf()
+                    .getStringSet(Key.UncheckedCalendarIds, setOf()) ?: setOf()
         }
 
         private fun putUncheckedCalendarIds(context: Context, value: Set<String>) {
             context.getSharedPreferences(Name.Preference, Context.MODE_PRIVATE)
-                    .edit().putStringSet(Key.UncheckedCalendarIDs, value).apply()
+                    .edit().putStringSet(Key.UncheckedCalendarIds, value).apply()
         }
 
         fun addUncheckedCalendarId(context: Context, value: String) {
@@ -78,6 +101,7 @@ object Preference {
         private object Key {
             const val DarkMode = "$Prefix.Display.Key.DarkMode"
             const val FontSize = "$Prefix.Display.Key.FontSize"
+            const val TimeFormat = "$Prefix.Display.Key.TimeFormat"
         }
 
         fun putIsDarkMode(context: Context, value: Boolean) {
@@ -115,6 +139,19 @@ object Preference {
             return context.getSharedPreferences(Name.Preference, Context.MODE_PRIVATE)
                     .getFloat(Key.FontSize, 16F)
         }
+
+        fun putTimeFormat(context: Context, value: String) {
+            context.getSharedPreferences(Name.Preference, Context.MODE_PRIVATE).apply {
+                edit().putString(Key.TimeFormat, value).apply()
+            }
+        }
+
+        fun getTimeFormat(context: Context): String {
+            val defaultValue = context.getString(R.string.format_date_001)
+
+            return context.getSharedPreferences(Name.Preference, Context.MODE_PRIVATE)
+                    .getString(Key.TimeFormat, defaultValue) ?: defaultValue
+        }
     }
 
     object LockScreen {
@@ -125,6 +162,7 @@ object Preference {
         private object Key {
             const val ShowAfterUnlocking = "$Prefix.LockScreen.Key.ShowAfterUnlocking"
             const val ShowOnLockScreen = "$Prefix.LockScreen.Key.ShowOnLockScreen"
+            const val UnlockWithBackKey = "$Prefix.LockScreen.Key.UnlockWithBackKey"
         }
 
         fun getShowOnLockScreen(context: Context): Boolean {
@@ -138,13 +176,30 @@ object Preference {
         }
 
         fun getShowAfterUnlocking(context: Context): Boolean {
-            val sharedPreferences = context.getSharedPreferences(Name.Preference, Context.MODE_PRIVATE)
-            return sharedPreferences.getBoolean(Key.ShowAfterUnlocking, false)
+            return context.getSharedPreferences(Name.Preference, Context.MODE_PRIVATE)
+                    .getBoolean(Key.ShowAfterUnlocking, false)
         }
 
         fun putShowAfterUnlocking(context: Context, value: Boolean) {
-            val sharedPreferences = context.getSharedPreferences(Name.Preference, Context.MODE_PRIVATE)
-            sharedPreferences.edit().putBoolean(Key.ShowAfterUnlocking, value).apply()
+            return context.getSharedPreferences(Name.Preference, Context.MODE_PRIVATE)
+                    .edit().putBoolean(Key.ShowAfterUnlocking, value).apply()
+        }
+
+        fun getUnlockWithBackKey(context: Context): Boolean {
+            return context.getSharedPreferences(Name.Preference, Context.MODE_PRIVATE)
+                    .getBoolean(Key.UnlockWithBackKey, false)
+        }
+
+        fun putUnlockWithBackKey(context: Context, value: Boolean) {
+            return context.getSharedPreferences(Name.Preference, Context.MODE_PRIVATE)
+                    .edit().putBoolean(Key.UnlockWithBackKey, value).apply()
         }
     }
+
+    @Parcelize
+    data class PreferenceChanged(
+            val fondSize: Boolean,
+            val timeFormat: Boolean,
+            val uncheckedCalendarIds: Boolean,
+    ) : Parcelable
 }

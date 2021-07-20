@@ -4,7 +4,7 @@ import android.app.Application
 import android.graphics.Color
 import androidx.annotation.ColorInt
 import androidx.lifecycle.*
-import com.flow.android.kotlin.lockscreen.preference.viewmodel.ConfigurationChange
+import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
 import com.flow.android.kotlin.lockscreen.util.SingleLiveEvent
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
@@ -21,14 +21,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _refreshEvent.value = refresh
     }
 
-    fun refresh(configurationChange: ConfigurationChange) {
-        if (configurationChange.calendarChanged)
-            callRefresh(Refresh.Calendar)
-
-        if (configurationChange.fondSizeChanged) {
-            callRefresh(Refresh.Calendar)
+    fun refresh(preferenceChanged: Preference.PreferenceChanged) {
+        if (preferenceChanged.fondSize || preferenceChanged.timeFormat)
             callRefresh(Refresh.Memo)
-        }
+
+        if (preferenceChanged.fondSize || preferenceChanged.uncheckedCalendarIds)
+            callRefresh(Refresh.Calendar)
     }
 }
 

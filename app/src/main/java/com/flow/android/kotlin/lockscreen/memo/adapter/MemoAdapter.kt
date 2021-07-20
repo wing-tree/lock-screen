@@ -16,10 +16,10 @@ import androidx.recyclerview.widget.*
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.databinding.MemoBinding
 import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
+import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
+import com.flow.android.kotlin.lockscreen.util.*
 import com.flow.android.kotlin.lockscreen.util.BLANK
 import com.flow.android.kotlin.lockscreen.util.DEFAULT_FONT_SIZE
-import com.flow.android.kotlin.lockscreen.util.hide
-import com.flow.android.kotlin.lockscreen.util.show
 import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -29,6 +29,7 @@ class MemoAdapter(private val listener: Listener) : RecyclerView.Adapter<MemoAda
     private var fontSize = DEFAULT_FONT_SIZE
     private var inflater: LayoutInflater? = null
     private var simpleDateFormat: SimpleDateFormat? = null
+    private var timeFormat = DEFAULT_TIME_FORMAT
 
     interface Listener {
         fun onItemClick(item: Memo)
@@ -37,6 +38,10 @@ class MemoAdapter(private val listener: Listener) : RecyclerView.Adapter<MemoAda
 
     fun setFontSize(fontSize: Float) {
         this.fontSize = fontSize
+    }
+
+    fun setTimeFormat(timeFormat: String) {
+        this.timeFormat = timeFormat
     }
 
     fun currentList() = currentList.toList()
@@ -186,8 +191,9 @@ class MemoAdapter(private val listener: Listener) : RecyclerView.Adapter<MemoAda
     }
 
     private fun Long.format(context: Context): String {
-        val pattern = context.getString(R.string.format_date_001)
-        val simpleDateFormat = simpleDateFormat ?: SimpleDateFormat(pattern, Locale.getDefault())
+        val simpleDateFormat = simpleDateFormat ?: SimpleDateFormat(timeFormat, Locale.getDefault())
+
+        simpleDateFormat.applyPattern(timeFormat)
 
         return simpleDateFormat.format(this)
     }

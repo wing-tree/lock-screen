@@ -44,8 +44,10 @@
     <string name="device_credential_helper_001">비밀번호 또는 PIN을 입력하세요</string>
 
     <!-- DisplayConfigurationFragment -->
-    <string name="display_configuration_fragment_000">다크 모드</string>
-    <string name="display_configuration_fragment_001">글꼴 크기</string>
+    <string name="display_preference_fragment_000">시간 숨기기</string>
+    <string name="display_preference_fragment_001">다크 모드</string>
+    <string name="display_preference_fragment_002">글꼴 크기</string>
+    <string name="display_preference_fragment_003">시간 포맷</string>
 
     <!-- LockScreenConfigurationFragment -->
     <string name="lock_screen_configuration_fragment_000">잠금 설정</string>
@@ -57,9 +59,13 @@
 
     <!-- Settings -->
     <string name="calendar">캘린더</string>
-    <string name="display_after_unlocking">잠금 해제 후 표시</string>
     <string name="lock_screen">잠금화면</string>
-    <string name="show_on_lock_screen">잠금화면에 표시</string>
+
+    <!-- LockScreenPreferenceFragment -->
+    <string name="lock_screen_preference_fragment_000">잠금화면</string>
+    <string name="lock_screen_preference_fragment_001">잠금화면에 표시</string>
+    <string name="lock_screen_preference_fragment_002">잠금 해제 후 표시</string>
+    <string name="lock_screen_preference_fragment_003">백 버튼으로 잠금해제</string>
 
     <!-- MainActivity -->
     <string name="main_activity_000">캘린더</string>
@@ -104,4 +110,5 @@
 
     <!-- Util -->
     <string name="util_000">공유하기</string>
+    <string name="util_001">앱 공유하기</string>
 </resources>

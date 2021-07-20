@@ -5,10 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
-import androidx.fragment.app.activityViewModels
 import com.flow.android.kotlin.lockscreen.preference.adapter.PreferenceAdapter
 import com.flow.android.kotlin.lockscreen.preference.view.PreferenceActivity
-import com.flow.android.kotlin.lockscreen.preference.viewmodel.PreferenceViewModel
 import com.flow.android.kotlin.lockscreen.databinding.FragmentPreferenceBinding
 import com.flow.android.kotlin.lockscreen.util.LinearLayoutManagerWrapper
 
@@ -16,7 +14,6 @@ abstract class PreferenceFragment : BaseFragment<FragmentPreferenceBinding>() {
     abstract fun createPreferenceAdapter() : PreferenceAdapter
     abstract val toolbarTitleResId: Int
 
-    protected val viewModel by activityViewModels<PreferenceViewModel>()
     protected val preferenceAdapter : PreferenceAdapter by lazy {
         createPreferenceAdapter()
     }

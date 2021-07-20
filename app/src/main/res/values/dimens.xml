@@ -164,7 +164,7 @@
     <dimen name="height_color_medium">@dimen/small_150</dimen>
 
     <dimen name="height_unlock_layout">@dimen/extra_large_275</dimen>
-    <dimen name="padding_unlock_view">@dimen/small_125</dimen>
+    <dimen name="padding_unlock_icon">@dimen/small_125</dimen>
 
     <item name="shadow_dx" format="float" type="dimen">1.0</item>
     <item name="shadow_dy" format="float" type="dimen">1.0</item>

@@ -9,7 +9,7 @@
         android:layout_width="@dimen/width_double_extra_large"
         android:layout_height="@dimen/height_double_extra_large"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:elevation="@dimen/small_100"
+        android:elevation="@dimen/elevation_large"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

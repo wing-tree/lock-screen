@@ -21,12 +21,10 @@ import com.flow.android.kotlin.lockscreen.preference.calendar.view.CalendarPrefe
 import com.flow.android.kotlin.lockscreen.preference.display.view.DisplayPreferenceFragment
 import com.flow.android.kotlin.lockscreen.preference.lockscreen.view.LockScreenPreferenceFragment
 import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
-import com.flow.android.kotlin.lockscreen.preference.viewmodel.PreferenceViewModel
 import com.flow.android.kotlin.lockscreen.util.LinearLayoutManagerWrapper
 
 class PreferenceActivity: AppCompatActivity() {
     private val viewBinding by lazy { ActivityPreferenceBinding.inflate(layoutInflater) }
-    private val viewModel: PreferenceViewModel by viewModels()
 
     private val activity = this
     private val checkBoxAdapter = CheckBoxAdapter(arrayListOf())
@@ -63,7 +61,7 @@ class PreferenceActivity: AppCompatActivity() {
     object Name {
         private const val Prefix = "com.flow.android.kotlin.lockscreen.preference.view" +
                 ".PreferenceActivity.Name"
-        const val PreferenceChange = "$Prefix.PreferenceChange"
+        const val PreferenceChanged = "$Prefix.PreferenceChange"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,6 +88,7 @@ class PreferenceActivity: AppCompatActivity() {
         }
 
         initializeToolbar(viewBinding.toolbar)
+        Preference.initializeOldValues(this)
 
         viewBinding.recyclerView.apply {
             adapter = this@PreferenceActivity.adapter
@@ -119,8 +118,9 @@ class PreferenceActivity: AppCompatActivity() {
             return
         }
 
+        val preferenceChanged = Preference.getPreferenceChanged(this)
         val intent = Intent().apply {
-            putExtra(Name.PreferenceChange, viewModel.configurationChanged)
+            putExtra(Name.PreferenceChanged, preferenceChanged)
         }
 
         setResult(RESULT_OK, intent)

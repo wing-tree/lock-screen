@@ -23,7 +23,6 @@ import com.flow.android.kotlin.lockscreen.application.ApplicationUtil
 import com.flow.android.kotlin.lockscreen.base.BaseActivity
 import com.flow.android.kotlin.lockscreen.calendar.viewmodel.CalendarViewModel
 import com.flow.android.kotlin.lockscreen.preference.view.PreferenceActivity
-import com.flow.android.kotlin.lockscreen.preference.viewmodel.ConfigurationChange
 import com.flow.android.kotlin.lockscreen.databinding.ActivityMainBinding
 import com.flow.android.kotlin.lockscreen.devicecredential.DeviceCredential
 import com.flow.android.kotlin.lockscreen.devicecredential.RequireDeviceCredential
@@ -154,8 +153,12 @@ class MainActivity : BaseActivity(),
     override fun onBackPressed() {
         if (onBackPressedDispatcher.hasEnabledCallbacks())
             onBackPressedDispatcher.onBackPressed()
-        else
-            viewBinding.frameLayoutRipple.forceRippleAnimation()
+        else {
+            if (Preference.LockScreen.getUnlockWithBackKey(this))
+                finish()
+            else
+                viewBinding.frameLayoutRipple.forceRippleAnimation()
+        }
     }
 
     override fun finish() {
@@ -252,7 +255,7 @@ class MainActivity : BaseActivity(),
             Intent(this, PreferenceActivity::class.java).also {
                 it.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT)
 
-                getActivityResultLauncher(PreferenceActivity.Name.PreferenceChange)?.launch(it)
+                getActivityResultLauncher(PreferenceActivity.Name.PreferenceChanged)?.launch(it)
                 overridePendingTransition(R.anim.slide_in_left, R.anim.fade_out)
             }
         }
@@ -306,14 +309,14 @@ class MainActivity : BaseActivity(),
         )
 
         putActivityResultLauncher(
-                PreferenceActivity.Name.PreferenceChange,
+                PreferenceActivity.Name.PreferenceChanged,
                 registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                     if (result.resultCode == RESULT_OK) {
-                        val preferenceChange = result.data?.getParcelableExtra<ConfigurationChange>(
-                                PreferenceActivity.Name.PreferenceChange
+                        val preferenceChanged = result.data?.getParcelableExtra<Preference.PreferenceChanged>(
+                                PreferenceActivity.Name.PreferenceChanged
                         ) ?: return@registerForActivityResult
 
-                        viewModel.refresh(preferenceChange)
+                        viewModel.refresh(preferenceChanged)
                     }
                 }
         )
