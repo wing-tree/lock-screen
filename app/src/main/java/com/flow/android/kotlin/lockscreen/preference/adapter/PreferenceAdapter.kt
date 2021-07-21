@@ -13,11 +13,43 @@ import java.security.InvalidParameterException
 class PreferenceAdapter(private val currentList: ArrayList<AdapterItem>): RecyclerView.Adapter<PreferenceAdapter.ViewHolder>() {
     private var recyclerView: RecyclerView? = null
 
-    class ViewHolder(private val viewBinding: ViewBinding): RecyclerView.ViewHolder(viewBinding.root) {
+    inner class ViewHolder(private val viewBinding: ViewBinding): RecyclerView.ViewHolder(viewBinding.root) {
         private val duration = 300L
 
         fun bind(adapterItem: AdapterItem) {
+            viewBinding.root.isClickable = adapterItem.isClickable
+
+            if (adapterItem.isVisible)
+                viewBinding.root.show()
+            else
+                viewBinding.root.hide()
+
             when(viewBinding) {
+                is ContentBinding -> {
+                    if (adapterItem is AdapterItem.Content) {
+                        adapterItem.drawable?.let {
+                            viewBinding.imageViewIcon.show()
+                            viewBinding.imageViewIcon.setImageDrawable(it)
+                        } ?: let {
+                            viewBinding.imageViewIcon.hide()
+                        }
+
+                        viewBinding.textViewSummary.text = adapterItem.summary
+                        viewBinding.textViewTitle.text = adapterItem.title
+
+                        if (adapterItem.summary.isBlank())
+                            viewBinding.textViewSummary.hide()
+
+                        viewBinding.root.setOnClickListener {
+                            adapterItem.onClick?.invoke(viewBinding, adapterItem)
+                        }
+
+                        if (isAboveSpace(adapterPosition))
+                            viewBinding.viewDivider.hide()
+                        else
+                            viewBinding.viewDivider.show()
+                    }
+                }
                 is PreferenceBinding -> {
                     if (adapterItem is AdapterItem.Preference) {
                         adapterItem.drawable?.let {
@@ -27,12 +59,20 @@ class PreferenceAdapter(private val currentList: ArrayList<AdapterItem>): Recycl
                             viewBinding.imageViewIcon.hide()
                         }
 
-                        viewBinding.textViewSummary.text = adapterItem.description
+                        viewBinding.textViewSummary.text = adapterItem.summary
                         viewBinding.textViewTitle.text = adapterItem.title
+
+                        if (adapterItem.summary.isBlank())
+                            viewBinding.textViewSummary.hide()
 
                         viewBinding.root.setOnClickListener {
                             adapterItem.onClick.invoke(viewBinding, adapterItem)
                         }
+
+                        if (isAboveSpace(adapterPosition))
+                            viewBinding.viewDivider.hide()
+                        else
+                            viewBinding.viewDivider.show()
                     }
                 }
                 is MultiSelectListPreferenceBinding -> {
@@ -64,7 +104,10 @@ class PreferenceAdapter(private val currentList: ArrayList<AdapterItem>): Recycl
                 }
                 is PreferenceCategoryBinding -> {
                     if (adapterItem is AdapterItem.PreferenceCategory)
-                        viewBinding.textViewCategory.text = adapterItem.subtitle
+                        viewBinding.textViewCategory.text = adapterItem.category
+                }
+                is SpaceBinding -> {
+                    // pass
                 }
                 is SwitchPreferenceBinding -> {
                     if (adapterItem is AdapterItem.SwitchPreference) {
@@ -98,20 +141,20 @@ class PreferenceAdapter(private val currentList: ArrayList<AdapterItem>): Recycl
             if (viewBinding is PreferenceBinding)
                 viewBinding.textViewSummary.text = summary
         }
+    }
 
-        companion object {
-            fun from(layoutInflater: LayoutInflater, parent: ViewGroup, viewType: Int): ViewHolder {
-                val viewBinding = when(viewType) {
-                    ViewType.Preference -> PreferenceBinding.inflate(layoutInflater, parent, false)
-                    ViewType.MultiSelectListPreference -> MultiSelectListPreferenceBinding.inflate(layoutInflater, parent, false)
-                    ViewType.PreferenceCategory -> PreferenceCategoryBinding.inflate(layoutInflater, parent, false)
-                    ViewType.SwitchPreference -> SwitchPreferenceBinding.inflate(layoutInflater, parent, false)
-                    else -> throw InvalidParameterException("Invalid viewType")
-                }
-
-                return ViewHolder(viewBinding)
-            }
+    private fun createViewHolder(layoutInflater: LayoutInflater, parent: ViewGroup, viewType: Int): ViewHolder {
+        val viewBinding = when(viewType) {
+            ViewType.Content -> ContentBinding.inflate(layoutInflater, parent, false)
+            ViewType.Preference -> PreferenceBinding.inflate(layoutInflater, parent, false)
+            ViewType.MultiSelectListPreference -> MultiSelectListPreferenceBinding.inflate(layoutInflater, parent, false)
+            ViewType.PreferenceCategory -> PreferenceCategoryBinding.inflate(layoutInflater, parent, false)
+            ViewType.Space -> SpaceBinding.inflate(layoutInflater, parent, false)
+            ViewType.SwitchPreference -> SwitchPreferenceBinding.inflate(layoutInflater, parent, false)
+            else -> throw InvalidParameterException("Invalid viewType")
         }
+
+        return ViewHolder(viewBinding)
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
@@ -120,9 +163,7 @@ class PreferenceAdapter(private val currentList: ArrayList<AdapterItem>): Recycl
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val layoutInflater = LayoutInflater.from(parent.context)
-
-        return ViewHolder.from(layoutInflater, parent, viewType)
+        return createViewHolder(LayoutInflater.from(parent.context), parent, viewType)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -133,9 +174,11 @@ class PreferenceAdapter(private val currentList: ArrayList<AdapterItem>): Recycl
 
     override fun getItemViewType(position: Int): Int {
         return when(currentList[position]) {
-            is AdapterItem.Preference -> ViewType.Preference
+            is AdapterItem.Content -> ViewType.Content
             is AdapterItem.MultiSelectListPreference -> ViewType.MultiSelectListPreference
+            is AdapterItem.Preference -> ViewType.Preference
             is AdapterItem.PreferenceCategory -> ViewType.PreferenceCategory
+            is AdapterItem.Space -> ViewType.Space
             is AdapterItem.SwitchPreference -> ViewType.SwitchPreference
         }
     }
@@ -156,55 +199,80 @@ class PreferenceAdapter(private val currentList: ArrayList<AdapterItem>): Recycl
             }
         }
     }
+
+    private fun isAboveSpace(position: Int): Boolean {
+        return if (position < currentList.count().dec()) {
+            currentList[position.inc()] is AdapterItem.Space
+        } else
+            false
+    }
 }
 
-object ViewType {
-    const val MultiSelectListPreference = 0
-    const val Preference = 1
-    const val PreferenceCategory = 2
-    const val SwitchPreference = 3
+private object ViewType {
+    const val Content = 0
+    const val MultiSelectListPreference = 1
+    const val Preference = 2
+    const val PreferenceCategory = 3
+    const val Space = 4
+    const val SwitchPreference = 5
 }
 
 sealed class AdapterItem {
     abstract val id: Long
-    abstract var isEnabled: Boolean
+    abstract var isClickable: Boolean
     abstract var isVisible: Boolean
+
+    data class Content(
+            override val id: Long = 0L,
+            override var isClickable: Boolean = true,
+            override var isVisible: Boolean = true,
+            val drawable: Drawable?,
+            val onClick: ((ContentBinding, Content) -> Unit)? = null,
+            val title: String,
+            var summary: String = BLANK,
+    ) : AdapterItem()
+
+    data class Space(
+            override val id: Long = 0L,
+            override var isClickable: Boolean = false,
+            override var isVisible: Boolean = true,
+    ) : AdapterItem()
 
     data class Preference(
             override val id: Long = 0L,
-            override var isEnabled: Boolean = true,
+            override var isClickable: Boolean = true,
             override var isVisible: Boolean = true,
-            val description: String,
+            val summary: String,
             val drawable: Drawable?,
             val onClick: (PreferenceBinding, Preference) -> Unit,
             val title: String
-    ): AdapterItem()
+    ) : AdapterItem()
 
     data class MultiSelectListPreference(
             override val id: Long = 0L,
-            override var isEnabled: Boolean = true,
+            override var isClickable: Boolean = true,
             override var isVisible: Boolean = true,
             val adapter: RecyclerView.Adapter<*>,
             val drawable: Drawable?,
             val onClick: (MultiSelectListPreferenceBinding, MultiSelectListPreference) -> Unit,
             val title: String,
             var isExpanded: Boolean = false
-    ): AdapterItem()
+    ) : AdapterItem()
 
     data class PreferenceCategory(
             override val id: Long = 0L,
-            override var isEnabled: Boolean = true,
+            override var isClickable: Boolean = true,
             override var isVisible: Boolean = true,
-            val subtitle: String
-    ): AdapterItem()
+            val category: String
+    ) : AdapterItem()
 
     data class SwitchPreference(
             override val id: Long = 0L,
-            override var isEnabled: Boolean = true,
+            override var isClickable: Boolean = true,
             override var isVisible: Boolean = true,
             val drawable: Drawable?,
             val isChecked: Boolean,
             val onCheckedChange: (isChecked: Boolean) -> Unit,
             val title: String
-    ): AdapterItem()
+    ) : AdapterItem()
 }

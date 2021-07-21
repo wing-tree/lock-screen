@@ -117,6 +117,7 @@ class BlindScreenPresenter(context: Context) {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             val windowMetrics = windowManager.currentWindowMetrics
             val insets = windowMetrics.windowInsets.getInsetsIgnoringVisibility(WindowInsets.Type.systemBars())
+
             windowMetrics.bounds.height() + insets.bottom + insets.top
         } else {
             val displayMetrics = DisplayMetrics()

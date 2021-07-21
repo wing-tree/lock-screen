@@ -11,6 +11,7 @@ import com.flow.android.kotlin.lockscreen.preference.adapter.PreferenceAdapter
 import com.flow.android.kotlin.lockscreen.databinding.PreferenceBinding
 import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
 import com.flow.android.kotlin.lockscreen.preference.view.SingleFontSizeChoiceDialogFragment
+import com.flow.android.kotlin.lockscreen.util.BLANK
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -65,7 +66,7 @@ class DisplayPreferenceFragment : PreferenceFragment() {
                 ),
                 AdapterItem.Preference(
                         drawable = ContextCompat.getDrawable(context, R.drawable.ic_round_format_size_24),
-                        description = "${Preference.Display.getFontSize(requireContext())}dp",
+                        summary = "${Preference.Display.getFontSize(requireContext())}dp",
                         onClick = { viewBinding: PreferenceBinding, _ ->
                             SingleFontSizeChoiceDialogFragment(fontSizes) { dialogFragment, item ->
                                 val text = "${item}dp"
@@ -81,10 +82,13 @@ class DisplayPreferenceFragment : PreferenceFragment() {
                 ),
                 AdapterItem.Preference(
                         drawable = ContextCompat.getDrawable(context, R.drawable.ic_round_access_time_24),
-                        description = format(timeFormat, date),
+                        summary = format(timeFormat, date),
                         onClick = { viewBinding: PreferenceBinding, _ ->
                             SingleStringChoiceDialogFragment(timeFormats) { dialogFragment, timeFormat ->
-                                Preference.Display.putTimeFormat(requireContext(), timeFormat)
+                                if (timeFormat == getString(R.string.display_preference_fragment_000))
+                                    Preference.Display.putTimeFormat(requireContext(), BLANK)
+                                else
+                                    Preference.Display.putTimeFormat(requireContext(), timeFormat)
 
                                 viewBinding.textViewSummary.text = timeFormat
 

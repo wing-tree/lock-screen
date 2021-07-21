@@ -14,6 +14,7 @@
     <color name="border">@color/high_emphasis</color>
     <color name="divider">#33FFFFFF</color>
     <color name="icon">@color/high_emphasis</color>
+    <color name="space">#33FFFFFF</color>
     <color name="status_bar">@color/black</color>
     <color name="title">@color/white</color>
     <color name="toolbar">@color/dark_grey</color>

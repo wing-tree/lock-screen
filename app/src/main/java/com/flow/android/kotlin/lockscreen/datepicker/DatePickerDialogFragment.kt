@@ -43,11 +43,11 @@ class DatePickerDialogFragment: BaseDialogFragment<FragmentDatePickerDialogBindi
             date = GregorianCalendar(year, monthOfYear, dayOfMonth).time
         }
 
-        viewBinding.materialButtonClose.setOnClickListener {
+        viewBinding.textViewClose.setOnClickListener {
             dismiss()
         }
 
-        viewBinding.materialButtonConfirm.setOnClickListener {
+        viewBinding.textViewConfirm.setOnClickListener {
             val intent = Intent(MemoEditingDialogFragment.Action.Date).apply {
                 putExtra(MemoEditingDialogFragment.Name.Date, date)
             }

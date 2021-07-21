@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Paint
 import android.graphics.PorterDuff
+import android.text.format.DateUtils
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -14,6 +15,7 @@ import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.*
 import com.flow.android.kotlin.lockscreen.R
+import com.flow.android.kotlin.lockscreen.application.MainApplication
 import com.flow.android.kotlin.lockscreen.databinding.MemoBinding
 import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
@@ -26,22 +28,33 @@ import java.util.*
 
 class MemoAdapter(private val listener: Listener) : RecyclerView.Adapter<MemoAdapter.ViewHolder>() {
     private val currentList = arrayListOf<Memo>()
-    private var fontSize = DEFAULT_FONT_SIZE
+
+    private var fontSize = MainApplication.instance?.let {
+        Preference.Display.getFontSize(it)
+    } ?: DEFAULT_FONT_SIZE
+
+    private var timeFormat = MainApplication.instance?.let {
+        Preference.Display.getTimeFormat(it)
+    } ?: DEFAULT_TIME_FORMAT
+
     private var inflater: LayoutInflater? = null
     private var simpleDateFormat: SimpleDateFormat? = null
-    private var timeFormat = DEFAULT_TIME_FORMAT
 
     interface Listener {
         fun onItemClick(item: Memo)
         fun onSwapIconTouch(viewHolder: ViewHolder)
     }
 
-    fun setFontSize(fontSize: Float) {
-        this.fontSize = fontSize
-    }
+    fun refresh() {
+        fontSize = MainApplication.instance?.let {
+            Preference.Display.getFontSize(it)
+        } ?: DEFAULT_FONT_SIZE
 
-    fun setTimeFormat(timeFormat: String) {
-        this.timeFormat = timeFormat
+        timeFormat = MainApplication.instance?.let {
+            Preference.Display.getTimeFormat(it)
+        } ?: DEFAULT_TIME_FORMAT
+
+        notifyDataSetChanged()
     }
 
     fun currentList() = currentList.toList()
@@ -192,8 +205,12 @@ class MemoAdapter(private val listener: Listener) : RecyclerView.Adapter<MemoAda
 
     private fun Long.format(context: Context): String {
         val simpleDateFormat = simpleDateFormat ?: SimpleDateFormat(timeFormat, Locale.getDefault())
+        val todayTimeFormat = context.getString(R.string.format_time_000)
 
-        simpleDateFormat.applyPattern(timeFormat)
+        if (DateUtils.isToday(this))
+            simpleDateFormat.applyPattern(todayTimeFormat)
+        else
+            simpleDateFormat.applyPattern(timeFormat)
 
         return simpleDateFormat.format(this)
     }

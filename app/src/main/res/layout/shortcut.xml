@@ -3,12 +3,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="@dimen/app_item_width"
+    android:layout_width="@dimen/width_80dp"
     android:layout_height="wrap_content"
-    android:layout_margin="@dimen/double_extra_small_100"
+    android:layout_margin="@dimen/margin_2dp"
     android:outlineProvider="none"
     app:cardBackgroundColor="@android:color/transparent"
-    app:cardElevation="@dimen/double_extra_small_100">
+    app:cardElevation="@dimen/elevation_1dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -16,8 +16,8 @@
 
         <ImageView
             android:id="@+id/image_view"
-            android:layout_width="@dimen/app_item_width"
-            android:layout_height="@dimen/app_icon_height"
+            android:layout_width="@dimen/width_80dp"
+            android:layout_height="@dimen/height_48dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -27,7 +27,7 @@
         <TextView
             android:id="@+id/text_view"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/app_label_height"
+            android:layout_height="@dimen/height_40dp"
             android:ellipsize="end"
             android:gravity="center_horizontal"
             android:maxLines="2"

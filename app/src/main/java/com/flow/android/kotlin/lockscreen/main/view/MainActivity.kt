@@ -7,7 +7,6 @@ import android.app.KeyguardManager
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
-import android.graphics.PorterDuff
 import android.net.Uri
 import android.os.*
 import android.provider.MediaStore
@@ -59,9 +58,6 @@ import kotlin.math.sqrt
 class MainActivity : BaseActivity(),
         OnPermissionAllowClickListener, RequireDeviceCredential<Unit> {
     private val duration = 300L
-    private val torch: Torch by lazy {
-        Torch(this)
-    }
 
     private val viewBinding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val viewModel: MainViewModel by viewModels()
@@ -69,14 +65,18 @@ class MainActivity : BaseActivity(),
     private val memoViewModel: MemoViewModel by viewModels()
     private val shortcutViewModel: ShortcutViewModel by viewModels()
 
+    private val torch: Torch by lazy {
+        Torch(viewBinding)
+    }
+
     private val delayMillis = 800L
     private val notificationManager by lazy { getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager }
     private var handler: Handler? = null
 
     private object Unlock {
+        const val endRange = 600F
         var x = 0F
         var y = 0F
-        const val endRange = 600F
         var outOfEndRange = false
     }
 
@@ -263,20 +263,6 @@ class MainActivity : BaseActivity(),
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             viewBinding.imageViewHighlight.setOnClickListener {
                 torch.toggle()
-
-                val color = when(torch.mode) {
-                    Torch.Mode.On -> {
-                        viewBinding.frameLayoutHighlight.showRipple()
-                        ContextCompat.getColor(this, R.color.yellow_A_200)
-                    }
-                    Torch.Mode.Off -> {
-                        viewBinding.frameLayoutHighlight.hideRipple()
-                        ContextCompat.getColor(this, R.color.white)
-                    }
-                    else -> throw IllegalArgumentException("Invalid mode")
-                }
-
-                viewBinding.imageViewHighlight.setColorFilter(color, PorterDuff.Mode.SRC_IN)
             }
         } else
             viewBinding.imageViewHighlight.visibility = GONE

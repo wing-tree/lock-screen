@@ -5,6 +5,8 @@ import android.content.res.Configuration
 import android.os.Parcelable
 import androidx.appcompat.app.AppCompatDelegate
 import com.flow.android.kotlin.lockscreen.R
+import com.flow.android.kotlin.lockscreen.util.DEFAULT_FONT_SIZE
+import com.flow.android.kotlin.lockscreen.util.DEFAULT_TIME_FORMAT
 import kotlinx.android.parcel.Parcelize
 
 object Preference {
@@ -137,7 +139,7 @@ object Preference {
 
         fun getFontSize(context: Context): Float {
             return context.getSharedPreferences(Name.Preference, Context.MODE_PRIVATE)
-                    .getFloat(Key.FontSize, 16F)
+                    .getFloat(Key.FontSize, DEFAULT_FONT_SIZE)
         }
 
         fun putTimeFormat(context: Context, value: String) {
@@ -147,7 +149,7 @@ object Preference {
         }
 
         fun getTimeFormat(context: Context): String {
-            val defaultValue = context.getString(R.string.format_date_001)
+            val defaultValue = DEFAULT_TIME_FORMAT
 
             return context.getSharedPreferences(Name.Preference, Context.MODE_PRIVATE)
                     .getString(Key.TimeFormat, defaultValue) ?: defaultValue
@@ -194,6 +196,15 @@ object Preference {
             return context.getSharedPreferences(Name.Preference, Context.MODE_PRIVATE)
                     .edit().putBoolean(Key.UnlockWithBackKey, value).apply()
         }
+    }
+
+    fun isChanged(vararg preferenceChanged: Boolean): Boolean {
+        preferenceChanged.forEach {
+            if (it)
+                return it
+        }
+
+        return false
     }
 
     @Parcelize

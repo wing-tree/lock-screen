@@ -61,7 +61,8 @@
                 android:maxLines="1"
                 android:textColor="@color/medium_emphasis"
                 android:textSize="@dimen/text_size_14dp"
-                tools:text="Summary" />
+                tools:text="Summary"
+                tools:visibility="gone"/>
         </LinearLayout>
 
         <View

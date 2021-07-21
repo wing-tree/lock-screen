@@ -1,5 +1,6 @@
 package com.flow.android.kotlin.lockscreen.util
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -7,6 +8,7 @@ import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.RippleDrawable
+import android.net.Uri
 import androidx.annotation.ColorInt
 import com.flow.android.kotlin.lockscreen.R
 import java.text.SimpleDateFormat
@@ -57,5 +59,22 @@ fun versionName(context: Context): String {
     } catch (e: PackageManager.NameNotFoundException) {
         e.printStackTrace()
         return BLANK
+    }
+}
+
+fun goToPlayStore(context: Context) {
+    try {
+        context.startActivity(
+            Intent (
+                Intent.ACTION_VIEW,
+                Uri.parse("market://details?id=${context.packageName}"))
+        )
+    } catch (e: ActivityNotFoundException) {
+        context.startActivity(
+            Intent (
+                Intent.ACTION_VIEW,
+                Uri.parse("https://play.google.com/store/apps/details?id=${context.packageName}")
+            )
+        )
     }
 }

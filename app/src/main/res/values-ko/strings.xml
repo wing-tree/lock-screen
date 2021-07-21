@@ -9,6 +9,10 @@
 
     <string name="notification_content_text">안정적인 실행을 위한 알림입니다</string>
 
+    <!-- fragment_date_picker_dialog -->
+    <string name="fragment_date_picker_dialog_000">Cancel</string>
+    <string name="fragment_date_picker_dialog_001">Save</string>
+
     <!-- fragment_permission_rationale_dialog -->
     <string name="fragment_permission_rationale_dialog_000">앱 권한 요청</string>
     <string name="fragment_permission_rationale_dialog_001">앱을 정상적으로 사용하기 위해서는 다음 권한을 허용해야 합니다.</string>
@@ -38,6 +42,9 @@
     <string name="configuration_activity_004">설정</string>
     <string name="configuration_activity_005">캘린더</string>
     <string name="configuration_activity_006">표시할 캘린더</string>
+    <string name="configuration_activity_007">앱 공유하기</string>
+    <string name="configuration_activity_008">리뷰 쓰기</string>
+    <string name="configuration_activity_009">버전</string>
 
     <!-- DeviceCredentialHelper -->
     <string name="device_credential_helper_000">잠금 해제 패턴을 그리세요</string>
@@ -107,6 +114,9 @@
     <string name="permission_rationale_dialog_fragment_003"></string>
     <string name="permission_rationale_dialog_fragment_004">다른 앱 위에 표시</string>
     <string name="permission_rationale_dialog_fragment_005"></string>
+
+    <!-- Review -->
+    <string name="review_000">소중한 리뷰 감사합니다.</string>
 
     <!-- Util -->
     <string name="util_000">공유하기</string>

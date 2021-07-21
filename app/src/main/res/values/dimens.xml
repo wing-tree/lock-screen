@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Component elevation values
          1. Nav drawer: 16dp
          2. App bar: 4dp
@@ -8,164 +8,178 @@
          5. Button: 2dp to 8dp
          6. Dialog: 24dp -->
 
-    <dimen name="triple_extra_small_100">1dp</dimen>
-    <dimen name="triple_extra_small_125">1.25dp</dimen>
-    <dimen name="triple_extra_small_150">1.5dp</dimen>
-    <dimen name="triple_extra_small_175">1.75dp</dimen>
-    <dimen name="triple_extra_small_200">2dp</dimen>
-    <dimen name="triple_extra_small_225">2.25dp</dimen>
-    <dimen name="triple_extra_small_250">2.5dp</dimen>
-    <dimen name="triple_extra_small_275">2.75dp</dimen>
+    <dimen name="elevation_1dp">1dp</dimen>
+    <dimen name="elevation_2dp">2dp</dimen>
+    <dimen name="elevation_3dp">3dp</dimen>
+    <dimen name="elevation_4dp">4dp</dimen>
+    <dimen name="elevation_5dp">5dp</dimen>
+    <dimen name="elevation_6dp">6dp</dimen>
+    <dimen name="elevation_7dp">7dp</dimen>
+    <dimen name="elevation_8dp">8dp</dimen>
+    <dimen name="elevation_16dp">16dp</dimen>
+    <dimen name="elevation_24dp">24dp</dimen>
 
-    <dimen name="double_extra_small_100">2dp</dimen>
-    <dimen name="double_extra_small_125">2.5dp</dimen>
-    <dimen name="double_extra_small_150">3dp</dimen>
-    <dimen name="double_extra_small_175">3.5dp</dimen>
-    <dimen name="double_extra_small_200">4dp</dimen>
-    <dimen name="double_extra_small_225">4.5dp</dimen>
-    <dimen name="double_extra_small_250">5dp</dimen>
-    <dimen name="double_extra_small_275">5.5dp</dimen>
+    <dimen name="height_0dp">0dp</dimen>
+    <dimen name="height_1dp">1dp</dimen>
+    <dimen name="height_2dp">2dp</dimen>
+    <dimen name="height_3dp">3dp</dimen>
 
-    <dimen name="extra_small_100">4dp</dimen>
-    <dimen name="extra_small_125">5dp</dimen>
-    <dimen name="extra_small_150">6dp</dimen>
-    <dimen name="extra_small_175">7dp</dimen>
-    <dimen name="extra_small_200">8dp</dimen>
-    <dimen name="extra_small_225">9dp</dimen>
-    <dimen name="extra_small_250">10dp</dimen>
-    <dimen name="extra_small_275">11dp</dimen>
+    <dimen name="height_4dp">4dp</dimen>
+    <dimen name="height_8dp">8dp</dimen>
+    <dimen name="height_12dp">12dp</dimen>
+    <dimen name="height_16dp">16dp</dimen>
+    <dimen name="height_20dp">20dp</dimen>
+    <dimen name="height_24dp">24dp</dimen>
+    <dimen name="height_28dp">28dp</dimen>
+    <dimen name="height_32dp">32dp</dimen>
+    <dimen name="height_36dp">36dp</dimen>
+    <dimen name="height_40dp">40dp</dimen>
+    <dimen name="height_44dp">44dp</dimen>
+    <dimen name="height_48dp">48dp</dimen>
+    <dimen name="height_52dp">52dp</dimen>
+    <dimen name="height_56dp">56dp</dimen>
+    <dimen name="height_60dp">60dp</dimen>
+    <dimen name="height_64dp">64dp</dimen>
+    <dimen name="height_68dp">68dp</dimen>
+    <dimen name="height_72dp">72dp</dimen>
+    <dimen name="height_76dp">76dp</dimen>
+    <dimen name="height_80dp">80dp</dimen>
 
-    <dimen name="small_100">8dp</dimen>
-    <dimen name="small_125">10dp</dimen>
-    <dimen name="small_150">12dp</dimen>
-    <dimen name="small_175">14dp</dimen>
-    <dimen name="small_200">16dp</dimen>
-    <dimen name="small_225">18dp</dimen>
-    <dimen name="small_250">20dp</dimen>
-    <dimen name="small_275">22dp</dimen>
+    <dimen name="height_88dp">88dp</dimen>
+    <dimen name="height_96dp">96dp</dimen>
+    <dimen name="height_104dp">104dp</dimen>
+    <dimen name="height_112dp">112dp</dimen>
+    <dimen name="height_120dp">120dp</dimen>
+    <dimen name="height_128dp">128dp</dimen>
 
-    <dimen name="normal_100">16dp</dimen>
-    <dimen name="normal_125">20dp</dimen>
-    <dimen name="normal_150">24dp</dimen>
-    <dimen name="normal_175">28dp</dimen>
-    <dimen name="normal_200">32dp</dimen>
-    <dimen name="normal_225">36dp</dimen>
-    <dimen name="normal_250">40dp</dimen>
-    <dimen name="normal_275">44dp</dimen>
+    <dimen name="height_144dp">144dp</dimen>
+    <dimen name="height_160dp">160dp</dimen>
+    <dimen name="height_176dp">176dp</dimen>
+    <dimen name="height_192dp">192dp</dimen>
+    <dimen name="height_208dp">208dp</dimen>
+    <dimen name="height_224dp">224dp</dimen>
+    <dimen name="height_240dp">240dp</dimen>
+    <dimen name="height_256dp">256dp</dimen>
 
-    <dimen name="large_100">32dp</dimen>
-    <dimen name="large_125">40dp</dimen>
-    <dimen name="large_150">48dp</dimen>
-    <dimen name="large_175">56dp</dimen>
-    <dimen name="large_200">64dp</dimen>
-    <dimen name="large_225">72dp</dimen>
-    <dimen name="large_250">80dp</dimen>
-    <dimen name="large_275">88dp</dimen>
+    <dimen name="margin_0dp">0dp</dimen>
+    <dimen name="margin_1dp">1dp</dimen>
+    <dimen name="margin_2dp">2dp</dimen>
+    <dimen name="margin_3dp">3dp</dimen>
 
-    <dimen name="extra_large_100">64dp</dimen>
-    <dimen name="extra_large_125">80dp</dimen>
-    <dimen name="extra_large_150">96dp</dimen>
-    <dimen name="extra_large_175">112dp</dimen>
-    <dimen name="extra_large_200">128dp</dimen>
-    <dimen name="extra_large_225">144dp</dimen>
-    <dimen name="extra_large_250">160dp</dimen>
-    <dimen name="extra_large_275">176dp</dimen>
+    <dimen name="margin_4dp">4dp</dimen>
+    <dimen name="margin_8dp">8dp</dimen>
+    <dimen name="margin_12dp">12dp</dimen>
+    <dimen name="margin_16dp">16dp</dimen>
+    <dimen name="margin_20dp">20dp</dimen>
+    <dimen name="margin_24dp">24dp</dimen>
+    <dimen name="margin_28dp">28dp</dimen>
+    <dimen name="margin_32dp">32dp</dimen>
+    <dimen name="margin_36dp">36dp</dimen>
+    <dimen name="margin_40dp">40dp</dimen>
+    <dimen name="margin_44dp">44dp</dimen>
+    <dimen name="margin_48dp">48dp</dimen>
+    <dimen name="margin_52dp">52dp</dimen>
+    <dimen name="margin_56dp">56dp</dimen>
+    <dimen name="margin_60dp">60dp</dimen>
+    <dimen name="margin_64dp">64dp</dimen>
+    <dimen name="margin_68dp">68dp</dimen>
+    <dimen name="margin_72dp">72dp</dimen>
+    <dimen name="margin_76dp">76dp</dimen>
+    <dimen name="margin_80dp">80dp</dimen>
 
-    <dimen name="double_extra_large_100">128dp</dimen>
-    <dimen name="double_extra_large_125">160dp</dimen>
-    <dimen name="double_extra_large_150">192dp</dimen>
-    <dimen name="double_extra_large_175">224dp</dimen>
-    <dimen name="double_extra_large_200">256dp</dimen>
-    <dimen name="double_extra_large_225">288dp</dimen>
-    <dimen name="double_extra_large_250">320dp</dimen>
-    <dimen name="double_extra_large_275">352dp</dimen>
+    <dimen name="margin_88dp">88dp</dimen>
+    <dimen name="margin_96dp">96dp</dimen>
+    <dimen name="margin_104dp">104dp</dimen>
+    <dimen name="margin_112dp">112dp</dimen>
+    <dimen name="margin_120dp">120dp</dimen>
+    <dimen name="margin_128dp">128dp</dimen>
 
-    <dimen name="triple_extra_large_100">256dp</dimen>
-    <dimen name="triple_extra_large_125">320dp</dimen>
-    <dimen name="triple_extra_large_150">384dp</dimen>
-    <dimen name="triple_extra_large_175">448dp</dimen>
-    <dimen name="triple_extra_large_200">512dp</dimen>
-    <dimen name="triple_extra_large_225">576dp</dimen>
-    <dimen name="triple_extra_large_250">640dp</dimen>
-    <dimen name="triple_extra_large_275">704dp</dimen>
+    <dimen name="margin_144dp">144dp</dimen>
+    <dimen name="margin_160dp">160dp</dimen>
+    <dimen name="margin_176dp">176dp</dimen>
+    <dimen name="margin_192dp">192dp</dimen>
+    <dimen name="margin_208dp">208dp</dimen>
+    <dimen name="margin_224dp">224dp</dimen>
+    <dimen name="margin_240dp">240dp</dimen>
+    <dimen name="margin_256dp">256dp</dimen>
 
-    <dimen name="margin_triple_extra_small">@dimen/triple_extra_small_100</dimen>
-    <dimen name="margin_double_extra_small">@dimen/double_extra_small_100</dimen>
-    <dimen name="margin_extra_small">@dimen/extra_small_100</dimen>
-    <dimen name="margin_small">@dimen/small_100</dimen>
-    <dimen name="margin_normal">@dimen/normal_100</dimen>
-    <dimen name="margin_large">@dimen/normal_150</dimen>
-    <dimen name="margin_extra_large">@dimen/large_100</dimen>
-    <dimen name="margin_double_extra_large">@dimen/large_150</dimen>
-    <dimen name="margin_triple_extra_large">@dimen/large_175</dimen>
+    <dimen name="padding_0dp">0dp</dimen>
+    <dimen name="padding_1dp">1dp</dimen>
+    <dimen name="padding_2dp">2dp</dimen>
+    <dimen name="padding_3dp">3dp</dimen>
 
-    <dimen name="elevation_double_extra_small">1dp</dimen>
-    <dimen name="elevation_extra_small">2dp</dimen>
-    <dimen name="elevation_small">4dp</dimen>
-    <dimen name="elevation_normal">6dp</dimen>
-    <dimen name="elevation_large">8dp</dimen>
-    <dimen name="elevation_extra_large">16dp</dimen>
-    <dimen name="elevation_double_extra_large">24dp</dimen>
+    <dimen name="padding_4dp">4dp</dimen>
+    <dimen name="padding_8dp">8dp</dimen>
+    <dimen name="padding_12dp">12dp</dimen>
+    <dimen name="padding_16dp">16dp</dimen>
+    <dimen name="padding_20dp">20dp</dimen>
+    <dimen name="padding_24dp">24dp</dimen>
+    <dimen name="padding_28dp">28dp</dimen>
+    <dimen name="padding_32dp">32dp</dimen>
+    <dimen name="padding_36dp">36dp</dimen>
+    <dimen name="padding_40dp">40dp</dimen>
+    <dimen name="padding_44dp">44dp</dimen>
+    <dimen name="padding_48dp">48dp</dimen>
+    <dimen name="padding_52dp">52dp</dimen>
+    <dimen name="padding_56dp">56dp</dimen>
+    <dimen name="padding_60dp">60dp</dimen>
+    <dimen name="padding_64dp">64dp</dimen>
+    <dimen name="padding_68dp">68dp</dimen>
+    <dimen name="padding_72dp">72dp</dimen>
+    <dimen name="padding_76dp">76dp</dimen>
+    <dimen name="padding_80dp">80dp</dimen>
 
-    <dimen name="padding_triple_extra_small">@dimen/triple_extra_small_100</dimen>
-    <dimen name="padding_double_extra_small">@dimen/double_extra_small_100</dimen>
-    <dimen name="padding_extra_small">@dimen/extra_small_100</dimen>
-    <dimen name="padding_small">@dimen/small_100</dimen>
-    <dimen name="padding_normal">@dimen/small_150</dimen>
-    <dimen name="padding_large">@dimen/normal_100</dimen>
+    <dimen name="width_0dp">0dp</dimen>
+    <dimen name="width_1dp">1dp</dimen>
+    <dimen name="width_2dp">2dp</dimen>
+    <dimen name="width_3dp">3dp</dimen>
 
-    <dimen name="width_triple_extra_small">@dimen/extra_small_100</dimen>
-    <dimen name="width_double_extra_small">@dimen/small_100</dimen>
-    <dimen name="width_extra_small">@dimen/normal_100</dimen>
-    <dimen name="width_small">@dimen/normal_125</dimen>
-    <dimen name="width_normal">@dimen/normal_150</dimen>
-    <dimen name="width_large">@dimen/large_100</dimen>
-    <dimen name="width_extra_large">@dimen/large_125</dimen>
-    <dimen name="width_double_extra_large">@dimen/large_150</dimen>
-    <dimen name="width_triple_extra_large">@dimen/large_175</dimen>
+    <dimen name="width_4dp">4dp</dimen>
+    <dimen name="width_8dp">8dp</dimen>
+    <dimen name="width_12dp">12dp</dimen>
+    <dimen name="width_16dp">16dp</dimen>
+    <dimen name="width_20dp">20dp</dimen>
+    <dimen name="width_24dp">24dp</dimen>
+    <dimen name="width_28dp">28dp</dimen>
+    <dimen name="width_32dp">32dp</dimen>
+    <dimen name="width_36dp">36dp</dimen>
+    <dimen name="width_40dp">40dp</dimen>
+    <dimen name="width_44dp">44dp</dimen>
+    <dimen name="width_48dp">48dp</dimen>
+    <dimen name="width_52dp">52dp</dimen>
+    <dimen name="width_56dp">56dp</dimen>
+    <dimen name="width_60dp">60dp</dimen>
+    <dimen name="width_64dp">64dp</dimen>
+    <dimen name="width_68dp">68dp</dimen>
+    <dimen name="width_72dp">72dp</dimen>
+    <dimen name="width_76dp">76dp</dimen>
+    <dimen name="width_80dp">80dp</dimen>
 
-    <dimen name="height_triple_extra_small">@dimen/extra_small_100</dimen>
-    <dimen name="height_double_extra_small">@dimen/small_100</dimen>
-    <dimen name="height_extra_small">@dimen/normal_100</dimen>
-    <dimen name="height_small">@dimen/normal_125</dimen>
-    <dimen name="height_normal">@dimen/normal_150</dimen>
-    <dimen name="height_large">@dimen/large_100</dimen>
-    <dimen name="height_extra_large">@dimen/large_125</dimen>
-    <dimen name="height_double_extra_large">@dimen/large_150</dimen>
-    <dimen name="height_triple_extra_large">@dimen/large_175</dimen>
+    <dimen name="width_88dp">88dp</dimen>
+    <dimen name="width_96dp">96dp</dimen>
+    <dimen name="width_104dp">104dp</dimen>
+    <dimen name="width_112dp">112dp</dimen>
+    <dimen name="width_120dp">120dp</dimen>
+    <dimen name="width_128dp">128dp</dimen>
 
-    <dimen name="height_divider">@dimen/triple_extra_small_100</dimen>
-    <dimen name="height_one_line">@dimen/large_150</dimen>
-    <dimen name="height_two_line">@dimen/large_225</dimen>
+    <dimen name="width_144dp">144dp</dimen>
+    <dimen name="width_160dp">160dp</dimen>
+    <dimen name="width_176dp">176dp</dimen>
+    <dimen name="width_192dp">192dp</dimen>
+    <dimen name="width_208dp">208dp</dimen>
+    <dimen name="width_224dp">224dp</dimen>
+    <dimen name="width_240dp">240dp</dimen>
+    <dimen name="width_256dp">256dp</dimen>
 
-    <dimen name="height_constrained">@dimen/extra_large_125</dimen>
-    <dimen name="height_max">@dimen/extra_large_100</dimen>
-    <dimen name="height_min">@dimen/large_125</dimen>
-
-    <dimen name="text_size_extra_small">12dp</dimen>
-    <dimen name="text_size_small">14dp</dimen>
-    <dimen name="text_size_normal">16dp</dimen>
-    <dimen name="text_size_large">20dp</dimen>
-    <dimen name="text_size_extra_large">24dp</dimen>
-
-    <item name="line_spacing_multiplier" format="float" type="dimen">1.15</item>
+    <dimen name="text_size_12dp">12dp</dimen>
+    <dimen name="text_size_14dp">14dp</dimen>
+    <dimen name="text_size_16dp">16dp</dimen>
+    <dimen name="text_size_20dp">20dp</dimen>
+    <dimen name="text_size_24dp">24dp</dimen>
 
     <dimen name="default_rounded_corner">4dp</dimen>
 
-    <dimen name="app_icon_width">48dp</dimen>
-    <dimen name="app_icon_height">48dp</dimen>
-    <dimen name="app_item_width">80dp</dimen>
-    <dimen name="app_label_height">40dp</dimen>
-
-    <dimen name="width_color_small">@dimen/extra_small_225</dimen>
-    <dimen name="width_color_medium">@dimen/small_150</dimen>
-
-    <dimen name="height_color_small">@dimen/extra_small_225</dimen>
-    <dimen name="height_color_medium">@dimen/small_150</dimen>
-
-    <dimen name="height_unlock_layout">@dimen/extra_large_275</dimen>
-    <dimen name="padding_unlock_icon">@dimen/small_125</dimen>
-
+    <item name="line_spacing_multiplier" format="float" type="dimen">1.15</item>
     <item name="shadow_dx" format="float" type="dimen">1.0</item>
     <item name="shadow_dy" format="float" type="dimen">1.0</item>
     <item name="shadow_radius" format="float" type="dimen">1.0</item>

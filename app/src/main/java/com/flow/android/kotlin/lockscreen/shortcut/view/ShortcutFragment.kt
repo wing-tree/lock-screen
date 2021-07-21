@@ -92,7 +92,7 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewBinding.appCompatImageView.setOnClickListener {
+        viewBinding.imageView.setOnClickListener {
             if (DeviceCredential.requireUnlock(requireContext())) {
                 confirmDeviceCredential(Value(false))
             } else {

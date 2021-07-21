@@ -5,8 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/margin_triple_extra_small"
-    android:layout_marginBottom="@dimen/margin_triple_extra_small"
+    android:layout_marginTop="1dp"
+    android:layout_marginBottom="1dp"
     android:background="@drawable/border">
 
     <TextView
@@ -14,11 +14,11 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:paddingBottom="@dimen/padding_small"
-        android:paddingEnd="@dimen/padding_normal"
-        android:paddingStart="@dimen/padding_normal"
-        android:paddingTop="@dimen/padding_small"
-        android:textSize="@dimen/text_size_normal"
+        android:paddingBottom="@dimen/padding_8dp"
+        android:paddingEnd="@dimen/padding_12dp"
+        android:paddingStart="@dimen/padding_12dp"
+        android:paddingTop="@dimen/padding_8dp"
+        android:textSize="@dimen/text_size_16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/frame_layout"
         app:layout_constraintStart_toStartOf="parent"
@@ -29,7 +29,7 @@
         android:id="@+id/frame_layout"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:layout_marginEnd="@dimen/margin_double_extra_small"
+        android:layout_marginEnd="@dimen/margin_4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -45,10 +45,10 @@
 
         <ImageView
             android:id="@+id/image_view_clear"
-            android:layout_width="@dimen/width_normal"
-            android:layout_height="@dimen/height_normal"
+            android:layout_width="@dimen/width_24dp"
+            android:layout_height="@dimen/height_24dp"
             android:layout_gravity="center"
-            android:layout_marginEnd="@dimen/margin_double_extra_small"
+            android:layout_marginEnd="@dimen/margin_4dp"
             android:visibility="gone"
             app:srcCompat="@drawable/ic_round_clear_24"
             app:tint="@color/icon"

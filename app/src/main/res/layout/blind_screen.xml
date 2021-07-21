@@ -3,8 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     android:id="@+id/constraint_layout"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background_blind_screen">
 
@@ -12,14 +12,15 @@
         android:id="@+id/linear_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/margin_double_extra_large"
-        android:layout_marginStart="@dimen/margin_double_extra_large"
-        android:layout_marginTop="@dimen/double_extra_large_125"
+        android:layout_marginEnd="@dimen/margin_48dp"
+        android:layout_marginStart="@dimen/margin_48dp"
+        android:layout_marginTop="@dimen/margin_192dp"
         android:orientation="vertical"
         android:gravity="center_horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+
         <LinearLayout
             android:id="@+id/linear_layout_date_time"
             android:layout_width="wrap_content"
@@ -40,14 +41,14 @@
                 android:shadowDy="@dimen/shadow_dy"
                 android:shadowRadius="@dimen/shadow_radius"
                 android:textColor="@color/white"
-                android:textSize="56sp"
+                android:textSize="56dp"
                 tools:text="12시 00분" />
 
             <TextClock
                 android:id="@+id/text_clock_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_extra_small"
+                android:layout_marginTop="@dimen/margin_4dp"
                 android:format12Hour="@string/format_date_000"
                 android:fontFamily="sans-serif-light"
                 android:gravity="center_vertical"
@@ -57,7 +58,7 @@
                 android:shadowDy="@dimen/shadow_dy"
                 android:shadowRadius="@dimen/shadow_radius"
                 android:textColor="@color/white"
-                android:textSize="35sp"
+                android:textSize="35dp"
                 tools:text="Fri, January 1" />
         </LinearLayout>
 
@@ -65,11 +66,11 @@
             android:id="@+id/text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/extra_large_150"
+            android:layout_marginTop="@dimen/margin_72dp"
             android:gravity="center"
             android:text="@string/blind_screen_000"
             android:textColor="@color/white"
-            android:textSize="@dimen/text_size_large"
+            android:textSize="@dimen/text_size_20dp"
             android:shadowColor="@color/shadow"
             android:shadowDx="@dimen/shadow_dx"
             android:shadowDy="@dimen/shadow_dy"
@@ -78,18 +79,18 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_extra_large"
+            android:layout_marginTop="@dimen/margin_96dp"
             android:gravity="center"
             android:text="@string/blind_screen_001"
             android:textColor="@color/white"
-            android:textSize="@dimen/text_size_normal" />
+            android:textSize="@dimen/text_size_16dp" />
     </LinearLayout>
 
     <FrameLayout
         android:id="@+id/frame_layout_ripple"
-        android:layout_width="@dimen/extra_large_125"
-        android:layout_height="@dimen/extra_large_125"
-        android:layout_marginTop="@dimen/extra_large_150"
+        android:layout_width="@dimen/width_72dp"
+        android:layout_height="@dimen/height_72dp"
+        android:layout_marginTop="@dimen/margin_24dp"
         android:foreground="@drawable/ripple_unlock"
         app:layout_constraintTop_toBottomOf="@id/linear_layout"
         app:layout_constraintEnd_toEndOf="parent"
@@ -98,12 +99,12 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/image_view_unlock"
-            android:layout_width="@dimen/width_triple_extra_large"
-            android:layout_height="@dimen/height_triple_extra_large"
+            android:layout_width="@dimen/width_56dp"
+            android:layout_height="@dimen/height_56dp"
             android:layout_gravity="center"
             android:background="@drawable/oval_border"
             android:duplicateParentState="true"
-            android:padding="@dimen/small_125"
+            android:padding="@dimen/padding_12dp"
             android:scaleType="centerInside"
             app:srcCompat="@drawable/ic_unlock_90px"
             app:tint="@color/white"

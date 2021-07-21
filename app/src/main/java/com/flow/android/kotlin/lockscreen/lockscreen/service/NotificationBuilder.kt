@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.calendar.CalendarLoader
 import com.flow.android.kotlin.lockscreen.calendar.model.Model
@@ -23,6 +24,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.Comparator
+import kotlin.math.abs
 
 object NotificationBuilder {
     const val ID = 5337800
@@ -52,20 +54,24 @@ object NotificationBuilder {
             )
 
             GlobalScope.launch(Dispatchers.IO) {
-                val eventForNotification = calendarEventForNotification(context)
+                val calendarEventForNotification = calendarEventForNotification(context)
+                val smallIcon = R.drawable.ic_round_lock_24
+
                 val memos = todayMemos(context)
                 val memoForNotification = memoForNotification(memos)
 
+                var color = 0
                 var contentTitle = context.getString(R.string.app_name)
                 var contentText = context.getString(R.string.notification_content_text)
                 var subText = BLANK
 
                 val simpleDateFormat = SimpleDateFormat(context.getString(R.string.format_time_002), Locale.getDefault())
 
-                eventForNotification?.let { event ->
-                    contentTitle = context.getString(R.string.notification_builder_000)
-                    contentText = event.title.take(160)
-                    subText = event.begin.toDateString(simpleDateFormat)
+                calendarEventForNotification?.let {
+                    color = ContextCompat.getColor(context, R.color.calendar)
+                    contentTitle = it.title.take(160)
+                    contentText = context.getString(R.string.notification_builder_000)
+                    subText = it.begin.toDateString(simpleDateFormat)
                 } ?: memoForNotification?.let { memo ->
                     contentTitle = context.getString(R.string.notification_builder_001)
                     contentText = memo.content.take(160)
@@ -78,14 +84,14 @@ object NotificationBuilder {
                 }
 
                 val builder = NotificationCompat.Builder(context, CHANNEL_ID)
-                        .setSmallIcon(R.drawable.ic_round_lock_open_24)
-                        .setContentTitle(contentTitle)
-                        .setContentText(contentText)
-                        .setContentIntent(pendingIntent)
-                        .setPriority(NotificationCompat.PRIORITY_MIN)
-                        .setShowWhen(false)
-                        .setSubText(subText)
-
+                    .setSmallIcon(smallIcon)
+                    .setColor(color)
+                    .setContentTitle(contentTitle)
+                    .setContentText(contentText)
+                    .setContentIntent(pendingIntent)
+                    .setPriority(NotificationCompat.PRIORITY_MIN)
+                    .setShowWhen(false)
+                    .setSubText(subText)
                 it.onSuccess(builder)
             }
         }
@@ -93,6 +99,8 @@ object NotificationBuilder {
 
     private fun calendarEventForNotification(context: Context): Model.CalendarEvent? {
         val contentResolver = context.contentResolver
+        var calendarEvent: Model.CalendarEvent? = null
+        var m = 3.inc()
 
         val gregorianCalendar = GregorianCalendar().apply {
             timeInMillis = System.currentTimeMillis()
@@ -103,22 +111,25 @@ object NotificationBuilder {
         val calendars = CalendarLoader.calendars(contentResolver)
         val uncheckedCalendarIds = Preference.Calendar.getUncheckedCalendarIds(context)
 
-        val events = CalendarLoader.calendarEvents(context.contentResolver, calendars.filter {
+        val calendarEvents = CalendarLoader.calendarEvents(context.contentResolver, calendars.filter {
             uncheckedCalendarIds.contains(it.id.toString()).not()
         }, 0)
 
-        for (event in events) {
-            val beginHourOfDay = gregorianCalendar.apply { timeInMillis = event.begin }
-                    .get(GregorianCalendar.HOUR_OF_DAY)
-            val endHourOfDay = gregorianCalendar.apply { timeInMillis = event.end }
+        calendarEvents.forEach {
+            val beginHourOfDay = gregorianCalendar.apply { timeInMillis = it.begin }
                     .get(GregorianCalendar.HOUR_OF_DAY)
 
-            if (beginHourOfDay - 3 <= currentTimeHourOfDay && currentTimeHourOfDay <= endHourOfDay + 3) {
-                return event
+            if (beginHourOfDay - 3 <= currentTimeHourOfDay && currentTimeHourOfDay <= beginHourOfDay + 1) {
+                val n = abs(currentTimeHourOfDay - beginHourOfDay)
+
+                if (m > n) {
+                    m = n
+                    calendarEvent = it
+                }
             }
         }
 
-        return null
+        return calendarEvent
     }
 
     private fun todayMemos(context: Context): List<Memo> {

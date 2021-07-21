@@ -14,7 +14,6 @@ import com.flow.android.kotlin.lockscreen.memo.adapter.ItemTouchCallback
 import com.flow.android.kotlin.lockscreen.memo.adapter.MemoAdapter
 import com.flow.android.kotlin.lockscreen.memo.viewmodel.MemoViewModel
 import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
-import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
 import com.flow.android.kotlin.lockscreen.util.LinearLayoutManagerWrapper
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -44,9 +43,7 @@ class MemoFragment: BaseMainFragment<FragmentMemoBinding>() {
             override fun onSwapIconTouch(viewHolder: MemoAdapter.ViewHolder) {
                 itemTouchHelper.startDrag(viewHolder)
             }
-        }).apply {
-            setFontSize(Preference.Display.getFontSize(requireContext()))
-        }
+        })
     }
 
     private val itemTouchHelper by lazy { ItemTouchHelper(ItemTouchCallback(adapter) {
@@ -100,9 +97,7 @@ class MemoFragment: BaseMainFragment<FragmentMemoBinding>() {
 
     private fun registerLifecycleObservers() {
         viewModel.refresh.observe(viewLifecycleOwner, {
-            adapter.setFontSize(Preference.Display.getFontSize(requireContext()))
-            adapter.setTimeFormat(Preference.Display.getTimeFormat(requireContext()))
-            adapter.notifyDataSetChanged()
+            adapter.refresh()
         })
     }
 

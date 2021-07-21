@@ -4,12 +4,12 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/app_compat_image_view"
-        android:layout_width="@dimen/width_double_extra_large"
-        android:layout_height="@dimen/height_double_extra_large"
+    <ImageView
+        android:id="@+id/image_view"
+        android:layout_width="@dimen/width_48dp"
+        android:layout_height="@dimen/height_48dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:elevation="@dimen/elevation_large"
+        android:elevation="@dimen/elevation_8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -20,12 +20,12 @@
         android:id="@+id/recycler_view"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_marginEnd="@dimen/margin_small"
-        android:layout_marginStart="@dimen/margin_small"
-        android:layout_marginTop="@dimen/margin_small"
+        android:layout_marginEnd="@dimen/margin_8dp"
+        android:layout_marginStart="@dimen/margin_8dp"
+        android:layout_marginTop="@dimen/margin_8dp"
         android:layout_gravity="center_horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/app_compat_image_view" />
+        app:layout_constraintTop_toBottomOf="@+id/image_view" />
 </androidx.constraintlayout.widget.ConstraintLayout>

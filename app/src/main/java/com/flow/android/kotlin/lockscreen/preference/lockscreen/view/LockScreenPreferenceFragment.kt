@@ -28,13 +28,13 @@ class LockScreenPreferenceFragment : PreferenceFragment() {
                             val position = preferenceAdapter.getPosition(Id.ShowAfterUnlocking)
 
                             if (isChecked) {
-                                adapterItem?.isEnabled = true
+                                adapterItem?.isClickable = true
                                 adapterItem?.isVisible = true
 
                                 if (position != -1)
                                     preferenceAdapter.notifyItemChanged(position)
                             } else {
-                                adapterItem?.isEnabled = false
+                                adapterItem?.isClickable = false
                                 adapterItem?.isVisible = false
 
                                 if (position != -1)
@@ -47,7 +47,7 @@ class LockScreenPreferenceFragment : PreferenceFragment() {
                         drawable = null,
                         id = Id.ShowAfterUnlocking,
                         isChecked = Preference.LockScreen.getShowAfterUnlocking(context),
-                        isEnabled = Preference.LockScreen.getShowOnLockScreen(context),
+                        isClickable = Preference.LockScreen.getShowOnLockScreen(context),
                         isVisible = Preference.LockScreen.getShowOnLockScreen(context),
                         onCheckedChange = { isChecked ->
                             Preference.LockScreen.putShowAfterUnlocking(context, isChecked)

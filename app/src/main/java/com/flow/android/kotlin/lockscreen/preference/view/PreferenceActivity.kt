@@ -5,7 +5,6 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
@@ -21,7 +20,10 @@ import com.flow.android.kotlin.lockscreen.preference.calendar.view.CalendarPrefe
 import com.flow.android.kotlin.lockscreen.preference.display.view.DisplayPreferenceFragment
 import com.flow.android.kotlin.lockscreen.preference.lockscreen.view.LockScreenPreferenceFragment
 import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
+import com.flow.android.kotlin.lockscreen.review.Review
 import com.flow.android.kotlin.lockscreen.util.LinearLayoutManagerWrapper
+import com.flow.android.kotlin.lockscreen.util.shareApplication
+import com.flow.android.kotlin.lockscreen.util.versionName
 
 class PreferenceActivity: AppCompatActivity() {
     private val viewBinding by lazy { ActivityPreferenceBinding.inflate(layoutInflater) }
@@ -32,8 +34,8 @@ class PreferenceActivity: AppCompatActivity() {
     private val adapter: PreferenceAdapter by lazy {
         PreferenceAdapter(arrayListOf(
                 AdapterItem.Preference(
-                        drawable = ContextCompat.getDrawable(this, R.drawable.ic_round_today_24),
-                        description = getString(R.string.configuration_activity_006),
+                        drawable = ContextCompat.getDrawable(this, R.drawable.ic_round_calendar_today_24),
+                        summary = getString(R.string.configuration_activity_006),
                         onClick = { _, _ ->
                             addFragment(CalendarPreferenceFragment())
                         },
@@ -41,7 +43,7 @@ class PreferenceActivity: AppCompatActivity() {
                 ),
                 AdapterItem.Preference(
                         drawable = ContextCompat.getDrawable(this, R.drawable.ic_mobile_48px),
-                        description = getString(R.string.configuration_activity_002),
+                        summary = getString(R.string.configuration_activity_002),
                         onClick = { _, _ ->
                             addFragment(DisplayPreferenceFragment())
                         },
@@ -49,12 +51,33 @@ class PreferenceActivity: AppCompatActivity() {
                 ),
                 AdapterItem.Preference(
                         drawable = ContextCompat.getDrawable(this, R.drawable.ic_round_screen_lock_portrait_24),
-                        description = getString(R.string.configuration_activity_000),
+                        summary = getString(R.string.configuration_activity_000),
                         onClick = { _, _ ->
                             addFragment(LockScreenPreferenceFragment())
                         },
                         title = getString(R.string.configuration_activity_003)
-                )
+                ),
+                AdapterItem.Space(),
+                AdapterItem.Content(
+                        drawable = ContextCompat.getDrawable(this, R.drawable.ic_round_share_24),
+                        onClick = { _, _ ->
+                            shareApplication(this)
+                        },
+                        title = getString(R.string.configuration_activity_007)
+                ),
+                AdapterItem.Content(
+                        drawable = ContextCompat.getDrawable(this, R.drawable.ic_round_rate_review_24),
+                        onClick = { _, _ ->
+                            Review.launchReviewFlow(this)
+                        },
+                        title = getString(R.string.configuration_activity_008)
+                ),
+                AdapterItem.Content(
+                        drawable = ContextCompat.getDrawable(this, R.drawable.ic_round_info_24),
+                        isClickable = false,
+                        summary = versionName(this),
+                        title = getString(R.string.configuration_activity_009)
+                ),
         ))
     }
 

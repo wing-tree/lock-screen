@@ -4,15 +4,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/frame_layout"
     android:background="@drawable/color_rounded_corners"
-    android:elevation="@dimen/elevation_small"
-    android:layout_width="32dp"
-    android:layout_height="32dp"
-    android:layout_margin="@dimen/padding_small">
+    android:elevation="@dimen/elevation_4dp"
+    android:layout_width="@dimen/width_32dp"
+    android:layout_height="@dimen/height_32dp"
+    android:layout_margin="@dimen/padding_8dp">
 
     <ImageView
         android:id="@+id/image_view"
-        android:layout_width="@dimen/width_normal"
-        android:layout_height="@dimen/width_normal"
+        android:layout_width="@dimen/width_24dp"
+        android:layout_height="@dimen/width_24dp"
         android:layout_gravity="center"
         android:visibility="gone"
         app:srcCompat="@drawable/ic_round_check_24"

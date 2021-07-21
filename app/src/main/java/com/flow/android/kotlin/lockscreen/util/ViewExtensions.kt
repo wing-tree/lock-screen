@@ -184,7 +184,9 @@ fun View.rotate(
             .start()
 }
 
-fun View.scale(scale: Float, duration: Number = 200, alpha: Float = 1F) {
+fun View.scale(scale: Float, duration: Number = 150, alpha: Float = 1F) {
+    show()
+
     this.animate()
         .scaleX(scale)
         .scaleY(scale)

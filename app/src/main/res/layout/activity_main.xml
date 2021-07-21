@@ -14,7 +14,7 @@
         android:id="@+id/constraint_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginBottom="@dimen/margin_normal"
+        android:layout_marginBottom="@dimen/margin_16dp"
         android:clipChildren="false"
         android:clipToPadding="false"
         app:layout_constraintBottom_toTopOf="@+id/linear_layout_unlock"
@@ -26,8 +26,8 @@
             android:id="@+id/linear_layout_date_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_extra_large"
-            android:layout_marginTop="@dimen/margin_triple_extra_large"
+            android:layout_marginStart="@dimen/margin_32dp"
+            android:layout_marginTop="@dimen/margin_56dp"
             android:orientation="vertical"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -52,7 +52,7 @@
                 android:id="@+id/text_clock_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_extra_small"
+                android:layout_marginTop="@dimen/margin_4dp"
                 android:format12Hour="@string/format_date_000"
                 android:fontFamily="sans-serif-light"
                 android:gravity="center_vertical"
@@ -66,12 +66,26 @@
                 tools:text="Fri, January 1" />
         </LinearLayout>
 
+        <FrameLayout
+            android:id="@+id/frame_layout_highlight"
+            android:layout_width="@dimen/width_56dp"
+            android:layout_height="@dimen/height_56dp"
+            android:background="@drawable/background_highlight"
+            android:alpha="0.0"
+            android:scaleX="0.5"
+            android:scaleY="0.5"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/linear_layout_icon"
+            app:layout_constraintEnd_toEndOf="@+id/linear_layout_icon"
+            app:layout_constraintStart_toStartOf="@+id/linear_layout_icon"
+            app:layout_constraintTop_toTopOf="@+id/linear_layout_icon" />
+
         <LinearLayout
-            android:id="@+id/constraint_layout_icon"
+            android:id="@+id/linear_layout_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_triple_extra_large"
-            android:layout_marginEnd="@dimen/margin_normal"
+            android:layout_marginTop="@dimen/margin_56dp"
+            android:layout_marginEnd="@dimen/margin_16dp"
             android:orientation="horizontal"
             android:clipChildren="false"
             android:clipToPadding="false"
@@ -83,37 +97,30 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:elevation="@dimen/elevation_small"
-                android:padding="@dimen/small_100"
+                android:elevation="@dimen/elevation_4dp"
+                android:padding="@dimen/padding_8dp"
                 android:scaleType="centerCrop"
                 app:srcCompat="@drawable/ic_round_photo_camera_24"
                 app:tint="@android:color/white"
                 tools:ignore="ContentDescription" />
 
-            <FrameLayout
-                android:id="@+id/frame_layout_highlight"
+            <ImageView
+                android:id="@+id/image_view_highlight"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:foreground="?attr/selectableItemBackgroundBorderless">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/image_view_highlight"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:elevation="@dimen/elevation_small"
-                    android:padding="@dimen/small_100"
-                    app:srcCompat="@drawable/ic_round_flashlight_on_24"
-                    app:tint="@android:color/white"
-                    tools:ignore="ContentDescription" />
-            </FrameLayout>
+                android:elevation="@dimen/elevation_4dp"
+                android:padding="@dimen/padding_8dp"
+                app:srcCompat="@drawable/ic_round_flashlight_on_24"
+                app:tint="@android:color/white"
+                tools:ignore="ContentDescription" />
 
             <ImageView
                 android:id="@+id/image_view_settings"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:elevation="@dimen/elevation_small"
-                android:padding="@dimen/small_100"
+                android:elevation="@dimen/elevation_4dp"
+                android:padding="@dimen/padding_8dp"
                 app:srcCompat="@drawable/ic_round_settings_24"
                 app:tint="@android:color/white"
                 tools:ignore="ContentDescription" />
@@ -122,8 +129,8 @@
         <com.flow.android.kotlin.lockscreen.widget.CenterAlignedTabLayout
             android:id="@+id/center_aligned_tab_layout"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/large_150"
-            android:layout_marginTop="@dimen/margin_small"
+            android:layout_height="@dimen/height_48dp"
+            android:layout_marginTop="@dimen/margin_8dp"
             android:background="@android:color/transparent"
             android:visibility="invisible"
             app:layout_constraintEnd_toEndOf="parent"
@@ -132,15 +139,15 @@
             app:tabGravity="center"
             app:tabIndicator="@null"
             app:tabMode="scrollable"
-            app:tabPaddingEnd="@dimen/large_100"
-            app:tabPaddingStart="@dimen/large_100"
+            app:tabPaddingEnd="@dimen/padding_16dp"
+            app:tabPaddingStart="@dimen/padding_16dp"
             app:tabTextAppearance="@style/TextAppearance.Tab" />
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/view_pager2"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginBottom="@dimen/margin_normal"
+            android:layout_marginBottom="@dimen/margin_16dp"
             android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -151,7 +158,7 @@
     <LinearLayout
         android:id="@+id/linear_layout_unlock"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/height_unlock_layout"
+        android:layout_height="@dimen/height_176dp"
         android:clipChildren="false"
         android:clipToPadding="false"
         android:gravity="center_horizontal"
@@ -161,20 +168,20 @@
 
         <FrameLayout
             android:id="@+id/frame_layout_ripple"
-            android:layout_width="@dimen/width_triple_extra_large"
-            android:layout_height="@dimen/height_triple_extra_large"
-            android:layout_marginTop="@dimen/margin_normal"
+            android:layout_width="@dimen/width_56dp"
+            android:layout_height="@dimen/height_56dp"
+            android:layout_marginTop="@dimen/margin_16dp"
             android:foreground="?attr/selectableItemBackgroundBorderless"
             tools:ignore="UselessParent">
 
             <ImageView
                 android:id="@+id/image_view_unlock"
-                android:layout_width="@dimen/width_triple_extra_large"
-                android:layout_height="@dimen/height_triple_extra_large"
+                android:layout_width="@dimen/width_56dp"
+                android:layout_height="@dimen/height_56dp"
                 android:layout_gravity="center"
                 android:background="@drawable/oval_border"
                 android:duplicateParentState="true"
-                android:padding="@dimen/padding_unlock_icon"
+                android:padding="@dimen/padding_12dp"
                 android:scaleType="centerInside"
                 app:srcCompat="@drawable/ic_unlock_90px"
                 app:tint="@color/white"

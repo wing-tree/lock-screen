@@ -19,34 +19,30 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/material_button_close"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="1dp"
-        android:layout_marginTop="@dimen/margin_normal"
-        android:background="@drawable/rounded_corner_bottom_left"
-        android:insetTop="0dp"
-        android:insetBottom="0dp"
-        android:text="@string/memo_editing_dialog_fragment_000"
-        app:layout_constraintEnd_toStartOf="@+id/material_button_confirm"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/date_picker" />
+        <TextView
+            style="@style/TextViewStyle.Button"
+            android:id="@+id/text_view_close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_16dp"
+            android:layout_marginTop="@dimen/margin_16dp"
+            android:layout_marginEnd="@dimen/margin_8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:text="@string/memo_detail_dialog_fragment_000"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/text_view_confirm"
+            app:layout_constraintTop_toBottomOf="@+id/date_picker" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/material_button_confirm"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="1dp"
-        android:background="@drawable/rounded_corner_bottom_right"
-        android:insetTop="0dp"
-        android:insetBottom="0dp"
-        android:text="@string/memo_editing_dialog_fragment_001"
-        app:layout_constraintBottom_toBottomOf="@+id/material_button_close"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/material_button_close"
-        app:layout_constraintTop_toTopOf="@+id/material_button_close" />
+        <TextView
+            style="@style/TextViewStyle.Button"
+            android:id="@+id/text_view_confirm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/margin_16dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:text="@string/memo_detail_dialog_fragment_001"
+            app:layout_constraintBottom_toBottomOf="@+id/text_view_close"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/text_view_close" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </RelativeLayout>

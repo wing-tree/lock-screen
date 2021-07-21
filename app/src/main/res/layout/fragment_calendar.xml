@@ -7,23 +7,24 @@
 
     <ImageView
         android:id="@+id/app_compat_image_view"
-        android:layout_width="@dimen/width_double_extra_large"
-        android:layout_height="@dimen/height_double_extra_large"
+        android:layout_width="@dimen/width_48dp"
+        android:layout_height="@dimen/height_48dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:elevation="@dimen/small_100"
+        android:elevation="@dimen/elevation_8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_round_add_24"
-        app:tint="@color/white" />
+        app:tint="@color/white"
+        tools:ignore="ContentDescription" />
 
     <RelativeLayout
         android:id="@+id/relative_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/margin_double_extra_large"
-        android:layout_marginStart="@dimen/margin_double_extra_large"
-        android:layout_marginTop="@dimen/margin_small"
+        android:layout_marginEnd="@dimen/margin_48dp"
+        android:layout_marginStart="@dimen/margin_48dp"
+        android:layout_marginTop="@dimen/margin_8dp"
         android:gravity="center_vertical"
         app:layout_constraintBottom_toTopOf="@+id/view_pager2"
         app:layout_constraintTop_toBottomOf="@+id/app_compat_image_view">
@@ -33,21 +34,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:paddingBottom="@dimen/double_extra_small_100"
+            android:paddingBottom="@dimen/padding_4dp"
             android:shadowColor="@color/shadow"
             android:shadowDx="@dimen/shadow_dx"
             android:shadowDy="@dimen/shadow_dy"
             android:shadowRadius="@dimen/shadow_radius"
             android:textColor="@color/white"
-            android:textSize="@dimen/text_size_large"
+            android:textSize="@dimen/text_size_20dp"
             android:textStyle="bold"
             app:layout_constraintVertical_bias="0.4"
             tools:text="오늘" />
 
         <ImageView
             android:id="@+id/image_view_back"
-            android:layout_width="@dimen/width_large"
-            android:layout_height="@dimen/height_large"
+            android:layout_width="@dimen/width_32dp"
+            android:layout_height="@dimen/height_32dp"
             android:layout_alignParentStart="true"
             app:srcCompat="@drawable/ic_round_arrow_back_ios_48"
             app:tint="@color/white"
@@ -55,8 +56,8 @@
 
         <ImageView
             android:id="@+id/image_view_forward"
-            android:layout_width="@dimen/large_100"
-            android:layout_height="@dimen/large_100"
+            android:layout_width="@dimen/width_32dp"
+            android:layout_height="@dimen/height_32dp"
             android:layout_alignParentEnd="true"
             app:srcCompat="@drawable/ic_round_arrow_forward_ios_48"
             app:tint="@color/white"
@@ -68,9 +69,9 @@
         android:id="@+id/view_pager2"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="@dimen/margin_extra_large"
-        android:layout_marginEnd="@dimen/margin_extra_large"
-        android:layout_marginTop="@dimen/margin_normal"
+        android:layout_marginStart="@dimen/margin_32dp"
+        android:layout_marginEnd="@dimen/margin_32dp"
+        android:layout_marginTop="@dimen/margin_16dp"
         android:layoutAnimation="@anim/layout_animation"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

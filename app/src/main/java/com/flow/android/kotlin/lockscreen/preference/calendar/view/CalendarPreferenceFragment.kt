@@ -42,11 +42,11 @@ class CalendarPreferenceFragment: PreferenceFragment() {
         return PreferenceAdapter(arrayListOf(
                 AdapterItem.MultiSelectListPreference(
                         adapter = checkBoxAdapter,
-                        drawable = ContextCompat.getDrawable(context, R.drawable.ic_round_today_24),
+                        drawable = ContextCompat.getDrawable(context, R.drawable.ic_round_calendar_today_24),
                         onClick = { viewBinding, item ->
                             if (item.isExpanded) {
-                                val constrainedHeight = resources.getDimensionPixelSize(R.dimen.double_extra_large_200)
-                                val heightOneLine = resources.getDimensionPixelSize(R.dimen.height_one_line)
+                                val constrainedHeight = resources.getDimensionPixelSize(R.dimen.height_256dp)
+                                val heightOneLine = resources.getDimensionPixelSize(R.dimen.height_48dp)
 
                                 var to = checkBoxAdapter.itemCount * heightOneLine
 

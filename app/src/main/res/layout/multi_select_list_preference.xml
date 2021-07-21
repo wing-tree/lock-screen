@@ -9,7 +9,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraint_layout"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/height_double_extra_large"
+        android:layout_height="@dimen/height_48dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -17,10 +17,10 @@
             android:id="@+id/text_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_normal"
-            android:layout_marginEnd="@dimen/margin_normal"
+            android:layout_marginStart="@dimen/margin_16dp"
+            android:layout_marginEnd="@dimen/margin_16dp"
             android:gravity="center_vertical"
-            android:textSize="@dimen/text_size_normal"
+            android:textSize="@dimen/text_size_16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/image_view_arrow_down"
             app:layout_constraintStart_toStartOf="parent"
@@ -29,9 +29,9 @@
 
         <ImageView
             android:id="@+id/image_view_arrow_down"
-            android:layout_width="@dimen/width_normal"
-            android:layout_height="@dimen/height_normal"
-            android:layout_marginEnd="@dimen/margin_normal"
+            android:layout_width="@dimen/width_24dp"
+            android:layout_height="@dimen/height_24dp"
+            android:layout_marginEnd="@dimen/margin_16dp"
             app:layout_constraintBottom_toBottomOf="@+id/text_title"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/text_title"
@@ -52,7 +52,7 @@
         <View
             android:id="@+id/view_divider"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
+            android:layout_height="@dimen/height_1dp"
             android:background="@color/divider"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -62,11 +62,11 @@
             android:id="@+id/recycler_view_entries"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/margin_small"
-            android:layout_marginStart="@dimen/margin_normal"
+            android:layout_marginEnd="@dimen/margin_8dp"
+            android:layout_marginStart="@dimen/margin_16dp"
             app:layout_constrainedHeight="true"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_max="@dimen/double_extra_large_200"
+            app:layout_constraintHeight_max="@dimen/height_256dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/view_divider" />
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -74,7 +74,7 @@
     <include
         layout="@layout/divider"
         android:layout_width="0dp"
-        android:layout_height="@dimen/height_divider"
+        android:layout_height="@dimen/height_1dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/constraint_layout_entries" />
 </androidx.constraintlayout.widget.ConstraintLayout>

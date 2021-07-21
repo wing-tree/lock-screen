@@ -5,6 +5,7 @@ import android.graphics.Color
 import androidx.annotation.ColorInt
 import androidx.lifecycle.*
 import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
+import com.flow.android.kotlin.lockscreen.preference.persistence.Preference.isChanged
 import com.flow.android.kotlin.lockscreen.util.SingleLiveEvent
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
@@ -22,10 +23,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun refresh(preferenceChanged: Preference.PreferenceChanged) {
-        if (preferenceChanged.fondSize || preferenceChanged.timeFormat)
+        if (isChanged(preferenceChanged.fondSize, preferenceChanged.timeFormat))
             callRefresh(Refresh.Memo)
 
-        if (preferenceChanged.fondSize || preferenceChanged.uncheckedCalendarIds)
+        if (isChanged(preferenceChanged.fondSize, preferenceChanged.uncheckedCalendarIds))
             callRefresh(Refresh.Calendar)
     }
 }
