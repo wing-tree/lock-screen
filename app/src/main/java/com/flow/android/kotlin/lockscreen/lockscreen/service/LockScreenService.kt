@@ -29,8 +29,7 @@ class LockScreenService : Service() {
         const val StopSelf = "$Prefix.StopSelf"
     }
 
-    private val blindScreenPresenter by lazy { BlindScreenPresenter(this) }
-
+    private val blindScreenPresenter = BlindScreenPresenter()
     private val localBroadcastManager: LocalBroadcastManager by lazy {
         LocalBroadcastManager.getInstance(this)
     }
@@ -95,7 +94,7 @@ class LockScreenService : Service() {
                     }
                 }
                 else -> {
-
+                    // pass
                 }
             }
         }

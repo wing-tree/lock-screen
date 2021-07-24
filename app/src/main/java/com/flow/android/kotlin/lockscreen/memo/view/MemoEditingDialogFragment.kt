@@ -1,5 +1,6 @@
 package com.flow.android.kotlin.lockscreen.memo.view
 
+import android.animation.Animator
 import android.animation.LayoutTransition
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -18,8 +19,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.transition.ChangeBounds
-import androidx.transition.TransitionManager
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.base.BaseDialogFragment
 import com.flow.android.kotlin.lockscreen.color.widget.ColorPickerLayout
@@ -30,11 +29,10 @@ import com.flow.android.kotlin.lockscreen.memo.viewmodel.MemoViewModel
 import com.flow.android.kotlin.lockscreen.persistence.entity.ChecklistItem
 import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.util.*
-import jp.wasabeef.recyclerview.animators.SlideInDownAnimator
+import jp.wasabeef.recyclerview.animators.FadeInDownAnimator
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
-
 
 class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBinding>() {
     override fun inflate(inflater: LayoutInflater, container: ViewGroup?): FragmentMemoEditingDialogBinding {
@@ -104,13 +102,11 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
     }
 
     object Action {
-        const val Date = "com.flow.android.kotlin.lockscreen.memo.view" +
-                ".MemoEditingDialogFragment.Action.Date"
+        const val Date = "$PREFIX.Action.Date"
     }
 
     object Name {
-        const val Date = "com.flow.android.kotlin.lockscreen.memo.view" +
-                ".MemoEditingDialogFragment.Name.Date"
+        const val Date = "$PREFIX.Name.Date"
     }
 
     private val currentTimeMillis = System.currentTimeMillis()
@@ -148,6 +144,11 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
         return viewBinding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewBinding.editText.requestFocus()
+    }
+
     override fun onDestroyView() {
         localBroadcastManager.unregisterReceiver(localBroadcastReceiver)
         super.onDestroyView()
@@ -158,13 +159,14 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
 
         viewBinding.recyclerViewChecklist.apply {
             adapter = checklistAdapter
+            //itemAnimator = null
             layoutManager = LinearLayoutManagerWrapper(requireContext())
         }
 
         memo?.let {
             viewBinding.viewColor.backgroundTintList = ColorStateList.valueOf(selectedColor)
             viewBinding.textViewDate.text = it.modifiedTime.toDateString(simpleDateFormat)
-            viewBinding.editTextContent.setText(it.content)
+            viewBinding.editText.setText(it.content)
 
             checklist.value = ArrayList(it.checklist.toList())
         } ?: run {
@@ -190,7 +192,7 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
             }
         }
 
-        viewBinding.editTextContent.addTextChangedListener(object : TextWatcher {
+        viewBinding.editText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
@@ -245,8 +247,7 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
             dismiss()
         }
 
-        viewBinding.constraintLayout.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
-        viewBinding.root.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
+        setupLayoutTransition()
     }
 
     private fun registerLifecycleObservers() {
@@ -268,9 +269,12 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
             }
 
             if (it.isNullOrEmpty()) {
-                viewBinding.viewDividerBottom.fadeOut(duration, true)
-                viewBinding.viewDividerTop.fadeOut(duration, true)
+                viewBinding.recyclerViewChecklist.hide()
+                viewBinding.viewDividerBottom.hide(true)
+                viewBinding.viewDividerTop.hide(true)
             } else {
+                viewBinding.recyclerViewChecklist.show()
+
                 if (viewBinding.viewDividerBottom.isVisible.not())
                     viewBinding.viewDividerBottom.fadeIn(duration)
 
@@ -279,10 +283,26 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
             }
 
             checklistAdapter.submitList(it.toList())
-//            TransitionManager.beginDelayedTransition(
-//                viewBinding.root, ChangeBounds().apply { duration = mediumDuration }
-//            )
         })
+    }
+
+    private fun setupLayoutTransition() {
+        requireDialog().window?.decorView?.let {
+            if (it is ViewGroup) {
+                it.layoutTransition = LayoutTransition()
+
+                it.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
+                it.layoutTransition.setDuration(LayoutTransition.CHANGING, duration)
+                it.layoutTransition.setStartDelay(LayoutTransition.CHANGING, duration)
+            }
+        }
+
+        viewBinding.constraintLayout.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
+        viewBinding.constraintLayout.layoutTransition.setDuration(LayoutTransition.CHANGING, duration)
+        viewBinding.constraintLayout.layoutTransition.setStartDelay(LayoutTransition.CHANGING, duration)
+        viewBinding.root.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
+        viewBinding.root.layoutTransition.setDuration(LayoutTransition.CHANGING, duration)
+        viewBinding.root.layoutTransition.setStartDelay(LayoutTransition.CHANGING, duration)
     }
 
     private fun enableSaveButton() {
@@ -293,7 +313,7 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
         viewBinding.textViewSave.isEnabled = false
     }
 
-    private fun isContentBlank() = viewBinding.editTextContent.text.isNullOrBlank()
+    private fun isContentBlank() = viewBinding.editText.text.isNullOrBlank()
 
     private fun checkForChanges() : Boolean {
         val memo = memo() ?: return false
@@ -325,8 +345,10 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
     }
 
     companion object {
-        private const val KEY_MEMO = "com.flow.android.kotlin.lockscreen.memo.view" +
-                ".MemoEditingDialogFragment.companion.KEY_MEMO"
+        private const val PREFIX = "com.flow.android.kotlin.lockscreen.memo.view" +
+                ".MemoEditingDialogFragment.companion"
+
+        private const val KEY_MEMO = "$PREFIX.KEY_MEMO"
 
         fun getInstance(memo: Memo?): MemoEditingDialogFragment {
             val instance = MemoEditingDialogFragment()

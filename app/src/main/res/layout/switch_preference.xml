@@ -5,7 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/background">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -19,6 +20,7 @@
             app:layout_constraintBottom_toBottomOf="@+id/text_title"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/text_title"
+            app:tint="@color/icon"
             tools:ignore="ContentDescription"
             tools:srcCompat="@drawable/ic_round_settings_24" />
 

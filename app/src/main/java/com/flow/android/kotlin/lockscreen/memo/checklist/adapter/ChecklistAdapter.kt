@@ -21,7 +21,7 @@ class ChecklistAdapter(private val listener: Listener, private val isEditable: B
         fun onItemCheckedChange(item: ChecklistItem, isChecked: Boolean)
     }
 
-    class ViewHolder(
+    inner class ViewHolder(
         private val binding: ChecklistItemBinding,
         private val listener: Listener,
         private val isEditable: Boolean
@@ -65,16 +65,10 @@ class ChecklistAdapter(private val listener: Listener, private val isEditable: B
                 }
             }
         }
-
-        companion object {
-            fun from(binding: ChecklistItemBinding, listener: Listener, isEditable: Boolean): ViewHolder {
-                return ViewHolder(binding, listener, isEditable)
-            }
-        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder.from(
+        return ViewHolder(
                 ChecklistItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
                 listener,
                 isEditable

@@ -175,11 +175,11 @@ fun View.hideRipple() {
 }
 
 fun View.rotate(
-        degrees: Float, duration: Number,
+        degrees: Float, duration: Long,
         animationListenerAdapter: AnimatorListenerAdapter? = null
 ) {
     this.animate().rotation(degrees)
-            .setDuration(duration.toLong())
+            .setDuration(duration)
             .setListener(animationListenerAdapter)
             .start()
 }

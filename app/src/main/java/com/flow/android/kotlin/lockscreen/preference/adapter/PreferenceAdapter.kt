@@ -6,11 +6,14 @@ import android.view.MotionEvent
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
+import com.flow.android.kotlin.lockscreen.R
+import com.flow.android.kotlin.lockscreen.application.MainApplication
 import com.flow.android.kotlin.lockscreen.databinding.*
 import com.flow.android.kotlin.lockscreen.util.*
 import java.security.InvalidParameterException
 
 class PreferenceAdapter(private val currentList: ArrayList<AdapterItem>): RecyclerView.Adapter<PreferenceAdapter.ViewHolder>() {
+    private val applicationContext = MainApplication.instance.applicationContext
     private var recyclerView: RecyclerView? = null
 
     inner class ViewHolder(private val viewBinding: ViewBinding): RecyclerView.ViewHolder(viewBinding.root) {
@@ -98,7 +101,24 @@ class PreferenceAdapter(private val currentList: ArrayList<AdapterItem>): Recycl
                         viewBinding.textTitle.text = adapterItem.title
 
                         viewBinding.root.setOnClickListener {
-                            adapterItem.onClick.invoke(viewBinding, adapterItem)
+                            if (adapterItem.isExpanded) {
+                                val constrainedHeight = applicationContext.resources.getDimensionPixelSize(R.dimen.height_256dp)
+                                val heightOneLine = applicationContext.resources.getDimensionPixelSize(R.dimen.height_48dp)
+
+                                var to = adapterItem.adapter.itemCount * heightOneLine
+
+                                if (to > constrainedHeight)
+                                    to = constrainedHeight
+
+                                viewBinding.imageViewKeyboardArrowUp.rotate(0F, duration)
+                                viewBinding.constraintLayoutEntries.expand(duration, to.inc())
+                            } else {
+                                viewBinding.imageViewKeyboardArrowUp.rotate(180F, duration)
+                                viewBinding.constraintLayoutEntries.collapse(duration, 0)
+                            }
+
+                            adapterItem.isExpanded = adapterItem.isExpanded.not()
+                            adapterItem.onClick?.invoke(viewBinding, adapterItem)
                         }
                     }
                 }
@@ -254,7 +274,7 @@ sealed class AdapterItem {
             override var isVisible: Boolean = true,
             val adapter: RecyclerView.Adapter<*>,
             val drawable: Drawable?,
-            val onClick: (MultiSelectListPreferenceBinding, MultiSelectListPreference) -> Unit,
+            val onClick: ((MultiSelectListPreferenceBinding, MultiSelectListPreference) -> Unit)? = null,
             val title: String,
             var isExpanded: Boolean = false
     ) : AdapterItem()

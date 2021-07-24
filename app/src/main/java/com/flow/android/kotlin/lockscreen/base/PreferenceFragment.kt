@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.Toolbar
 import com.flow.android.kotlin.lockscreen.preference.adapter.PreferenceAdapter
 import com.flow.android.kotlin.lockscreen.preference.view.PreferenceActivity
 import com.flow.android.kotlin.lockscreen.databinding.FragmentPreferenceBinding
@@ -18,16 +17,11 @@ abstract class PreferenceFragment : BaseFragment<FragmentPreferenceBinding>() {
         createPreferenceAdapter()
     }
 
-    private fun initializeToolbar(toolbar: Toolbar) {
+    private fun initializeToolbar() {
         val activity = requireActivity()
 
-        if (activity is PreferenceActivity) {
-            activity.setSupportActionBar(toolbar)
-            activity.supportActionBar?.setHomeButtonEnabled(true)
-            activity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        if (activity is PreferenceActivity)
             activity.supportActionBar?.setTitle(toolbarTitleResId)
-            toolbar.setNavigationOnClickListener { activity.onBackPressed() }
-        }
     }
 
     override fun inflate(inflater: LayoutInflater, container: ViewGroup?): FragmentPreferenceBinding {
@@ -36,7 +30,7 @@ abstract class PreferenceFragment : BaseFragment<FragmentPreferenceBinding>() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        initializeToolbar(viewBinding.toolbar)
+        initializeToolbar()
 
         viewBinding.recyclerView.apply {
             adapter = preferenceAdapter

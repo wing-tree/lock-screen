@@ -10,6 +10,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.flow.android.kotlin.lockscreen.R
+import com.flow.android.kotlin.lockscreen.base.BaseActivity
 import com.flow.android.kotlin.lockscreen.calendar.CalendarLoader
 import com.flow.android.kotlin.lockscreen.databinding.ActivityPreferenceBinding
 import com.flow.android.kotlin.lockscreen.preference.adapter.AdapterItem
@@ -25,7 +26,7 @@ import com.flow.android.kotlin.lockscreen.util.LinearLayoutManagerWrapper
 import com.flow.android.kotlin.lockscreen.util.shareApplication
 import com.flow.android.kotlin.lockscreen.util.versionName
 
-class PreferenceActivity: AppCompatActivity() {
+class PreferenceActivity: BaseActivity() {
     private val viewBinding by lazy { ActivityPreferenceBinding.inflate(layoutInflater) }
 
     private val activity = this
@@ -91,24 +92,24 @@ class PreferenceActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(viewBinding.root)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                window?.decorView?.windowInsetsController?.let {
-                    if (Preference.Display.getIsDarkMode(this))
-                        it.setSystemBarsAppearance(0, APPEARANCE_LIGHT_STATUS_BARS)
-                    else
-                        it.setSystemBarsAppearance(APPEARANCE_LIGHT_STATUS_BARS, APPEARANCE_LIGHT_STATUS_BARS)
-                }
-            } else {
-                window?.decorView?.let {
-                    @Suppress("DEPRECATION")
-                    if (Preference.Display.getIsDarkMode(this))
-                        it.systemUiVisibility = 0
-                    else
-                        it.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-                }
-            }
-        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//                window?.decorView?.windowInsetsController?.let {
+//                    if (Preference.Display.getIsDarkMode(this))
+//                        it.setSystemBarsAppearance(0, APPEARANCE_LIGHT_STATUS_BARS)
+//                    else
+//                        it.setSystemBarsAppearance(APPEARANCE_LIGHT_STATUS_BARS, APPEARANCE_LIGHT_STATUS_BARS)
+//                }
+//            } else {
+//                window?.decorView?.let {
+//                    @Suppress("DEPRECATION")
+//                    if (Preference.Display.getIsDarkMode(this))
+//                        it.systemUiVisibility = 0
+//                    else
+//                        it.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+//                }
+//            }
+//        }
 
         initializeToolbar(viewBinding.toolbar)
         Preference.initializeOldValues(this)
@@ -138,6 +139,7 @@ class PreferenceActivity: AppCompatActivity() {
     override fun onBackPressed() {
         if (supportFragmentManager.fragments.isNotEmpty()) {
             super.onBackPressed()
+            supportActionBar?.setTitle(R.string.configuration_activity_004)
             return
         }
 

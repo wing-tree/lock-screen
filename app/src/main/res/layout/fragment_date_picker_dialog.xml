@@ -14,7 +14,10 @@
             android:id="@+id/date_picker"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:headerBackground="@drawable/notification_background"
+            android:layout_marginEnd="@dimen/margin_24dp"
+            android:layout_marginStart="@dimen/margin_24dp"
+            android:calendarViewShown="false"
+            android:datePickerMode="spinner"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

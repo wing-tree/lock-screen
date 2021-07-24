@@ -74,7 +74,7 @@ class ShortcutAdapter: RecyclerView.Adapter<ShortcutAdapter.ViewHolder>() {
             }
 
             binding.root.setOnLongClickListener {
-                listener?.onItemLongClick(it, item) ?: return@setOnLongClickListener false
+                listener?.onItemLongClick(binding.imageView, item) ?: return@setOnLongClickListener false
                 true
             }
         }

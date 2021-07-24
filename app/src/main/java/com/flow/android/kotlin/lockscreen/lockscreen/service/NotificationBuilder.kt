@@ -60,7 +60,6 @@ object NotificationBuilder {
                 val memos = todayMemos(context)
                 val memoForNotification = memoForNotification(memos)
 
-                var color = 0
                 var contentTitle = context.getString(R.string.app_name)
                 var contentText = context.getString(R.string.notification_content_text)
                 var subText = BLANK
@@ -68,7 +67,6 @@ object NotificationBuilder {
                 val simpleDateFormat = SimpleDateFormat(context.getString(R.string.format_time_002), Locale.getDefault())
 
                 calendarEventForNotification?.let {
-                    color = ContextCompat.getColor(context, R.color.calendar)
                     contentTitle = it.title.take(160)
                     contentText = context.getString(R.string.notification_builder_000)
                     subText = it.begin.toDateString(simpleDateFormat)
@@ -85,7 +83,6 @@ object NotificationBuilder {
 
                 val builder = NotificationCompat.Builder(context, CHANNEL_ID)
                     .setSmallIcon(smallIcon)
-                    .setColor(color)
                     .setContentTitle(contentTitle)
                     .setContentText(contentText)
                     .setContentIntent(pendingIntent)

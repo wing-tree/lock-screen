@@ -3,6 +3,7 @@ package com.flow.android.kotlin.lockscreen.main.view
 import android.Manifest
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
+import android.app.ActivityOptions
 import android.app.KeyguardManager
 import android.app.NotificationManager
 import android.content.Context
@@ -151,19 +152,15 @@ class MainActivity : BaseActivity(),
     }
 
     override fun onBackPressed() {
-        if (onBackPressedDispatcher.hasEnabledCallbacks())
-            onBackPressedDispatcher.onBackPressed()
-        else {
-            if (Preference.LockScreen.getUnlockWithBackKey(this))
-                finish()
-            else
-                viewBinding.frameLayoutRipple.forceRippleAnimation()
-        }
+        if (Preference.LockScreen.getUnlockWithBackKey(this))
+            finish()
+        else
+            viewBinding.frameLayoutRipple.forceRippleAnimation()
     }
 
     override fun finish() {
         super.finish()
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
     }
 
     private fun restoreVisibility() {
@@ -314,9 +311,12 @@ class MainActivity : BaseActivity(),
         else {
             val uri = Uri.fromParts("package", packageName, null)
             @SuppressLint("InlinedApi")
-            val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, uri)
+            val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, uri).apply {
+                flags = Intent.FLAG_ACTIVITY_NO_HISTORY
+            }
 
             startActivity(intent)
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
 
             handler = Handler(mainLooper)
 
@@ -329,7 +329,13 @@ class MainActivity : BaseActivity(),
                     if (Settings.canDrawOverlays(this@MainActivity)) {
                         Intent(this@MainActivity, MainActivity::class.java).run {
                             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                            startActivity(this)
+                            val customAnimation = ActivityOptions.makeCustomAnimation(
+                                    this@MainActivity,
+                                    R.anim.slide_in_right,
+                                    R.anim.slide_out_left
+                            )
+
+                            startActivity(this, customAnimation.toBundle())
                         }
 
                         handler = null

@@ -16,8 +16,8 @@
 
         <View
             android:id="@+id/view_color"
-            android:layout_width="@dimen/width_12dp"
-            android:layout_height="@dimen/height_12dp"
+            android:layout_width="@dimen/width_8dp"
+            android:layout_height="@dimen/height_8dp"
             android:layout_marginStart="@dimen/margin_16dp"
             android:background="@drawable/background_calendar_event_color"
             android:padding="@dimen/padding_4dp"

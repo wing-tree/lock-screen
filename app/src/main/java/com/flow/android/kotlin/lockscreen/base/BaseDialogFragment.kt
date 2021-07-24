@@ -33,13 +33,8 @@ abstract class BaseDialogFragment<VB : ViewBinding> : DialogFragment() {
         return viewBinding.root
     }
 
-    override fun onStart() {
-        super.onStart()
-
-        dialog?.window?.setWindowAnimations(R.style.WindowAnimation_DialogFragment)
-    }
-
     override fun onDestroyView() {
+        dialog?.window?.setWindowAnimations(R.style.WindowAnimation_DialogFragment)
         _viewBinding = null
         super.onDestroyView()
     }

@@ -72,7 +72,7 @@
         android:layout_marginStart="@dimen/margin_32dp"
         android:layout_marginEnd="@dimen/margin_32dp"
         android:layout_marginTop="@dimen/margin_16dp"
-        android:layoutAnimation="@anim/layout_animation"
+        android:layoutAnimation="@anim/layout_animation_slide_down"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

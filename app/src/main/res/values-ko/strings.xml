@@ -31,8 +31,8 @@
     <string name="settings_004">잠금화면</string>
     <string name="settings_005">잠금 설정, 잠금 방식</string>
 
-    <!-- shortcut -->
-    <string name="shortcut_000">화면에서 삭제</string>
+    <!-- popup_window -->
+    <string name="popup_window_000">화면에서 삭제</string>
 
     <!-- ConfigurationActivity -->
     <string name="configuration_activity_000">잠금 설정, 잠금 방식</string>

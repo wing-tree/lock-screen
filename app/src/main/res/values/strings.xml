@@ -27,7 +27,7 @@
     <string name="blind_screen_001">Drag to unlock</string>
 
     <!-- shortcut -->
-    <string name="shortcut_000">Remove from screen</string>
+    <string name="popup_window_000">Remove from screen</string>
 
     <!-- ConfigurationActivity -->
     <string name="configuration_activity_000">Lock setting, Lock type</string>
@@ -95,8 +95,8 @@
     <!-- MemoEditingDialogFragment -->
     <string name="memo_editing_dialog_fragment_000">Cancel</string>
     <string name="memo_editing_dialog_fragment_001">Save</string>
-    <string name="memo_editing_dialog_fragment_002">Enter your memo.</string>
-    <string name="memo_editing_dialog_fragment_003">Enter your checklist.</string>
+    <string name="memo_editing_dialog_fragment_002">Enter a memo.</string>
+    <string name="memo_editing_dialog_fragment_003">Enter a checklist.</string>
 
     <!-- MemoFragment -->
     <string name="memo_fragment_000">You may delay, but time will not. (Benjamin Franklin)</string>

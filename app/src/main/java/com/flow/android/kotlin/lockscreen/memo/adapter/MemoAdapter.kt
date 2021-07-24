@@ -21,21 +21,17 @@ import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
 import com.flow.android.kotlin.lockscreen.util.*
 import com.flow.android.kotlin.lockscreen.util.BLANK
-import com.flow.android.kotlin.lockscreen.util.DEFAULT_FONT_SIZE
 import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
 
 class MemoAdapter(private val listener: Listener) : RecyclerView.Adapter<MemoAdapter.ViewHolder>() {
+    private val applicationContext = MainApplication.instance.applicationContext
     private val currentList = arrayListOf<Memo>()
 
-    private var fontSize = MainApplication.instance?.let {
-        Preference.Display.getFontSize(it)
-    } ?: DEFAULT_FONT_SIZE
+    private var fontSize = Preference.Display.getFontSize(applicationContext)
 
-    private var timeFormat = MainApplication.instance?.let {
-        Preference.Display.getTimeFormat(it)
-    } ?: DEFAULT_TIME_FORMAT
+    private var timeFormat = Preference.Display.getTimeFormat(applicationContext)
 
     private var inflater: LayoutInflater? = null
     private var simpleDateFormat: SimpleDateFormat? = null
@@ -46,13 +42,8 @@ class MemoAdapter(private val listener: Listener) : RecyclerView.Adapter<MemoAda
     }
 
     fun refresh() {
-        fontSize = MainApplication.instance?.let {
-            Preference.Display.getFontSize(it)
-        } ?: DEFAULT_FONT_SIZE
-
-        timeFormat = MainApplication.instance?.let {
-            Preference.Display.getTimeFormat(it)
-        } ?: DEFAULT_TIME_FORMAT
+        fontSize = Preference.Display.getFontSize(applicationContext)
+        timeFormat = Preference.Display.getTimeFormat(applicationContext)
 
         notifyDataSetChanged()
     }

@@ -2,13 +2,14 @@ package com.flow.android.kotlin.lockscreen.shortcut.view
 
 import android.app.KeyguardManager
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.PopupWindow
+import android.widget.RelativeLayout
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
@@ -17,10 +18,11 @@ import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.base.BaseMainFragment
 import com.flow.android.kotlin.lockscreen.base.DataChangedState
 import com.flow.android.kotlin.lockscreen.databinding.FragmentShortcutBinding
+import com.flow.android.kotlin.lockscreen.databinding.PopupWindowBinding
 import com.flow.android.kotlin.lockscreen.devicecredential.DeviceCredential
 import com.flow.android.kotlin.lockscreen.devicecredential.RequireDeviceCredential
-import com.flow.android.kotlin.lockscreen.shortcut.adapter.ShortcutAdapter
 import com.flow.android.kotlin.lockscreen.shortcut.adapter.ItemTouchCallback
+import com.flow.android.kotlin.lockscreen.shortcut.adapter.ShortcutAdapter
 import com.flow.android.kotlin.lockscreen.shortcut.model.Model
 import com.flow.android.kotlin.lockscreen.shortcut.viewmodel.ShortcutViewModel
 import com.flow.android.kotlin.lockscreen.util.BLANK
@@ -41,9 +43,9 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
     private val compositeDisposable = CompositeDisposable()
 
     private val activityResultLauncherMap = mapOf(
-            DeviceCredential.Key.ConfirmDeviceCredential to registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
-                Timber.d(tag)
-            }
+        DeviceCredential.Key.ConfirmDeviceCredential to registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { Timber.d(tag) }
     )
 
     private val adapter = ShortcutAdapter().apply {
@@ -56,18 +58,18 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
             }
 
             override fun onItemLongClick(view: View, item: Model.Shortcut): Boolean {
-                return showPopupMenu(view, item)
+                return showPopupWindow(view, item)
             }
         })
     }
 
     private val itemTouchHelper = ItemTouchHelper(ItemTouchCallback(adapter, {
-        popupMenu?.dismiss()
+        popupWindow?.dismiss()
     }) {
         viewModel.updateAll(adapter.currentList())
     })
 
-    private var popupMenu: PopupMenu? = null
+    private var popupWindow: PopupWindow? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -79,6 +81,7 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
         viewBinding.recyclerView.apply {
             adapter = this@ShortcutFragment.adapter
             layoutManager = GridLayoutManager(requireContext(), 4)
+            scheduleLayoutAnimation()
             setHasFixedSize(true)
         }
 
@@ -104,7 +107,7 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
     }
 
     override fun onDestroyView() {
-        compositeDisposable.dispose()
+        compositeDisposable.clear()
         super.onDestroyView()
     }
 
@@ -120,19 +123,25 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
 
     private fun subscribeObservables() {
         compositeDisposable.add(viewModel.publishSubject
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe ({
-                    Timber.d("DataChanged<Model.Shortcut>! :$it")
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                Timber.d("DataChanged<Model.Shortcut>! :$it")
 
-                    when(it.state) {
-                        DataChangedState.Deleted -> { adapter.remove(it.data) }
-                        DataChangedState.Inserted -> { adapter.add(it.data) }
-                        DataChangedState.Updated -> { adapter.update(it.data) }
+                when (it.state) {
+                    DataChangedState.Deleted -> {
+                        adapter.remove(it.data)
                     }
-                }) {
-                    Timber.e(it)
+                    DataChangedState.Inserted -> {
+                        adapter.add(it.data)
+                    }
+                    DataChangedState.Updated -> {
+                        adapter.update(it.data)
+                    }
                 }
+            }) {
+                Timber.e(it)
+            }
         )
     }
 
@@ -156,19 +165,21 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
         val packageName = value.packageName
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            DeviceCredential.confirmDeviceCredential(requireActivity(), object : KeyguardManager.KeyguardDismissCallback() {
-                override fun onDismissSucceeded() {
-                    super.onDismissSucceeded()
+            DeviceCredential.confirmDeviceCredential(
+                requireActivity(),
+                object : KeyguardManager.KeyguardDismissCallback() {
+                    override fun onDismissSucceeded() {
+                        super.onDismissSucceeded()
 
-                    if (shortcutClicked)
-                        launchApplication(packageName)
-                    else {
-                        AllShortcutBottomSheetDialogFragment().also {
-                            it.show(requireActivity().supportFragmentManager, it.tag)
+                        if (shortcutClicked)
+                            launchApplication(packageName)
+                        else {
+                            AllShortcutBottomSheetDialogFragment().also {
+                                it.show(requireActivity().supportFragmentManager, it.tag)
+                            }
                         }
                     }
-                }
-            })
+                })
         } else {
             activityResultLauncherMap[DeviceCredential.Key.ConfirmDeviceCredential]?.let {
                 DeviceCredential.confirmDeviceCredential(this, it)
@@ -176,22 +187,34 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
         }
     }
 
-    private fun showPopupMenu(view: View, shortcut: Model.Shortcut): Boolean {
-        popupMenu = PopupMenu(requireContext(), view)
-        popupMenu?.inflate(R.menu.shortcut)
-        popupMenu?.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.delete -> {
+    private fun showPopupWindow(view: View, shortcut: Model.Shortcut): Boolean {
+        val popupWindowBinding = PopupWindowBinding.bind(
+            layoutInflater.inflate(R.layout.popup_window, viewBinding.root, false)
+        )
+
+        layoutInflater.inflate(R.layout.popup_window, viewBinding.root, false).also {
+            popupWindow = PopupWindow(
+                popupWindowBinding.root,
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                true
+            )
+
+            popupWindow?.let{ popupWindow ->
+                popupWindowBinding.root.setOnClickListener {
                     viewModel.delete(shortcut.toEntity())
-                    true
+                    popupWindow.dismiss()
                 }
-                else -> false
+
+                popupWindow.elevation = resources.getDimensionPixelSize(R.dimen.elevation_8dp).toFloat()
+
+                popupWindow.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                popupWindow.showAsDropDown(view)
             }
         }
 
-        popupMenu?.show()
         return true
     }
 
-    data class Value(val shortcutClicked : Boolean, val packageName: String = BLANK)
+    data class Value(val shortcutClicked: Boolean, val packageName: String = BLANK)
 }

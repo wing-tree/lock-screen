@@ -15,11 +15,15 @@ import com.flow.android.kotlin.lockscreen.shortcut.adapter.ShortcutAdapter
 import com.flow.android.kotlin.lockscreen.shortcut.model.Model
 import com.flow.android.kotlin.lockscreen.shortcut.viewmodel.ShortcutViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import jp.wasabeef.recyclerview.animators.FadeInAnimator
 import kotlinx.coroutines.*
 import timber.log.Timber
 
 class AllShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
+    private var viewBinding: FragmentAllShortcutBottomSheetDialogBinding? = null
     private val viewModel: ShortcutViewModel by activityViewModels()
+
+    private val batchSize = 1
     private val job = Job()
     private val shortcutAdapter = ShortcutAdapter().apply {
         setListener(object : ShortcutAdapter.Listener {
@@ -35,9 +39,6 @@ class AllShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
         })
     }
 
-    private val batchSize = 8
-    private var viewBinding: FragmentAllShortcutBottomSheetDialogBinding? = null
-
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
@@ -50,9 +51,10 @@ class AllShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
         )
 
         viewBinding?.recyclerView?.apply {
-            setHasFixedSize(true)
-            layoutManager = GridLayoutManager(requireContext(), 4)
             adapter = shortcutAdapter
+            itemAnimator = FadeInAnimator()
+            layoutManager = GridLayoutManager(requireContext(), 4)
+            setHasFixedSize(true)
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -64,6 +66,7 @@ class AllShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
 
     override fun onDestroyView() {
         job.cancel()
+        viewBinding = null
         super.onDestroyView()
     }
 

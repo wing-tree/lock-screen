@@ -2,14 +2,10 @@ package com.flow.android.kotlin.lockscreen.permission
 
 import android.Manifest
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.Settings
-import androidx.annotation.RequiresApi
-import androidx.core.app.NotificationManagerCompat
 import com.flow.android.kotlin.lockscreen.application.MainApplication
-import com.flow.android.kotlin.lockscreen.main.view.MainActivity
 
 internal object PermissionChecker {
     internal fun checkPermission(context: Context, permission: String): Boolean {
@@ -33,20 +29,16 @@ internal object PermissionChecker {
     }
 
     internal fun hasCalendarPermission(): Boolean {
-        return MainApplication.instance?.let {
-            checkPermissions(
-                    it,
-                    arrayOf(Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR)
-            )
-        } ?: false
+        return checkPermissions(
+            MainApplication.instance,
+            arrayOf(Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR)
+        )
     }
 
     internal fun hasManageOverlayPermission(): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
             return true
 
-        MainApplication.instance?.let {
-            return Settings.canDrawOverlays(it)
-        } ?: return false
+        return Settings.canDrawOverlays(MainApplication.instance)
     }
 }

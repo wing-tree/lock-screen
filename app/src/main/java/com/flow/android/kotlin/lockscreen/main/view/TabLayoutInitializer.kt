@@ -3,6 +3,7 @@ package com.flow.android.kotlin.lockscreen.main.view
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.viewpager2.widget.ViewPager2
 import com.flow.android.kotlin.lockscreen.R
