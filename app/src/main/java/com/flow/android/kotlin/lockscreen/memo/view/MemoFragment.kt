@@ -106,6 +106,9 @@ class MemoFragment: BaseMainFragment<FragmentMemoBinding>() {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
+                    Timber.d("DataChanged<Memo>! :$it")
+                    showToast("DataChanged<Memo>! :$it")
+
                     when(it.state) {
                         DataChangedState.Deleted -> adapter.remove(it.data)
                         DataChangedState.Inserted -> {

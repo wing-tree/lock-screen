@@ -6,7 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ImageView
-        android:id="@+id/app_compat_image_view"
+        android:id="@+id/image_view"
         android:layout_width="@dimen/width_48dp"
         android:layout_height="@dimen/height_48dp"
         android:background="?attr/selectableItemBackgroundBorderless"
@@ -15,10 +15,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_round_add_24"
-        app:tint="@color/white"
+        app:tint="@color/big_icon"
         tools:ignore="ContentDescription" />
 
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/relative_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -27,13 +27,12 @@
         android:layout_marginTop="@dimen/margin_8dp"
         android:gravity="center_vertical"
         app:layout_constraintBottom_toTopOf="@+id/view_pager2"
-        app:layout_constraintTop_toBottomOf="@+id/app_compat_image_view">
+        app:layout_constraintTop_toBottomOf="@+id/image_view">
 
         <TextView
             android:id="@+id/text_view_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
             android:paddingBottom="@dimen/padding_4dp"
             android:shadowColor="@color/shadow"
             android:shadowDx="@dimen/shadow_dx"
@@ -42,16 +41,21 @@
             android:textColor="@color/white"
             android:textSize="@dimen/text_size_20dp"
             android:textStyle="bold"
-            app:layout_constraintVertical_bias="0.4"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/image_view_forward"
+            app:layout_constraintStart_toEndOf="@id/image_view_back"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="오늘" />
 
         <ImageView
             android:id="@+id/image_view_back"
             android:layout_width="@dimen/width_32dp"
             android:layout_height="@dimen/height_32dp"
-            android:layout_alignParentStart="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_round_arrow_back_ios_48"
-            app:tint="@color/white"
+            app:tint="@color/big_icon"
             tools:ignore="ContentDescription" />
 
         <ImageView
@@ -59,11 +63,14 @@
             android:layout_width="@dimen/width_32dp"
             android:layout_height="@dimen/height_32dp"
             android:layout_alignParentEnd="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_round_arrow_forward_ios_48"
-            app:tint="@color/white"
+            app:tint="@color/big_icon"
             tools:ignore="ContentDescription" />
 
-    </RelativeLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/view_pager2"
@@ -77,4 +84,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/relative_layout" />
+
+    <include
+        layout="@layout/no_calendar_permission_message"
+        android:id="@+id/no_calendar_permission_message"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_32dp"
+        android:layout_marginEnd="@dimen/margin_32dp"
+        android:layout_marginTop="@dimen/margin_16dp"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/relative_layout"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

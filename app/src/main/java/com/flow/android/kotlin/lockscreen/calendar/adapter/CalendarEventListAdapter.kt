@@ -19,6 +19,7 @@ class CalendarEventListAdapter(private val currentList: ArrayList<List<Model.Cal
 
     fun clear() {
         currentList.clear()
+        notifyDataSetChanged()
     }
 
     class ViewHolder private constructor(
@@ -33,6 +34,7 @@ class CalendarEventListAdapter(private val currentList: ArrayList<List<Model.Cal
                 }.apply {
                     submitList(item)
                 }
+
                 scheduleLayoutAnimation()
             }
         }

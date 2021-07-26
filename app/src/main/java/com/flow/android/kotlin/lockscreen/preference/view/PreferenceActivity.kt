@@ -1,11 +1,9 @@
 package com.flow.android.kotlin.lockscreen.preference.view
 
+import android.Manifest
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.view.View
-import android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -13,6 +11,7 @@ import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.base.BaseActivity
 import com.flow.android.kotlin.lockscreen.calendar.CalendarLoader
 import com.flow.android.kotlin.lockscreen.databinding.ActivityPreferenceBinding
+import com.flow.android.kotlin.lockscreen.permission.PermissionChecker
 import com.flow.android.kotlin.lockscreen.preference.adapter.AdapterItem
 import com.flow.android.kotlin.lockscreen.preference.adapter.CheckBoxAdapter
 import com.flow.android.kotlin.lockscreen.preference.adapter.CheckBoxItem
@@ -38,7 +37,17 @@ class PreferenceActivity: BaseActivity() {
                         drawable = ContextCompat.getDrawable(this, R.drawable.ic_round_calendar_today_24),
                         summary = getString(R.string.configuration_activity_006),
                         onClick = { _, _ ->
-                            addFragment(CalendarPreferenceFragment())
+                            PermissionChecker.checkPermissions(this, listOf(
+                                    Manifest.permission.READ_CALENDAR,
+                                    Manifest.permission.WRITE_CALENDAR
+                            ), {
+                                addFragment(CalendarPreferenceFragment())
+                            }, {
+                                PermissionChecker.showRequestCalendarPermissionSnackbar(
+                                    viewBinding.root,
+                                    getActivityResultLauncher(PermissionChecker.Calendar.KEY)
+                                )
+                            })
                         },
                         title = getString(R.string.calendar)
                 ),
@@ -92,25 +101,6 @@ class PreferenceActivity: BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(viewBinding.root)
 
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-//                window?.decorView?.windowInsetsController?.let {
-//                    if (Preference.Display.getIsDarkMode(this))
-//                        it.setSystemBarsAppearance(0, APPEARANCE_LIGHT_STATUS_BARS)
-//                    else
-//                        it.setSystemBarsAppearance(APPEARANCE_LIGHT_STATUS_BARS, APPEARANCE_LIGHT_STATUS_BARS)
-//                }
-//            } else {
-//                window?.decorView?.let {
-//                    @Suppress("DEPRECATION")
-//                    if (Preference.Display.getIsDarkMode(this))
-//                        it.systemUiVisibility = 0
-//                    else
-//                        it.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-//                }
-//            }
-//        }
-
         initializeToolbar(viewBinding.toolbar)
         Preference.initializeOldValues(this)
 
@@ -134,6 +124,14 @@ class PreferenceActivity: BaseActivity() {
             }
 
         checkBoxAdapter.addAll(checkBoxItems)
+
+        putActivityResultLauncher(
+            PermissionChecker.Calendar.KEY,
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                if (PermissionChecker.hasCalendarPermission())
+                    addFragment(CalendarPreferenceFragment())
+            }
+        )
     }
 
     override fun onBackPressed() {
@@ -142,6 +140,9 @@ class PreferenceActivity: BaseActivity() {
             supportActionBar?.setTitle(R.string.configuration_activity_004)
             return
         }
+
+        if (PermissionChecker.dismissSnackbar())
+            return
 
         val preferenceChanged = Preference.getPreferenceChanged(this)
         val intent = Intent().apply {

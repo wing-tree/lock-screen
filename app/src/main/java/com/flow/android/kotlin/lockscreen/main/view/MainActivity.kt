@@ -43,12 +43,10 @@ import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
 import com.flow.android.kotlin.lockscreen.shortcut.viewmodel.ShortcutViewModel
 import com.flow.android.kotlin.lockscreen.util.*
 import com.karumi.dexter.Dexter
-import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionDeniedResponse
 import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
-import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.karumi.dexter.listener.single.PermissionListener
 import timber.log.Timber
 import java.util.*
@@ -118,6 +116,9 @@ class MainActivity : BaseActivity(),
         } else
             calendarViewModel.postValue()
 
+        memoViewModel
+        shortcutViewModel
+
         initializeViews()
         registerLifecycleObservers()
         initializeActivityResultLaunchers()
@@ -152,6 +153,9 @@ class MainActivity : BaseActivity(),
     }
 
     override fun onBackPressed() {
+        if (PermissionChecker.dismissSnackbar())
+            return
+
         if (Preference.LockScreen.getUnlockWithBackKey(this))
             finish()
         else
@@ -281,6 +285,13 @@ class MainActivity : BaseActivity(),
                 Refresh.Shortcut -> shortcutViewModel.callRefresh()
             }
         })
+
+        viewModel.showRequestCalendarPermissionSnackbar.observe(this, {
+            PermissionChecker.showRequestCalendarPermissionSnackbar(
+                    viewBinding.coordinatorLayout,
+                    getActivityResultLauncher(PermissionChecker.Calendar.KEY)
+            )
+        })
     }
 
     private fun initializeActivityResultLaunchers() {
@@ -301,6 +312,13 @@ class MainActivity : BaseActivity(),
 
                         viewModel.refresh(preferenceChanged)
                     }
+                }
+        )
+
+        putActivityResultLauncher(
+                PermissionChecker.Calendar.KEY,
+                registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                    calendarViewModel.postValue()
                 }
         )
     }
@@ -357,38 +375,6 @@ class MainActivity : BaseActivity(),
             startService(intent)
     }
 
-    private fun checkPermission() {
-        Dexter.withContext(this)
-                .withPermissions(Manifest.permission.WRITE_CALENDAR, Manifest.permission.READ_CALENDAR)
-                .withListener(object : MultiplePermissionsListener {
-                    override fun onPermissionsChecked(report: MultiplePermissionsReport) {
-                        for (grantedPermissionResponse in report.grantedPermissionResponses) {
-                            when (grantedPermissionResponse.permissionName) {
-                                Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR ->
-                                    calendarViewModel.postValue()
-                            }
-                        }
-
-                        for (deniedPermissionResponse in report.deniedPermissionResponses) {
-                            when (deniedPermissionResponse.permissionName) {
-                                Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR -> {
-                                /* todo 캘린더 프래그먼트에 권한 허용해야한다고 보이기. */
-                                }
-                            }
-                        }
-
-                        checkManageOverlayPermission()
-                    }
-
-                    override fun onPermissionRationaleShouldBeShown(
-                            permissions: List<PermissionRequest>,
-                            token: PermissionToken
-                    ) {
-                        token.continuePermissionRequest()
-                    }
-                }).check()
-    }
-
     private fun firstRun() {
         if (Preference.getFirstRun(this)) {
             memoViewModel.insert(
@@ -406,7 +392,17 @@ class MainActivity : BaseActivity(),
     }
 
     override fun onPermissionAllowClick() {
-        checkPermission()
+        PermissionChecker.checkPermissions(this, listOf(
+                Manifest.permission.READ_CALENDAR,
+                Manifest.permission.WRITE_CALENDAR
+        ), {
+            calendarViewModel.postValue()
+        }, {
+            calendarViewModel.callDisableCalendarControlViews()
+            viewModel.callShowRequestCalendarPermissionSnackbar()
+        }) {
+            checkManageOverlayPermission()
+        }
     }
 
     override fun onPermissionDenyClick() {
@@ -414,6 +410,13 @@ class MainActivity : BaseActivity(),
             startService()
         else
             finish()
+
+        if (PermissionChecker.hasCalendarPermission().not()) {
+            if (isFinishing.not()) {
+                calendarViewModel.callDisableCalendarControlViews()
+                viewModel.callShowRequestCalendarPermissionSnackbar()
+            }
+        }
     }
 
     override fun confirmDeviceCredential(value: Unit) {

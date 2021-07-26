@@ -12,6 +12,13 @@
 
     <string name="notification_content_text">This is a notification for stable execution.</string>
 
+    <!-- blind_screen -->
+    <string name="blind_screen_000">Unlocking with the home button is not allowed as per security policy.</string>
+    <string name="blind_screen_001">Drag to unlock</string>
+
+    <!-- fragment_all_shortcut_bottom_sheet_dialog -->
+    <string name="fragment_all_shortcut_bottom_sheet_dialog_000">Shortcuts</string>
+
     <!-- fragment_date_picker_dialog -->
     <string name="fragment_date_picker_dialog_000">Cancel</string>
     <string name="fragment_date_picker_dialog_001">Save</string>
@@ -22,9 +29,8 @@
     <string name="fragment_permission_rationale_dialog_002">Deny</string>
     <string name="fragment_permission_rationale_dialog_003">Allow</string>
 
-    <!-- home -->
-    <string name="blind_screen_000">Unlocking with the home button is not allowed as per security policy.</string>
-    <string name="blind_screen_001">Drag to unlock</string>
+    <!-- no_calendar_permission_message -->
+    <string name="no_calendar_permission_message_000">You must allow calendar permissions to display the calendar.\n(Click here to allow calendar permissions.)</string>
 
     <!-- shortcut -->
     <string name="popup_window_000">Remove from screen</string>
@@ -71,7 +77,7 @@
 
     <!-- MainActivity -->
     <string name="main_activity_000">Calendar</string>
-    <string name="main_activity_001">Favorite Apps</string>
+    <string name="main_activity_001">Shortcuts</string>
     <string name="main_activity_002">Memo</string>
     <string name="main_activity_003">Notifications</string>
 
@@ -100,6 +106,10 @@
 
     <!-- MemoFragment -->
     <string name="memo_fragment_000">You may delay, but time will not. (Benjamin Franklin)</string>
+
+    <!-- PermissionChecker -->
+    <string name="permission_checker_000">You must allow calendar permissions to display the calendar.</string>
+    <string name="permission_checker_001">Settings</string>
 
     <!-- PermissionRationaleDialogFragment -->
     <string name="permission_rationale_dialog_fragment_000">Calendar</string>

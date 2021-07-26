@@ -9,7 +9,6 @@ import com.flow.android.kotlin.lockscreen.persistence.entity.Shortcut
 import com.flow.android.kotlin.lockscreen.repository.ShortcutRepository
 import com.flow.android.kotlin.lockscreen.shortcut.model.Model
 import com.flow.android.kotlin.lockscreen.util.SingleLiveEvent
-import io.reactivex.subjects.PublishSubject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -17,10 +16,13 @@ import timber.log.Timber
 class ShortcutViewModel(application: Application): AndroidViewModel(application) {
     private val packageManager = application.packageManager
     private val repository = ShortcutRepository(application)
-    val publishSubject = PublishSubject.create<DataChanged<Model.Shortcut>>()
+
+    private val _dataChanged = MutableLiveData<DataChanged<Model.Shortcut>>()
+    val dataChanged: LiveData<DataChanged<Model.Shortcut>>
+        get() = _dataChanged
 
     override fun onCleared() {
-        repository.clearCompositeDisposable()
+        repository.disposeCompositeDisposable()
         super.onCleared()
     }
 
@@ -51,9 +53,12 @@ class ShortcutViewModel(application: Application): AndroidViewModel(application)
 
     fun insert(item: Shortcut, onComplete: (Model.Shortcut) -> Unit) {
         repository.insert(item) {
-            item.toModel()?.let {
-                model -> onComplete(model)
-                publishSubject.onNext(DataChanged(model, DataChangedState.Inserted))
+            item.toModel()?.let { model ->
+                Timber.tag("sjk")
+                Timber.d("obbb: ${dataChanged},,${dataChanged.hasActiveObservers()},, ${dataChanged.hasObservers()}")
+                onComplete(model)
+
+                _dataChanged.value = DataChanged(model, DataChangedState.Inserted)
             }
         }
     }
@@ -61,7 +66,7 @@ class ShortcutViewModel(application: Application): AndroidViewModel(application)
     fun delete(item: Shortcut) {
         repository.delete(item) {
             it.toModel()?.let { model ->
-                publishSubject.onNext(DataChanged(model, DataChangedState.Deleted))
+                _dataChanged.value = DataChanged(model, DataChangedState.Deleted)
             }
         }
     }

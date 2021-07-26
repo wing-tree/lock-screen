@@ -154,6 +154,16 @@
             app:layout_constraintTop_toBottomOf="@+id/center_aligned_tab_layout" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/coordinator_layout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/height_176dp"
+        android:layout_marginBottom="@dimen/margin_56dp"
+        android:elevation="@dimen/elevation_4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <LinearLayout
         android:id="@+id/linear_layout_unlock"
         android:layout_width="match_parent"

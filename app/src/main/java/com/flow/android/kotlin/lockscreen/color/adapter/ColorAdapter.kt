@@ -17,7 +17,6 @@ import timber.log.Timber
 class ColorAdapter(private val items: IntArray, private val onColorSelected: (color: Int) -> Unit) : RecyclerView.Adapter<ColorAdapter.ViewHolder>() {
     class ViewHolder(val binding: ColorBinding) : RecyclerView.ViewHolder(binding.root)
 
-    private val duration = 50
     private var selectedPosition = -1
     private var inflater: LayoutInflater? = null
     private var recyclerView: RecyclerView? = null
@@ -48,9 +47,9 @@ class ColorAdapter(private val items: IntArray, private val onColorSelected: (co
         )
 
         if (selectedPosition == position)
-            holder.binding.imageView.fadeIn(duration)
+            holder.binding.imageView.show()
         else
-            holder.binding.imageView.fadeOut(duration)
+            holder.binding.imageView.hide()
 
         holder.binding.frameLayout.backgroundTintList = ColorStateList.valueOf(color)
 

@@ -22,9 +22,17 @@ class CalendarViewModel(application: Application): AndroidViewModel(application)
 
     private val _calendarEvents = MutableLiveData<List<Model.CalendarEvent>>()
 
+    private val _disableCalendarControlViews = SingleLiveEvent<Unit>()
+    val disableCalendarControlViews: LiveData<Unit>
+        get() = _disableCalendarControlViews
+
     private val _refresh = SingleLiveEvent<Unit>()
     val refresh: LiveData<Unit>
         get() = _refresh
+
+    fun callDisableCalendarControlViews() {
+        _disableCalendarControlViews.call()
+    }
 
     fun callRefresh() {
         _refresh.call()

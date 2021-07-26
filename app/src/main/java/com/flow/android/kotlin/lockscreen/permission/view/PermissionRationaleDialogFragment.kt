@@ -10,7 +10,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.base.BaseDialogFragment
 import com.flow.android.kotlin.lockscreen.databinding.FragmentPermissionRationaleDialogBinding
@@ -48,13 +47,13 @@ class PermissionRationaleDialogFragment: BaseDialogFragment<FragmentPermissionRa
                 Permission(
                         icon = R.drawable.ic_mobile_48px,
                         isRequired = true,
-                        permissions = arrayOf(Settings.ACTION_MANAGE_OVERLAY_PERMISSION),
+                        permissions = listOf(Settings.ACTION_MANAGE_OVERLAY_PERMISSION),
                         permissionName = getString(R.string.permission_rationale_dialog_fragment_004),
                 ),
                 Permission(
                         icon = R.drawable.ic_round_calendar_today_24,
                         isRequired = false,
-                        permissions = arrayOf(
+                        permissions = listOf(
                                 Manifest.permission.READ_CALENDAR,
                                 Manifest.permission.WRITE_CALENDAR
                         ),
@@ -114,26 +113,6 @@ data class Permission(
         @DrawableRes
         val icon: Int,
         val isRequired: Boolean,
-        val permissions: Array<String>,
+        val permissions: List<String>,
         val permissionName: String,
-) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as Permission
-
-        if (icon != other.icon) return false
-        if (!permissions.contentEquals(other.permissions)) return false
-        if (permissionName != other.permissionName) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = icon
-        result = 31 * result + permissions.contentHashCode()
-        result = 31 * result + permissionName.hashCode()
-        return result
-    }
-}
+)

@@ -11,10 +11,13 @@ import android.widget.PopupWindow
 import android.widget.RelativeLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.flow.android.kotlin.lockscreen.R
+import com.flow.android.kotlin.lockscreen.application.MainApplication
 import com.flow.android.kotlin.lockscreen.base.BaseMainFragment
 import com.flow.android.kotlin.lockscreen.base.DataChangedState
 import com.flow.android.kotlin.lockscreen.databinding.FragmentShortcutBinding
@@ -26,9 +29,6 @@ import com.flow.android.kotlin.lockscreen.shortcut.adapter.ShortcutAdapter
 import com.flow.android.kotlin.lockscreen.shortcut.model.Model
 import com.flow.android.kotlin.lockscreen.shortcut.viewmodel.ShortcutViewModel
 import com.flow.android.kotlin.lockscreen.util.BLANK
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -40,7 +40,6 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
     }
 
     private val viewModel by activityViewModels<ShortcutViewModel>()
-    private val compositeDisposable = CompositeDisposable()
 
     private val activityResultLauncherMap = mapOf(
         DeviceCredential.Key.ConfirmDeviceCredential to registerForActivityResult(
@@ -87,14 +86,13 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
 
         itemTouchHelper.attachToRecyclerView(viewBinding.recyclerView)
         initializeData()
-        subscribeObservables()
+        registerLifecycleObservers()
 
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         viewBinding.imageView.setOnClickListener {
             if (DeviceCredential.requireUnlock(requireContext())) {
                 confirmDeviceCredential(Value(false))
@@ -104,11 +102,6 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
                 }
             }
         }
-    }
-
-    override fun onDestroyView() {
-        compositeDisposable.clear()
-        super.onDestroyView()
     }
 
     private fun initializeData() {
@@ -121,28 +114,20 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
         }
     }
 
-    private fun subscribeObservables() {
-        compositeDisposable.add(viewModel.publishSubject
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                Timber.d("DataChanged<Model.Shortcut>! :$it")
-
-                when (it.state) {
-                    DataChangedState.Deleted -> {
-                        adapter.remove(it.data)
-                    }
-                    DataChangedState.Inserted -> {
-                        adapter.add(it.data)
-                    }
-                    DataChangedState.Updated -> {
-                        adapter.update(it.data)
-                    }
+    private fun registerLifecycleObservers() {
+        viewModel.dataChanged.observe(viewLifecycleOwner, {
+            when (it.state) {
+                DataChangedState.Deleted -> {
+                    adapter.remove(it.data)
                 }
-            }) {
-                Timber.e(it)
+                DataChangedState.Inserted -> {
+                    adapter.add(it.data)
+                }
+                DataChangedState.Updated -> {
+                    adapter.update(it.data)
+                }
             }
-        )
+        })
     }
 
     private fun launchApplication(packageName: String) {

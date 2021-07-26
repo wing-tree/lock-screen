@@ -43,6 +43,7 @@ open class BaseActivity : AppCompatActivity() {
         localBroadcastManager.unregisterReceiver(bottomNavigationBroadcastReceiver)
         super.onDestroy()
     }
+
     protected fun putActivityResultLauncher(key: String, value: ActivityResultLauncher<Intent>) {
         activityResultLauncherMap[key] = value
     }

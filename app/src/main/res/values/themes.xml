@@ -20,7 +20,12 @@
         <item name="android:windowDisablePreview">true</item>
         <item name="android:windowIsTranslucent">false</item>
         <item name="android:windowShowWallpaper">true</item>
+
         <item name="materialButtonStyle">@style/MaterialButton</item>
+
+        <item name="snackbarStyle">@style/Snackbar</item>
+        <item name="snackbarButtonStyle">@style/Snackbar.TextButton</item>
+        <item name="snackbarTextViewStyle">@style/Snackbar.TextView</item>
     </style>
 
     <style name="Theme.PreferenceActivity" parent="Theme.MaterialComponents.DayNight.NoActionBar">
@@ -29,8 +34,8 @@
         <item name="colorPrimaryVariant">@color/indigo_700</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/blue_200</item>
-        <item name="colorSecondaryVariant">@color/blue_700</item>
+        <item name="colorSecondary">@color/light_blue_200</item>
+        <item name="colorSecondaryVariant">@color/light_blue_700</item>
         <item name="colorOnSecondary">@color/dark_grey</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@color/status_bar</item>
@@ -40,7 +45,12 @@
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowDisablePreview">true</item>
         <item name="android:windowIsTranslucent">false</item>
+
         <item name="materialButtonStyle">@style/MaterialButton</item>
+
+        <item name="snackbarStyle">@style/Snackbar</item>
+        <item name="snackbarButtonStyle">@style/Snackbar.TextButton</item>
+        <item name="snackbarTextViewStyle">@style/Snackbar.TextView</item>
     </style>
 
     <style name="TextAppearance.Tab" parent="TextAppearance.Design.Tab">
@@ -104,6 +114,23 @@
     </style>
 
     <style name="HeaderMonthTextAppearance" parent="@android:style/TextAppearance.Large">
+        <item name="android:textColor">@color/text</item>
+    </style>
+
+    <style name="ProgressBar" parent="@style/Theme.AppCompat">
+        <item name="colorAccent">@color/high_emphasis_light</item>
+    </style>
+
+    <style name="Snackbar" parent="@style/Widget.MaterialComponents.Snackbar">
+        <item name="android:backgroundTint">@color/surface</item>
+    </style>
+
+    <style name="Snackbar.TextButton" parent="@style/Widget.MaterialComponents.Button.TextButton.Snackbar">
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Snackbar.TextView" parent="@style/Widget.MaterialComponents.Snackbar.TextView">
         <item name="android:textColor">@color/text</item>
     </style>
 </resources>

@@ -9,6 +9,13 @@
 
     <string name="notification_content_text">안정적인 실행을 위한 알림입니다</string>
 
+    <!-- bline_screen -->
+    <string name="blind_screen_000">보안정책에 따라 홈 버튼으로 잠금 해제 할 수 없습니다.</string>
+    <string name="blind_screen_001">드래그해서 잠금 해제</string>
+
+    <!-- fragment_all_shortcut_bottom_sheet_dialog -->
+    <string name="fragment_all_shortcut_bottom_sheet_dialog_000">앱 바로가기</string>
+
     <!-- fragment_date_picker_dialog -->
     <string name="fragment_date_picker_dialog_000">Cancel</string>
     <string name="fragment_date_picker_dialog_001">Save</string>
@@ -19,9 +26,8 @@
     <string name="fragment_permission_rationale_dialog_002">거부</string>
     <string name="fragment_permission_rationale_dialog_003">허용</string>
 
-    <!-- bline_screen -->
-    <string name="blind_screen_000">보안정책에 따라 홈 버튼으로 잠금 해제 할 수 없습니다.</string>
-    <string name="blind_screen_001">드래그해서 잠금 해제</string>
+    <!-- no_calendar_permission_message -->
+    <string name="no_calendar_permission_message_000">캘린더를 표시하려면 캘린더 권한을 허용해야 합니다.\n(여기를 클릭하여 캘린더 권한을 허용하세요.)</string>
 
     <!-- settings -->
     <string name="settings_000">캘린더</string>
@@ -64,6 +70,10 @@
     <string name="notification_builder_000">캘린더</string>
     <string name="notification_builder_001">메모</string>
 
+    <!-- PermissionChecker -->
+    <string name="permission_checker_000">캘린더를 표시하려면 캘린더 권한을 허용해야 합니다.</string>
+    <string name="permission_checker_001">설정</string>
+
     <!-- Settings -->
     <string name="calendar">캘린더</string>
     <string name="lock_screen">잠금화면</string>
@@ -76,7 +86,7 @@
 
     <!-- MainActivity -->
     <string name="main_activity_000">캘린더</string>
-    <string name="main_activity_001">바로가기 앱</string>
+    <string name="main_activity_001">앱 바로가기</string>
     <string name="main_activity_002">메모</string>
     <string name="main_activity_003">알림</string>
 

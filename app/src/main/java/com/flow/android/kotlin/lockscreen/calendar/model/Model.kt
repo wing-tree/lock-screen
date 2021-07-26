@@ -4,12 +4,10 @@ import androidx.annotation.ColorInt
 import com.flow.android.kotlin.lockscreen.util.BLANK
 
 sealed class Model {
-    open class Calendar(
+    data class Calendar(
             val id: Long,
             val name: String
     ) : Model()
-
-    class PermissionDenied : Calendar(0, BLANK)
 
     data class CalendarEvent (
             val begin: Long,

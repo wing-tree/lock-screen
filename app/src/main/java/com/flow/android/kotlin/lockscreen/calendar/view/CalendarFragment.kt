@@ -1,6 +1,6 @@
 package com.flow.android.kotlin.lockscreen.calendar.view
 
-import android.graphics.PorterDuff
+import android.Manifest
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,7 +15,10 @@ import com.flow.android.kotlin.lockscreen.databinding.FragmentCalendarBinding
 import com.flow.android.kotlin.lockscreen.calendar.adapter.CalendarEventListAdapter
 import com.flow.android.kotlin.lockscreen.calendar.contract.CalendarContract
 import com.flow.android.kotlin.lockscreen.calendar.viewmodel.CalendarViewModel
+import com.flow.android.kotlin.lockscreen.permission.PermissionChecker
 import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
+import com.flow.android.kotlin.lockscreen.util.hide
+import com.flow.android.kotlin.lockscreen.util.show
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -29,7 +32,6 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
     }
 
     private val viewModel by activityViewModels<CalendarViewModel>()
-
     private val duration = 150L
 
     private val activityResultLauncher = registerForActivityResult(CalendarContract()) { result ->
@@ -75,9 +77,8 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
     ): View? {
         val view = super.onCreateView(inflater, container, savedInstanceState)
 
-        initializeView()
+        initializeViews()
         registerLifecycleObservers()
-        setIconColor()
         setTextColor()
 
         return view
@@ -89,14 +90,20 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
     }
 
     private fun registerLifecycleObservers() {
-        viewModel.calendars.observe(viewLifecycleOwner, { calendarDisplays ->
+        viewModel.calendars.observe(viewLifecycleOwner, { calendars ->
+            if (calendars.isEmpty())
+                return@observe
+
             val uncheckedCalendarIds = Preference.Calendar.getUncheckedCalendarIds(requireContext())
+
+            adapter.clear()
+            enableCalendarControlViews()
 
             viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
                 for (i in 0..itemCount) {
                     CalendarLoader.calendarEvents(
                             viewModel.contentResolver,
-                            calendarDisplays.filter {
+                            calendars.filter {
                                 uncheckedCalendarIds.contains(it.id.toString()).not()
                             }, i
                     ).also { events ->
@@ -109,10 +116,10 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
         })
 
         viewModel.refresh.observe(viewLifecycleOwner, {
+            adapter.clear()
+
             viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
                 val uncheckedCalendarIds = Preference.Calendar.getUncheckedCalendarIds(requireContext())
-
-                adapter.clear()
 
                 for (i in 0..itemCount) {
                     CalendarLoader.calendarEvents(
@@ -130,10 +137,14 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
                 }
             }
         })
+
+        viewModel.disableCalendarControlViews.observe(viewLifecycleOwner, {
+            disableCalendarControlViews()
+        })
     }
 
-    private fun initializeView() {
-        viewBinding.appCompatImageView.setOnClickListener {
+    private fun initializeViews() {
+        viewBinding.imageView.setOnClickListener {
             CalendarLoader.insertEvent(activityResultLauncher)
         }
 
@@ -149,12 +160,34 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
             if (viewBinding.viewPager2.currentItem < itemCount)
                 viewBinding.viewPager2.currentItem += 1
         }
+
+        viewBinding.noCalendarPermissionMessage.root.setOnClickListener {
+            PermissionChecker.checkPermissions(requireContext(), listOf(
+                    Manifest.permission.READ_CALENDAR,
+                    Manifest.permission.WRITE_CALENDAR
+            ), {
+                viewModel.postValue()
+            }, {
+                viewModel.callDisableCalendarControlViews()
+                mainViewModel.callShowRequestCalendarPermissionSnackbar()
+            })
+        }
     }
 
-    private fun setIconColor() {
-        viewBinding.imageViewBack.setColorFilter(mainViewModel.viewPagerRegionColor, PorterDuff.Mode.SRC_IN)
-        viewBinding.imageViewForward.setColorFilter(mainViewModel.viewPagerRegionColor, PorterDuff.Mode.SRC_IN)
-        viewBinding.appCompatImageView.setColorFilter(mainViewModel.viewPagerRegionColor, PorterDuff.Mode.SRC_IN)
+    private fun enableCalendarControlViews() {
+        viewBinding.imageView.isEnabled = true
+        viewBinding.imageViewBack.isEnabled = true
+        viewBinding.imageViewForward.isEnabled = true
+        viewBinding.noCalendarPermissionMessage.root.hide(invisible = true)
+        viewBinding.textViewDate.show()
+    }
+
+    private fun disableCalendarControlViews() {
+        viewBinding.imageView.isEnabled = false
+        viewBinding.imageViewBack.isEnabled = false
+        viewBinding.imageViewForward.isEnabled = false
+        viewBinding.noCalendarPermissionMessage.root.show()
+        viewBinding.textViewDate.hide(invisible = true)
     }
 
     private fun setTextColor() {

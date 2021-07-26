@@ -9,4 +9,5 @@
     android:shadowDx="@dimen/shadow_dx"
     android:shadowDy="@dimen/shadow_dy"
     android:shadowRadius="@dimen/shadow_radius"
-    android:textColor="@color/white"/>
+    android:textColor="@color/white"
+    android:textSize="@dimen/text_size_16dp"/>

@@ -3,9 +3,7 @@ package com.flow.android.kotlin.lockscreen.shortcut.adapter
 import android.annotation.SuppressLint
 import android.view.*
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.flow.android.kotlin.lockscreen.databinding.ShortcutBinding
-import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.shortcut.model.Model
 import java.util.*
 
@@ -42,10 +40,8 @@ class ShortcutAdapter: RecyclerView.Adapter<ShortcutAdapter.ViewHolder>() {
     }
 
     fun addAll(list: List<Model.Shortcut>) {
-        val positionStart = currentList.count()
-
         currentList.addAll(list)
-        notifyItemRangeInserted(positionStart, list.count())
+        notifyDataSetChanged()
     }
 
     fun remove(item: Model.Shortcut) {
@@ -65,8 +61,8 @@ class ShortcutAdapter: RecyclerView.Adapter<ShortcutAdapter.ViewHolder>() {
     inner class ViewHolder(private val binding: ShortcutBinding): RecyclerView.ViewHolder(binding.root) {
         @SuppressLint("ClickableViewAccessibility")
         fun bind(item: Model.Shortcut) {
-            Glide.with(binding.root.context).load(item.icon).into(binding.imageView)
-            binding.root.tag = adapterPosition
+            //Glide.with(binding.root.context).load(item.icon).into(binding.imageView)
+            binding.imageView.setImageDrawable(item.icon)
             binding.textView.text = item.label
 
             binding.root.setOnClickListener {

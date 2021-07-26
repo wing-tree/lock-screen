@@ -26,7 +26,10 @@ class ShortcutRepository(context: Context) {
         compositeDisposable.add(dao.insert(shortcut)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ onInserted(shortcut) }, { Timber.e(it) })
+                .subscribe({
+                    println("AAAAAAAAAA: $shortcut")
+                    onInserted(shortcut)
+                           }, { Timber.e(it) })
         )
     }
 
@@ -38,7 +41,7 @@ class ShortcutRepository(context: Context) {
 
     fun getAllValue() = dao.getAllValue()
 
-    fun clearCompositeDisposable() {
-        compositeDisposable.clear()
+    fun disposeCompositeDisposable() {
+        compositeDisposable.dispose()
     }
 }

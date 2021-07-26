@@ -14,16 +14,17 @@ import com.flow.android.kotlin.lockscreen.databinding.FragmentAllShortcutBottomS
 import com.flow.android.kotlin.lockscreen.shortcut.adapter.ShortcutAdapter
 import com.flow.android.kotlin.lockscreen.shortcut.model.Model
 import com.flow.android.kotlin.lockscreen.shortcut.viewmodel.ShortcutViewModel
+import com.flow.android.kotlin.lockscreen.util.hide
+import com.flow.android.kotlin.lockscreen.util.show
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import jp.wasabeef.recyclerview.animators.FadeInAnimator
 import kotlinx.coroutines.*
 import timber.log.Timber
 
 class AllShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
     private var viewBinding: FragmentAllShortcutBottomSheetDialogBinding? = null
-    private val viewModel: ShortcutViewModel by activityViewModels()
+    private val viewModel by activityViewModels<ShortcutViewModel>()
 
-    private val batchSize = 1
+    private val batchSize = 16
     private val job = Job()
     private val shortcutAdapter = ShortcutAdapter().apply {
         setListener(object : ShortcutAdapter.Listener {
@@ -52,7 +53,6 @@ class AllShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
 
         viewBinding?.recyclerView?.apply {
             adapter = shortcutAdapter
-            itemAnimator = FadeInAnimator()
             layoutManager = GridLayoutManager(requireContext(), 4)
             setHasFixedSize(true)
         }
@@ -75,6 +75,10 @@ class AllShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
             val shortcuts = arrayListOf<Model.Shortcut>()
             val packageNames = viewModel.getAll().map { it.packageName }
             var count = 0
+
+            withContext(Dispatchers.Main) {
+                viewBinding?.progressBar?.show()
+            }
 
             try {
                 val packageManager = requireActivity().packageManager
@@ -107,6 +111,7 @@ class AllShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
 
                     if (count >= batchSize) {
                         withContext(Dispatchers.Main) {
+                            viewBinding?.progressBar?.hide()
                             shortcutAdapter.addAll(shortcuts)
                             shortcuts.clear()
                         }

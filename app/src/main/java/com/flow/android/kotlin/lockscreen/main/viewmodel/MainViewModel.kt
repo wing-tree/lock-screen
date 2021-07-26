@@ -18,8 +18,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val refresh: LiveData<Refresh>
         get() = _refreshEvent
 
+    private val _showRequestCalendarPermissionSnackbar = SingleLiveEvent<Unit>()
+    val showRequestCalendarPermissionSnackbar: LiveData<Unit>
+        get() = _showRequestCalendarPermissionSnackbar
+
     private fun callRefresh(refresh: Refresh) {
         _refreshEvent.value = refresh
+    }
+
+    fun callShowRequestCalendarPermissionSnackbar() {
+        _showRequestCalendarPermissionSnackbar.call()
     }
 
     fun refresh(preferenceChanged: Preference.PreferenceChanged) {
