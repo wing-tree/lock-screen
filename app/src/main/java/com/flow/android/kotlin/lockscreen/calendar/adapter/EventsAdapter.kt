@@ -2,34 +2,25 @@ package com.flow.android.kotlin.lockscreen.calendar.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.flow.android.kotlin.lockscreen.calendar.model.Model
-import com.flow.android.kotlin.lockscreen.databinding.CalendarEventListBinding
+import com.flow.android.kotlin.lockscreen.databinding.EventsBinding
 import com.flow.android.kotlin.lockscreen.util.LinearLayoutManagerWrapper
 
-class CalendarEventListAdapter(private val currentList: ArrayList<List<Model.CalendarEvent>>, private val onItemClick: (item: Model.CalendarEvent) -> Unit): RecyclerView.Adapter<CalendarEventListAdapter.ViewHolder>() {
+class EventsAdapter(private val onItemClick: (item: Model.Event) -> Unit)
+    : ListAdapter<List<Model.Event>, EventsAdapter.ViewHolder>(DiffCallback()) {
     private var inflater: LayoutInflater? = null
 
-    fun add(list: List<Model.CalendarEvent>, notifyItemInserted: Boolean = true) {
-        currentList.add(list)
-
-        if (notifyItemInserted)
-            notifyItemInserted(itemCount.dec())
-    }
-
-    fun clear() {
-        currentList.clear()
-        notifyDataSetChanged()
-    }
-
     class ViewHolder private constructor(
-            private val binding: CalendarEventListBinding,
-            private val onItemClick: (item: Model.CalendarEvent) -> Unit
+            private val binding: EventsBinding,
+            private val onItemClick: (item: Model.Event) -> Unit
     ): RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: List<Model.CalendarEvent>) {
+        fun bind(item: List<Model.Event>) {
             binding.recyclerView.apply {
                 layoutManager = LinearLayoutManagerWrapper(binding.root.context)
-                adapter = CalendarEventAdapter {
+                adapter = EventAdapter {
                     onItemClick(it)
                 }.apply {
                     submitList(item)
@@ -40,7 +31,7 @@ class CalendarEventListAdapter(private val currentList: ArrayList<List<Model.Cal
         }
 
         companion object {
-            fun from(binding: CalendarEventListBinding, onItemClick: (item: Model.CalendarEvent) -> Unit): ViewHolder {
+            fun from(binding: EventsBinding, onItemClick: (item: Model.Event) -> Unit): ViewHolder {
                 return ViewHolder(binding, onItemClick)
             }
         }
@@ -48,7 +39,7 @@ class CalendarEventListAdapter(private val currentList: ArrayList<List<Model.Cal
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = this.inflater ?: LayoutInflater.from(parent.context)
-        val binding = CalendarEventListBinding.inflate(inflater, parent, false)
+        val binding = EventsBinding.inflate(inflater, parent, false)
 
         this.inflater = inflater
 
@@ -60,4 +51,14 @@ class CalendarEventListAdapter(private val currentList: ArrayList<List<Model.Cal
     }
 
     override fun getItemCount(): Int = currentList.count()
+
+    private class DiffCallback: DiffUtil.ItemCallback<List<Model.Event>>() {
+        override fun areItemsTheSame(oldItem: List<Model.Event>, newItem: List<Model.Event>): Boolean {
+            return oldItem == newItem
+        }
+
+        override fun areContentsTheSame(oldItem: List<Model.Event>, newItem: List<Model.Event>): Boolean {
+            return oldItem == newItem
+        }
+    }
 }

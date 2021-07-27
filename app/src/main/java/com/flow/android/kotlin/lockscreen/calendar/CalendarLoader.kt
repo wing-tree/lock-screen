@@ -75,7 +75,7 @@ object CalendarLoader {
         if (PermissionChecker.hasCalendarPermission().not())
             return listOf()
 
-        val calendarDisplays = mutableListOf<Model.Calendar>()
+        val calendars = mutableListOf<Model.Calendar>()
         val contentUri = CalendarContract.Calendars.CONTENT_URI
         val cursor = contentResolver.query(
                 contentUri,
@@ -93,20 +93,18 @@ object CalendarLoader {
             @Suppress("LocalVariableName")
             val _id = cursor.getLong(Calendars.Index._ID)
             val calendarDisplayName = cursor.getString(Calendars.Index.CALENDAR_DISPLAY_NAME)
-            // val isPrimary = cursor.getString(Calendars.Index.IS_PRIMARY)
 
-            // if (isPrimary == "1")
-            calendarDisplays.add(Model.Calendar(_id, calendarDisplayName))
+            calendars.add(Model.Calendar(_id, calendarDisplayName))
         }
 
         cursor.close()
 
-        return calendarDisplays
+        return calendars
     }
 
     @Suppress("SpellCheckingInspection")
-    private fun instances(contentResolver: ContentResolver, selection: String, DTSTART: Calendar, DTEND: Calendar): ArrayList<Model.CalendarEvent>? {
-        val events = arrayListOf<Model.CalendarEvent>()
+    private fun events(contentResolver: ContentResolver, selection: String, DTSTART: Calendar, DTEND: Calendar): ArrayList<Model.Event>? {
+        val events = arrayListOf<Model.Event>()
 
         val builder: Uri.Builder = CalendarContract.Instances.CONTENT_URI.buildUpon()
         ContentUris.appendId(builder, DTSTART.timeInMillis)
@@ -152,7 +150,7 @@ object CalendarLoader {
                 }
             }
 
-            events.add(Model.CalendarEvent(
+            events.add(Model.Event(
                     begin = begin,
                     calendarColor = calendarColor,
                     calendarDisplayName = calendarDisplayName,
@@ -176,9 +174,8 @@ object CalendarLoader {
         return events
     }
 
-    fun calendarEvents(contentResolver: ContentResolver, calendarModels: List<Model.Calendar>, amount: Int): ArrayList<Model.CalendarEvent> {
-
-        val events = arrayListOf<Model.CalendarEvent>()
+    fun events(contentResolver: ContentResolver, calendarModels: List<Model.Calendar>, amount: Int): ArrayList<Model.Event> {
+        val events = arrayListOf<Model.Event>()
 
         @Suppress("LocalVariableName", "SpellCheckingInspection")
         val DTSTART = Calendar.getInstance()
@@ -201,18 +198,18 @@ object CalendarLoader {
         val string = calendarModels.map { it.id }.joinToString(separator = ", ") { "\"$it\"" }
         val selection = "(${CalendarContract.Instances.CALENDAR_ID} IN ($string))"
 
-        instances(contentResolver, selection, DTSTART, DTEND)?.let { instances ->
+        events(contentResolver, selection, DTSTART, DTEND)?.let { instances ->
             events.addAll(instances)
         }
 
         return events
     }
 
-    fun editEvent(activityResultLauncher: ActivityResultLauncher<Model.CalendarEvent?>, calendarEvent: Model.CalendarEvent) {
-        activityResultLauncher.launch(calendarEvent)
+    fun edit(activityResultLauncher: ActivityResultLauncher<Model.Event?>, event: Model.Event) {
+        activityResultLauncher.launch(event)
     }
 
-    fun insertEvent(activityResultLauncher: ActivityResultLauncher<Model.CalendarEvent?>) {
+    fun insert(activityResultLauncher: ActivityResultLauncher<Model.Event?>) {
         activityResultLauncher.launch(null)
     }
 }

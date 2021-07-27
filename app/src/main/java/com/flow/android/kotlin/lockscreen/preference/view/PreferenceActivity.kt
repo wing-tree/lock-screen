@@ -113,7 +113,7 @@ class PreferenceActivity: BaseActivity() {
         val checkBoxItems = CalendarLoader.calendars(contentResolver).map {
                 CheckBoxItem(
                         isChecked = uncheckedCalendarIds.contains(it.id.toString()).not(),
-                        text = it.name,
+                        text = it.calendarDisplayName,
                         onCheckedChange = { isChecked ->
                             if (isChecked)
                                 Preference.Calendar.removeUncheckedCalendarId(this, it.id.toString())
@@ -150,7 +150,7 @@ class PreferenceActivity: BaseActivity() {
         }
 
         setResult(RESULT_OK, intent)
-        finish()
+        super.onBackPressed()
         overridePendingTransition(R.anim.fade_in, R.anim.slide_out_left)
     }
 

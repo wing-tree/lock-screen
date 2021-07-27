@@ -10,14 +10,10 @@ import android.view.*
 import android.widget.PopupWindow
 import android.widget.RelativeLayout
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.flow.android.kotlin.lockscreen.R
-import com.flow.android.kotlin.lockscreen.application.MainApplication
 import com.flow.android.kotlin.lockscreen.base.BaseMainFragment
 import com.flow.android.kotlin.lockscreen.base.DataChangedState
 import com.flow.android.kotlin.lockscreen.databinding.FragmentShortcutBinding
@@ -27,7 +23,6 @@ import com.flow.android.kotlin.lockscreen.devicecredential.RequireDeviceCredenti
 import com.flow.android.kotlin.lockscreen.shortcut.adapter.ItemTouchCallback
 import com.flow.android.kotlin.lockscreen.shortcut.adapter.ShortcutAdapter
 import com.flow.android.kotlin.lockscreen.shortcut.model.Model
-import com.flow.android.kotlin.lockscreen.shortcut.viewmodel.ShortcutViewModel
 import com.flow.android.kotlin.lockscreen.util.BLANK
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -39,7 +34,7 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
         return FragmentShortcutBinding.inflate(inflater, container, false)
     }
 
-    private val viewModel by activityViewModels<ShortcutViewModel>()
+    private val viewModel by lazy { mainViewModel.shortcutViewModel }
 
     private val activityResultLauncherMap = mapOf(
         DeviceCredential.Key.ConfirmDeviceCredential to registerForActivityResult(
@@ -74,8 +69,8 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val view = super.onCreateView(inflater, container, savedInstanceState)
+    ): View {
+        super.onCreateView(inflater, container, savedInstanceState)
 
         viewBinding.recyclerView.apply {
             adapter = this@ShortcutFragment.adapter
@@ -88,7 +83,7 @@ class ShortcutFragment: BaseMainFragment<FragmentShortcutBinding>(), RequireDevi
         initializeData()
         registerLifecycleObservers()
 
-        return view
+        return viewBinding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

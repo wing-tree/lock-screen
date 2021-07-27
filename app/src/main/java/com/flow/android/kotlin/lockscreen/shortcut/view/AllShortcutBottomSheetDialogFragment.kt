@@ -11,9 +11,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.flow.android.kotlin.lockscreen.databinding.FragmentAllShortcutBottomSheetDialogBinding
+import com.flow.android.kotlin.lockscreen.main.viewmodel.MainViewModel
 import com.flow.android.kotlin.lockscreen.shortcut.adapter.ShortcutAdapter
 import com.flow.android.kotlin.lockscreen.shortcut.model.Model
-import com.flow.android.kotlin.lockscreen.shortcut.viewmodel.ShortcutViewModel
 import com.flow.android.kotlin.lockscreen.util.hide
 import com.flow.android.kotlin.lockscreen.util.show
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -21,12 +21,14 @@ import kotlinx.coroutines.*
 import timber.log.Timber
 
 class AllShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
+    private val mainViewModel by activityViewModels<MainViewModel>()
+
     private var viewBinding: FragmentAllShortcutBottomSheetDialogBinding? = null
-    private val viewModel by activityViewModels<ShortcutViewModel>()
+    private val viewModel by lazy { mainViewModel.shortcutViewModel }
 
     private val batchSize = 16
     private val job = Job()
-    private val shortcutAdapter = ShortcutAdapter().apply {
+    private val adapter = ShortcutAdapter().apply {
         setListener(object : ShortcutAdapter.Listener {
             override fun onItemClick(item: Model.Shortcut) {
                 viewModel.insert(item.apply {
@@ -52,7 +54,7 @@ class AllShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
         )
 
         viewBinding?.recyclerView?.apply {
-            adapter = shortcutAdapter
+            adapter = this@AllShortcutBottomSheetDialogFragment.adapter
             layoutManager = GridLayoutManager(requireContext(), 4)
             setHasFixedSize(true)
         }
@@ -109,10 +111,10 @@ class AllShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
                             )
                     )
 
-                    if (count >= batchSize) {
+                    if (count >= batchSize.dec()) {
                         withContext(Dispatchers.Main) {
                             viewBinding?.progressBar?.hide()
-                            shortcutAdapter.addAll(shortcuts)
+                            adapter.addAll(shortcuts)
                             shortcuts.clear()
                         }
 
@@ -129,7 +131,7 @@ class AllShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
             }
 
             withContext(Dispatchers.Main) {
-                shortcutAdapter.addAll(shortcuts)
+                adapter.addAll(shortcuts)
             }
         }
     }

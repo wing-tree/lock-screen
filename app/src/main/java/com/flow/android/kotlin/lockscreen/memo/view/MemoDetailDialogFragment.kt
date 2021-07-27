@@ -9,7 +9,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.flow.android.kotlin.lockscreen.R
@@ -17,7 +16,6 @@ import com.flow.android.kotlin.lockscreen.base.BaseDialogFragment
 import com.flow.android.kotlin.lockscreen.databinding.FragmentMemoDetailDialogBinding
 import com.flow.android.kotlin.lockscreen.memo.checklist.adapter.ChecklistAdapter
 import com.flow.android.kotlin.lockscreen.memo.util.share
-import com.flow.android.kotlin.lockscreen.memo.viewmodel.MemoViewModel
 import com.flow.android.kotlin.lockscreen.persistence.entity.ChecklistItem
 import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.util.LinearLayoutManagerWrapper
@@ -33,7 +31,7 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
         return FragmentMemoDetailDialogBinding.inflate(inflater, container, false)
     }
 
-    private val viewModel by activityViewModels<MemoViewModel>()
+    private val viewModel by lazy { mainViewModel.memoViewModel }
     private var memo: Memo? = null
 
     private val checklist = MutableLiveData<ArrayList<ChecklistItem>>()
@@ -156,7 +154,6 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
                 when(i) {
                     0 -> insertToCalendar(memo)
                     1 -> share(requireContext(), memo)
-                    2 -> { /* notification. */ }
                 }
             }.show()
         }
@@ -176,7 +173,6 @@ class MemoDetailDialogFragment : BaseDialogFragment<FragmentMemoDetailDialogBind
 
     private fun registerLifecycleObservers() {
         checklist.observe(viewLifecycleOwner, { list ->
-            println("????: $list")
             checklistAdapter.submitList(list.map { it.deepCopy() })
         })
     }

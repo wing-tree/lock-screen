@@ -1,15 +1,14 @@
 package com.flow.android.kotlin.lockscreen.calendar.model
 
 import androidx.annotation.ColorInt
-import com.flow.android.kotlin.lockscreen.util.BLANK
 
 sealed class Model {
     data class Calendar(
             val id: Long,
-            val name: String
+            val calendarDisplayName: String
     ) : Model()
 
-    data class CalendarEvent (
+    data class Event (
             val begin: Long,
             @ColorInt
             val calendarColor: Int,

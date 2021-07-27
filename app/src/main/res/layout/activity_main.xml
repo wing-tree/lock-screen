@@ -141,7 +141,9 @@
             app:tabMode="scrollable"
             app:tabPaddingEnd="@dimen/padding_16dp"
             app:tabPaddingStart="@dimen/padding_16dp"
-            app:tabTextAppearance="@style/TextAppearance.Tab" />
+            app:tabRippleColor="@null"
+            app:tabTextAppearance="@style/TextAppearance.Tab"
+            app:tabUnboundedRipple="true"/>
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/view_pager2"

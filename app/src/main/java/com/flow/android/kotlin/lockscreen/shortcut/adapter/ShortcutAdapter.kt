@@ -61,7 +61,6 @@ class ShortcutAdapter: RecyclerView.Adapter<ShortcutAdapter.ViewHolder>() {
     inner class ViewHolder(private val binding: ShortcutBinding): RecyclerView.ViewHolder(binding.root) {
         @SuppressLint("ClickableViewAccessibility")
         fun bind(item: Model.Shortcut) {
-            //Glide.with(binding.root.context).load(item.icon).into(binding.imageView)
             binding.imageView.setImageDrawable(item.icon)
             binding.textView.text = item.label
 

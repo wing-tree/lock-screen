@@ -5,16 +5,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.base.BaseMainFragment
 import com.flow.android.kotlin.lockscreen.calendar.CalendarLoader
 import com.flow.android.kotlin.lockscreen.databinding.FragmentCalendarBinding
-import com.flow.android.kotlin.lockscreen.calendar.adapter.CalendarEventListAdapter
+import com.flow.android.kotlin.lockscreen.calendar.adapter.EventsAdapter
 import com.flow.android.kotlin.lockscreen.calendar.contract.CalendarContract
-import com.flow.android.kotlin.lockscreen.calendar.viewmodel.CalendarViewModel
+import com.flow.android.kotlin.lockscreen.calendar.model.Model
 import com.flow.android.kotlin.lockscreen.permission.PermissionChecker
 import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
 import com.flow.android.kotlin.lockscreen.util.hide
@@ -31,7 +30,8 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
         return FragmentCalendarBinding.inflate(inflater, container, false)
     }
 
-    private val viewModel by activityViewModels<CalendarViewModel>()
+    private val viewModel by lazy { mainViewModel.calendarViewModel }
+
     private val duration = 150L
 
     private val activityResultLauncher = registerForActivityResult(CalendarContract()) { result ->
@@ -45,10 +45,7 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
         }
     }
 
-    private val adapter = CalendarEventListAdapter(arrayListOf()) {
-        CalendarLoader.editEvent(activityResultLauncher, it)
-    }
-
+    private val adapter = EventsAdapter { CalendarLoader.edit(activityResultLauncher, it) }
     private val itemCount = 7
 
     private val onPageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
@@ -57,7 +54,7 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
 
             val text =
                 if (position == 0)
-                    getString(R.string.today)
+                    getString(R.string.calendar_fragment_000)
                 else
                     Calendar.getInstance().apply {
                         add(Calendar.DATE, position)
@@ -96,44 +93,50 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
 
             val uncheckedCalendarIds = Preference.Calendar.getUncheckedCalendarIds(requireContext())
 
-            adapter.clear()
             enableCalendarControlViews()
 
             viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                val currentList = arrayListOf<List<Model.Event>>()
+
                 for (i in 0..itemCount) {
-                    CalendarLoader.calendarEvents(
-                            viewModel.contentResolver,
+                    CalendarLoader.events(
+                            mainViewModel.contentResolver,
                             calendars.filter {
                                 uncheckedCalendarIds.contains(it.id.toString()).not()
                             }, i
                     ).also { events ->
                         withContext(Dispatchers.Main) {
-                            events.let { adapter.add(it) }
+                            events.let { currentList.add(it) }
                         }
                     }
+                }
+
+                withContext(Dispatchers.Main) {
+                    adapter.submitList(currentList)
                 }
             }
         })
 
         viewModel.refresh.observe(viewLifecycleOwner, {
-            adapter.clear()
+            adapter.submitList(emptyList())
 
             viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                val currentList = arrayListOf<List<Model.Event>>()
                 val uncheckedCalendarIds = Preference.Calendar.getUncheckedCalendarIds(requireContext())
 
                 for (i in 0..itemCount) {
-                    CalendarLoader.calendarEvents(
-                            viewModel.contentResolver,
+                    CalendarLoader.events(
+                            mainViewModel.contentResolver,
                             viewModel.calendars.value?.filter {
                                 uncheckedCalendarIds.contains(it.id.toString()).not()
                             } ?: emptyList(), i
                     ).also { events ->
-                        events.let { adapter.add(it, false) }
+                        events.let { currentList.add(it) }
                     }
                 }
 
                 withContext(Dispatchers.Main) {
-                    adapter.notifyDataSetChanged()
+                    adapter.submitList(currentList)
                 }
             }
         })
@@ -145,11 +148,31 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
 
     private fun initializeViews() {
         viewBinding.imageView.setOnClickListener {
-            CalendarLoader.insertEvent(activityResultLauncher)
+            CalendarLoader.insert(activityResultLauncher)
         }
 
         viewBinding.viewPager2.adapter = adapter
         viewBinding.viewPager2.registerOnPageChangeCallback(onPageChangeCallback)
+        viewBinding.viewPager2.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+
+                when (position) {
+                    0 -> {
+                        viewBinding.imageViewBack.isEnabled = false
+                        viewBinding.imageViewForward.isEnabled = true
+                    }
+                    adapter.itemCount.dec() -> {
+                        viewBinding.imageViewBack.isEnabled = true
+                        viewBinding.imageViewForward.isEnabled = false
+                    }
+                    else -> {
+                        viewBinding.imageViewBack.isEnabled = true
+                        viewBinding.imageViewForward.isEnabled = true
+                    }
+                }
+            }
+        })
 
         viewBinding.imageViewBack.setOnClickListener {
             if (viewBinding.viewPager2.currentItem > 0)

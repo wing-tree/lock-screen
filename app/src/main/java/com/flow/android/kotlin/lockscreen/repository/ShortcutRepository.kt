@@ -11,8 +11,8 @@ import timber.log.Timber
 
 class ShortcutRepository(context: Context) {
     private val appDatabase = AppDatabase.getInstance(context)
-    private val dao = appDatabase.shortcutDao()
     private val compositeDisposable = CompositeDisposable()
+    private val dao = appDatabase.shortcutDao()
 
     fun delete(shortcut: Shortcut, @MainThread onDeleted: (shortcut: Shortcut) -> Unit) {
         compositeDisposable.add(dao.delete(shortcut)
@@ -26,10 +26,7 @@ class ShortcutRepository(context: Context) {
         compositeDisposable.add(dao.insert(shortcut)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    println("AAAAAAAAAA: $shortcut")
-                    onInserted(shortcut)
-                           }, { Timber.e(it) })
+                .subscribe({ onInserted(shortcut) }, { Timber.e(it) })
         )
     }
 
@@ -39,9 +36,7 @@ class ShortcutRepository(context: Context) {
 
     suspend fun getAll() = dao.getAll()
 
-    fun getAllValue() = dao.getAllValue()
-
-    fun disposeCompositeDisposable() {
-        compositeDisposable.dispose()
+    fun clearCompositeDisposable() {
+        compositeDisposable.clear()
     }
 }

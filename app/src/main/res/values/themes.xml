@@ -2,8 +2,8 @@
     <!-- Base application theme. -->
     <style name="Theme.LockScreen" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/indigo_500</item>
-        <item name="colorPrimaryVariant">@color/indigo_700</item>
+        <item name="colorPrimary">@color/light_blue_500</item>
+        <item name="colorPrimaryVariant">@color/light_blue_700</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/high_emphasis</item>
@@ -30,12 +30,12 @@
 
     <style name="Theme.PreferenceActivity" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/indigo_500</item>
-        <item name="colorPrimaryVariant">@color/indigo_700</item>
+        <item name="colorPrimary">@color/light_blue_500</item>
+        <item name="colorPrimaryVariant">@color/light_blue_700</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/light_blue_200</item>
-        <item name="colorSecondaryVariant">@color/light_blue_700</item>
+        <item name="colorSecondary">@color/cyan_200</item>
+        <item name="colorSecondaryVariant">@color/cyan_700</item>
         <item name="colorOnSecondary">@color/dark_grey</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@color/status_bar</item>
@@ -59,12 +59,17 @@
     </style>
 
     <style name="WindowAnimation">
-        <item name="android:windowExitAnimation">@anim/fade_out</item>
+        <item name="android:windowEnterAnimation">@anim/fade_in</item>
+    </style>
+
+    <style name="WindowAnimation.BlindScreen">
+        <item name="android:windowEnterAnimation">@anim/fade_in_blind_screen</item>
+        <item name="android:windowExitAnimation">@anim/fade_out_blind_screen</item>
     </style>
 
     <style name="WindowAnimation.DialogFragment">
-        <item name="android:windowEnterAnimation">@anim/short_fade_in</item>
-        <item name="android:windowExitAnimation">@anim/short_fade_out</item>
+        <item name="android:windowEnterAnimation">@anim/fade_in_short</item>
+        <item name="android:windowExitAnimation">@anim/fade_out_short</item>
     </style>
 
     <style name="WindowAnimation.PreferenceActivity">

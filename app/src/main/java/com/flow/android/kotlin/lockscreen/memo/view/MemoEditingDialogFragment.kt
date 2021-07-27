@@ -1,6 +1,5 @@
 package com.flow.android.kotlin.lockscreen.memo.view
 
-import android.animation.Animator
 import android.animation.LayoutTransition
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -16,7 +15,6 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.flow.android.kotlin.lockscreen.R
@@ -25,11 +23,9 @@ import com.flow.android.kotlin.lockscreen.color.widget.ColorPickerLayout
 import com.flow.android.kotlin.lockscreen.databinding.FragmentMemoEditingDialogBinding
 import com.flow.android.kotlin.lockscreen.datepicker.DatePickerDialogFragment
 import com.flow.android.kotlin.lockscreen.memo.checklist.adapter.ChecklistAdapter
-import com.flow.android.kotlin.lockscreen.memo.viewmodel.MemoViewModel
 import com.flow.android.kotlin.lockscreen.persistence.entity.ChecklistItem
 import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.util.*
-import jp.wasabeef.recyclerview.animators.FadeInDownAnimator
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -39,7 +35,7 @@ class MemoEditingDialogFragment : BaseDialogFragment<FragmentMemoEditingDialogBi
         return FragmentMemoEditingDialogBinding.inflate(inflater, container, false)
     }
 
-    private val viewModel by activityViewModels<MemoViewModel>()
+    private val viewModel by lazy { mainViewModel.memoViewModel }
     private val duration = 150L
 
     private val simpleDateFormat by lazy {

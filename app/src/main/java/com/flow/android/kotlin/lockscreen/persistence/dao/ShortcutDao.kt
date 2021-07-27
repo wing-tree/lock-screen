@@ -19,8 +19,4 @@ interface ShortcutDao {
     @Transaction
     @Query("SELECT * FROM shortcut ORDER BY priority DESC")
     suspend fun getAll(): List<Shortcut>
-
-    @Transaction
-    @Query("SELECT * FROM shortcut ORDER BY priority ASC")
-    fun getAllValue(): List<Shortcut>
 }

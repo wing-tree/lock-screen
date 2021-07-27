@@ -93,9 +93,9 @@ object NotificationBuilder {
         }
     }
 
-    private fun calendarEventForNotification(context: Context): Model.CalendarEvent? {
+    private fun calendarEventForNotification(context: Context): Model.Event? {
         val contentResolver = context.contentResolver
-        var calendarEvent: Model.CalendarEvent? = null
+        var event: Model.Event? = null
         var m = 3.inc()
 
         val gregorianCalendar = GregorianCalendar().apply {
@@ -107,7 +107,7 @@ object NotificationBuilder {
         val calendars = CalendarLoader.calendars(contentResolver)
         val uncheckedCalendarIds = Preference.Calendar.getUncheckedCalendarIds(context)
 
-        val calendarEvents = CalendarLoader.calendarEvents(context.contentResolver, calendars.filter {
+        val calendarEvents = CalendarLoader.events(context.contentResolver, calendars.filter {
             uncheckedCalendarIds.contains(it.id.toString()).not()
         }, 0)
 
@@ -120,12 +120,12 @@ object NotificationBuilder {
 
                 if (m > n) {
                     m = n
-                    calendarEvent = it
+                    event = it
                 }
             }
         }
 
-        return calendarEvent
+        return event
     }
 
     private fun todayMemos(context: Context): List<Memo> {

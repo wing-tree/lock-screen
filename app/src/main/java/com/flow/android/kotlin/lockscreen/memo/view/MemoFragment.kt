@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.flow.android.kotlin.lockscreen.base.BaseMainFragment
@@ -12,7 +11,6 @@ import com.flow.android.kotlin.lockscreen.base.DataChangedState
 import com.flow.android.kotlin.lockscreen.databinding.FragmentMemoBinding
 import com.flow.android.kotlin.lockscreen.memo.adapter.ItemTouchCallback
 import com.flow.android.kotlin.lockscreen.memo.adapter.MemoAdapter
-import com.flow.android.kotlin.lockscreen.memo.viewmodel.MemoViewModel
 import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.util.LinearLayoutManagerWrapper
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -29,7 +27,7 @@ class MemoFragment: BaseMainFragment<FragmentMemoBinding>() {
         return FragmentMemoBinding.inflate(inflater, container, false)
     }
 
-    private val viewModel by activityViewModels<MemoViewModel>()
+    private val viewModel by lazy { mainViewModel.memoViewModel }
     private val compositeDisposable = CompositeDisposable()
 
     private val adapter: MemoAdapter by lazy {
@@ -106,9 +104,6 @@ class MemoFragment: BaseMainFragment<FragmentMemoBinding>() {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    Timber.d("DataChanged<Memo>! :$it")
-                    showToast("DataChanged<Memo>! :$it")
-
                     when(it.state) {
                         DataChangedState.Deleted -> adapter.remove(it.data)
                         DataChangedState.Inserted -> {

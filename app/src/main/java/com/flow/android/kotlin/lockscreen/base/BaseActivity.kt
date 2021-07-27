@@ -31,17 +31,17 @@ open class BaseActivity : AppCompatActivity() {
         LocalBroadcastManager.getInstance(this)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onResume() {
+        super.onResume()
         localBroadcastManager.registerReceiver(bottomNavigationBroadcastReceiver, IntentFilter().apply {
             addAction(LockScreenService.Action.HomeKeyPressed)
             addAction(LockScreenService.Action.RecentAppsPressed)
         })
     }
 
-    override fun onDestroy() {
+    override fun onPause() {
         localBroadcastManager.unregisterReceiver(bottomNavigationBroadcastReceiver)
-        super.onDestroy()
+        super.onPause()
     }
 
     protected fun putActivityResultLauncher(key: String, value: ActivityResultLauncher<Intent>) {

@@ -2,8 +2,6 @@
 <resources>
     <string name="app_name">잠금화면</string>
 
-    <string name="today">오늘</string>
-
     <string name="format_date_000">M월 d일 EEEE</string>
     <string name="format_date_001">M월 d일</string>
 
@@ -39,6 +37,9 @@
 
     <!-- popup_window -->
     <string name="popup_window_000">화면에서 삭제</string>
+
+    <!-- CalendarFragment -->
+    <string name="calendar_fragment_000">오늘</string>
 
     <!-- ConfigurationActivity -->
     <string name="configuration_activity_000">잠금 설정, 잠금 방식</string>
@@ -105,7 +106,6 @@
     <string-array name="memo_detail_dialog_fragment_005">
         <item>캘린더</item>
         <item>공유</item>
-        <item>알림 표시</item>
     </string-array>
 
     <!-- MemoEditingDialogFragment -->

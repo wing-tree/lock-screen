@@ -21,7 +21,6 @@ import androidx.core.content.ContextCompat
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.application.ApplicationUtil
 import com.flow.android.kotlin.lockscreen.base.BaseActivity
-import com.flow.android.kotlin.lockscreen.calendar.viewmodel.CalendarViewModel
 import com.flow.android.kotlin.lockscreen.preference.view.PreferenceActivity
 import com.flow.android.kotlin.lockscreen.databinding.ActivityMainBinding
 import com.flow.android.kotlin.lockscreen.devicecredential.DeviceCredential
@@ -33,14 +32,11 @@ import com.flow.android.kotlin.lockscreen.main.torch.Torch
 import com.flow.android.kotlin.lockscreen.main.view.MainActivity.Unlock.endRange
 import com.flow.android.kotlin.lockscreen.main.view.MainActivity.Unlock.outOfEndRange
 import com.flow.android.kotlin.lockscreen.main.viewmodel.MainViewModel
-import com.flow.android.kotlin.lockscreen.main.viewmodel.Refresh
-import com.flow.android.kotlin.lockscreen.memo.viewmodel.MemoViewModel
 import com.flow.android.kotlin.lockscreen.permission.PermissionChecker
 import com.flow.android.kotlin.lockscreen.permission._interface.OnPermissionAllowClickListener
 import com.flow.android.kotlin.lockscreen.permission.view.PermissionRationaleDialogFragment
 import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
-import com.flow.android.kotlin.lockscreen.shortcut.viewmodel.ShortcutViewModel
 import com.flow.android.kotlin.lockscreen.util.*
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.PermissionToken
@@ -60,9 +56,6 @@ class MainActivity : BaseActivity(),
 
     private val viewBinding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val viewModel: MainViewModel by viewModels()
-    private val calendarViewModel: CalendarViewModel by viewModels()
-    private val memoViewModel: MemoViewModel by viewModels()
-    private val shortcutViewModel: ShortcutViewModel by viewModels()
 
     private val torch: Torch by lazy {
         Torch(viewBinding)
@@ -82,6 +75,8 @@ class MainActivity : BaseActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(viewBinding.root)
+
+        viewModel.isInitialized = true
 
         if (Preference.LockScreen.getShowOnLockScreen(this)) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
@@ -112,12 +107,9 @@ class MainActivity : BaseActivity(),
                     it.show(supportFragmentManager, it.tag)
                 }
             } else
-                calendarViewModel.postValue()
+                viewModel.calendarViewModel.postValue()
         } else
-            calendarViewModel.postValue()
-
-        memoViewModel
-        shortcutViewModel
+            viewModel.calendarViewModel.postValue()
 
         initializeViews()
         registerLifecycleObservers()
@@ -175,6 +167,12 @@ class MainActivity : BaseActivity(),
 
     @SuppressLint("ClickableViewAccessibility")
     private fun initializeViews() {
+        TabLayoutInitializer.initialize(
+                viewBinding.centerAlignedTabLayout,
+                viewBinding.viewPager2,
+                FragmentStateAdapter(this)
+        )
+
         viewBinding.linearLayoutUnlock.setOnTouchListener { _, event ->
             when(event.action) {
                 MotionEvent.ACTION_DOWN -> {
@@ -267,25 +265,9 @@ class MainActivity : BaseActivity(),
             }
         } else
             viewBinding.imageViewHighlight.visibility = GONE
-
-        TabLayoutInitializer.initialize(
-                viewBinding.centerAlignedTabLayout,
-                viewBinding.viewPager2,
-                FragmentStateAdapter(this)
-        )
     }
 
     private fun registerLifecycleObservers() {
-        viewModel.refresh.observe(this, {
-            it ?: return@observe
-
-            when(it) {
-                Refresh.Calendar -> calendarViewModel.callRefresh()
-                Refresh.Memo -> memoViewModel.callRefresh()
-                Refresh.Shortcut -> shortcutViewModel.callRefresh()
-            }
-        })
-
         viewModel.showRequestCalendarPermissionSnackbar.observe(this, {
             PermissionChecker.showRequestCalendarPermissionSnackbar(
                     viewBinding.coordinatorLayout,
@@ -318,7 +300,7 @@ class MainActivity : BaseActivity(),
         putActivityResultLauncher(
                 PermissionChecker.Calendar.KEY,
                 registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                    calendarViewModel.postValue()
+                    viewModel.calendarViewModel.postValue()
                 }
         )
     }
@@ -377,7 +359,7 @@ class MainActivity : BaseActivity(),
 
     private fun firstRun() {
         if (Preference.getFirstRun(this)) {
-            memoViewModel.insert(
+            viewModel.memoViewModel.insert(
                     Memo(
                             content = getString(R.string.memo_fragment_000),
                             color = ContextCompat.getColor(this, R.color.white),
@@ -396,9 +378,9 @@ class MainActivity : BaseActivity(),
                 Manifest.permission.READ_CALENDAR,
                 Manifest.permission.WRITE_CALENDAR
         ), {
-            calendarViewModel.postValue()
+            viewModel.calendarViewModel.postValue()
         }, {
-            calendarViewModel.callDisableCalendarControlViews()
+            viewModel.calendarViewModel.callDisableCalendarControlViews()
             viewModel.callShowRequestCalendarPermissionSnackbar()
         }) {
             checkManageOverlayPermission()
@@ -413,7 +395,7 @@ class MainActivity : BaseActivity(),
 
         if (PermissionChecker.hasCalendarPermission().not()) {
             if (isFinishing.not()) {
-                calendarViewModel.callDisableCalendarControlViews()
+                viewModel.calendarViewModel.callDisableCalendarControlViews()
                 viewModel.callShowRequestCalendarPermissionSnackbar()
             }
         }

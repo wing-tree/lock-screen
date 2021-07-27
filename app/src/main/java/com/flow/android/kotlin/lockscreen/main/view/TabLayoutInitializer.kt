@@ -27,7 +27,7 @@ object TabLayoutInitializer {
                 context.getString(R.string.main_activity_003)
         )
 
-        viewPager2.offscreenPageLimit = 3
+        viewPager2.offscreenPageLimit = 2
         viewPager2.adapter = adapter
         TabLayoutMediator(tabLayout, viewPager2) { tab, position ->
             tab.customView = LayoutInflater.from(context).inflate(
@@ -43,12 +43,12 @@ object TabLayoutInitializer {
 
         val selectedTabIndex = Preference.getSelectedTabIndex(context)
 
-        Handler(Looper.getMainLooper()).postDelayed({
-            if (selectedTabIndex == 0)
-                tabLayout.getTabAt(selectedTabIndex)?.animateSelectedTab()
-            else
-                tabLayout.getTabAt(selectedTabIndex)?.select()
+        if (selectedTabIndex == 0)
+            tabLayout.getTabAt(selectedTabIndex)?.animateSelectedTab()
+        else
+            tabLayout.getTabAt(selectedTabIndex)?.select()
 
+        Handler(Looper.getMainLooper()).postDelayed({
             tabLayout.fadeIn(DURATION)
             viewPager2.fadeIn(DURATION)
         }, DURATION)

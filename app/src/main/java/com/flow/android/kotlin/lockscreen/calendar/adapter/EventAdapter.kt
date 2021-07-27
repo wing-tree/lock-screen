@@ -8,23 +8,23 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.flow.android.kotlin.lockscreen.calendar.model.Model
-import com.flow.android.kotlin.lockscreen.databinding.CalendarEventBinding
+import com.flow.android.kotlin.lockscreen.databinding.EventBinding
 import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
 import java.text.SimpleDateFormat
 import java.util.*
 
-class CalendarEventAdapter(private val onItemClick: (item: Model.CalendarEvent) -> Unit): ListAdapter<Model.CalendarEvent, CalendarEventAdapter.ViewHolder>(DiffCallback()) {
+class EventAdapter(private val onItemClick: (item: Model.Event) -> Unit): ListAdapter<Model.Event, EventAdapter.ViewHolder>(DiffCallback()) {
     private val simpleDateFormat = SimpleDateFormat("a hh:mm", Locale.getDefault())
 
-    fun add(item: Model.CalendarEvent) {
+    fun add(item: Model.Event) {
         val list = currentList.toMutableList()
         list.add(item)
         submitList(list)
     }
 
-    inner class ViewHolder(private val viewBinding: CalendarEventBinding) : RecyclerView.ViewHolder(viewBinding.root) {
+    inner class ViewHolder(private val viewBinding: EventBinding) : RecyclerView.ViewHolder(viewBinding.root) {
 
-        fun bind(item: Model.CalendarEvent) {
+        fun bind(item: Model.Event) {
             val begin = "${item.begin.format()} - "
             val fontSize = Preference.Display.getFontSize(viewBinding.root.context)
 
@@ -44,7 +44,7 @@ class CalendarEventAdapter(private val onItemClick: (item: Model.CalendarEvent) 
 
     private fun from(parent: ViewGroup): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val viewBinding = CalendarEventBinding.inflate(inflater, parent, false)
+        val viewBinding = EventBinding.inflate(inflater, parent, false)
 
         return ViewHolder(viewBinding)
     }
@@ -56,14 +56,14 @@ class CalendarEventAdapter(private val onItemClick: (item: Model.CalendarEvent) 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
-}
 
-class DiffCallback: DiffUtil.ItemCallback<Model.CalendarEvent>() {
-    override fun areItemsTheSame(oldItem: Model.CalendarEvent, newItem: Model.CalendarEvent): Boolean {
-        return oldItem.id == newItem.id
-    }
+    private class DiffCallback: DiffUtil.ItemCallback<Model.Event>() {
+        override fun areItemsTheSame(oldItem: Model.Event, newItem: Model.Event): Boolean {
+            return oldItem.id == newItem.id
+        }
 
-    override fun areContentsTheSame(oldItem: Model.CalendarEvent, newItem: Model.CalendarEvent): Boolean {
-        return oldItem == newItem
+        override fun areContentsTheSame(oldItem: Model.Event, newItem: Model.Event): Boolean {
+            return oldItem == newItem
+        }
     }
 }

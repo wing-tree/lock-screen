@@ -9,13 +9,17 @@ import android.view.ViewGroup
 import android.view.Window
 import androidx.annotation.CallSuper
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.activityViewModels
 import androidx.viewbinding.ViewBinding
 import com.flow.android.kotlin.lockscreen.R
+import com.flow.android.kotlin.lockscreen.main.viewmodel.MainViewModel
 
 abstract class BaseDialogFragment<VB : ViewBinding> : DialogFragment() {
     private var _viewBinding: VB? = null
     protected val viewBinding: VB
         get() = _viewBinding!!
+
+    protected val mainViewModel by activityViewModels<MainViewModel>()
 
     abstract fun inflate(inflater: LayoutInflater, container: ViewGroup?): VB
 

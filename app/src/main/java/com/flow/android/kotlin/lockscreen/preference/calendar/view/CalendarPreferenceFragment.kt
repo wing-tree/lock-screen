@@ -23,7 +23,7 @@ class CalendarPreferenceFragment: PreferenceFragment() {
         val calendarDisplays = CalendarLoader.calendars(contentResolver).map {
             CheckBoxItem(
                     isChecked = uncheckedCalendarIds.contains(it.id.toString()).not(),
-                    text = it.name,
+                    text = it.calendarDisplayName,
                     onCheckedChange = { isChecked ->
                         if (isChecked)
                             Preference.Calendar.removeUncheckedCalendarId(context, it.id.toString())

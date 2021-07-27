@@ -6,11 +6,11 @@
     <color name="dark_grey">#121212</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="indigo_500">#3f51b5</color>
-    <color name="indigo_700">#303f9f</color>
-
-    <color name="light_blue_200">#81d4fa</color>
+    <color name="light_blue_500">#03a9f4</color>
     <color name="light_blue_700">#0288d1</color>
+
+    <color name="cyan_200">#80deea</color>
+    <color name="cyan_700">#0097a7</color>
 
     <color name="yellow_A_200">#FFFF00</color>
 

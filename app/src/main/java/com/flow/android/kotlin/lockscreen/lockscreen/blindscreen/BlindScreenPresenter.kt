@@ -40,7 +40,7 @@ class BlindScreenPresenter {
         var outOfEndRange = false
     }
 
-    private fun restoreVisibility() {
+    private fun restoreVisibility(duration: Long) {
         viewBinding.frameLayoutRipple.hideRipple()
         viewBinding.linearLayout.scale(1F, duration)
         viewBinding.imageViewUnlock.scale(1F, duration)
@@ -55,7 +55,7 @@ class BlindScreenPresenter {
             _viewBinding = BlindScreenBinding.inflate(LayoutInflater.from(applicationContext))
         }
 
-        restoreVisibility()
+        restoreVisibility(0L)
 
         viewBinding.constraintLayout.setOnTouchListener { _, event ->
             when(event.action) {
@@ -89,7 +89,7 @@ class BlindScreenPresenter {
                     if (Unlock.outOfEndRange)
                         hide()
                     else
-                        restoreVisibility()
+                        restoreVisibility(duration)
                 }
             }
 
@@ -110,7 +110,7 @@ class BlindScreenPresenter {
         )
 
         layoutParams.height = windowHeight()
-        layoutParams.windowAnimations = R.style.WindowAnimation
+        layoutParams.windowAnimations = R.style.WindowAnimation_BlindScreen
 
         isBlindScreenVisible = true
         windowManager.addView(viewBinding.root, layoutParams)
