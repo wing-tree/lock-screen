@@ -16,12 +16,15 @@ class CalendarContract: ActivityResultContract<Model.Event?, Int>() {
             val uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, it.eventId)
 
             output = CalendarLoader.RequestCode.EditEvent
-            Intent(Intent.ACTION_INSERT).setData(uri)
-        } ?: run {
-            val intent = Intent(Intent.ACTION_INSERT).setData(CalendarContract.Events.CONTENT_URI)
 
+            Intent(Intent.ACTION_INSERT).apply {
+                putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, it.begin)
+                putExtra(CalendarContract.EXTRA_EVENT_END_TIME, it.end)
+            }.setData(uri)
+        } ?: run {
             output = CalendarLoader.RequestCode.InsertEvent
-            intent
+
+            Intent(Intent.ACTION_INSERT).setData(CalendarContract.Events.CONTENT_URI)
         }
     }
 

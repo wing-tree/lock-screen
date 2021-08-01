@@ -51,7 +51,10 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
         }
     }
 
-    private val adapter = EventsAdapter { CalendarLoader.edit(activityResultLauncher, it) }
+    private val adapter = EventsAdapter {
+        currentItem = viewBinding.viewPager2.currentItem
+        CalendarLoader.edit(activityResultLauncher, it)
+    }
     private val itemCount = 7
 
     private val onPageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
@@ -65,13 +68,31 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
                     Calendar.getInstance().apply {
                         add(Calendar.DATE, position)
                     }.timeInMillis.format()
+
             viewBinding.textViewDate.text = text
+
+            when (position) {
+                0 -> {
+                    viewBinding.imageViewBack.isEnabled = false
+                    viewBinding.imageViewForward.isEnabled = true
+                }
+                adapter.itemCount.dec() -> {
+                    viewBinding.imageViewBack.isEnabled = true
+                    viewBinding.imageViewForward.isEnabled = false
+                }
+                else -> {
+                    viewBinding.imageViewBack.isEnabled = true
+                    viewBinding.imageViewForward.isEnabled = true
+                }
+            }
         }
     }
 
     private val simpleDateFormat: SimpleDateFormat by lazy {
         SimpleDateFormat(getString(R.string.format_date_001), Locale.getDefault())
     }
+
+    private var currentItem = 0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -132,31 +153,12 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
 
     private fun initializeViews() {
         viewBinding.imageView.setOnClickListener {
+            currentItem = viewBinding.viewPager2.currentItem
             CalendarLoader.insert(activityResultLauncher)
         }
 
         viewBinding.viewPager2.adapter = adapter
         viewBinding.viewPager2.registerOnPageChangeCallback(onPageChangeCallback)
-        viewBinding.viewPager2.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-
-                when (position) {
-                    0 -> {
-                        viewBinding.imageViewBack.isEnabled = false
-                        viewBinding.imageViewForward.isEnabled = true
-                    }
-                    adapter.itemCount.dec() -> {
-                        viewBinding.imageViewBack.isEnabled = true
-                        viewBinding.imageViewForward.isEnabled = false
-                    }
-                    else -> {
-                        viewBinding.imageViewBack.isEnabled = true
-                        viewBinding.imageViewForward.isEnabled = true
-                    }
-                }
-            }
-        })
 
         viewBinding.imageViewBack.setOnClickListener {
             if (viewBinding.viewPager2.currentItem > 0)
@@ -193,10 +195,8 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
     }
 
     private fun refresh() {
-        adapter.submitList(emptyList())
-
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            val currentList = arrayListOf<List<Model.Event>>()
+            val currentList = adapter.currentList.toMutableList()
             val uncheckedCalendarIds = Preference.Calendar.getUncheckedCalendarIds(requireContext())
 
             for (i in 0..itemCount) {
@@ -205,13 +205,14 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
                     viewModel.calendars.value?.filter {
                         uncheckedCalendarIds.contains(it.id.toString()).not()
                     } ?: emptyList(), i
-                ).also { events ->
-                    events.let { currentList.add(it) }
-                }
+                ).also { currentList[i] = it }
             }
 
             withContext(Dispatchers.Main) {
                 adapter.submitList(currentList)
+
+                if (adapter.itemCount > currentItem)
+                    viewBinding.viewPager2.currentItem = currentItem
             }
         }
     }
