@@ -5,7 +5,97 @@
     <string name="format_date_000">M월 d일 EEEE</string>
     <string name="format_date_001">M월 d일</string>
 
-    <string name="notification_content_text">안정적인 실행을 위한 알림입니다</string>
+    <!-- CalendarFragment -->
+    <string name="calendar_fragment_000">오늘</string>
+
+    <!-- CalendarPreferenceFragment -->
+    <string name="calendar_preference_fragment_000">캘린더</string>
+
+    <!-- DeviceCredentialHelper -->
+    <string name="device_credential_helper_000">잠금 해제 패턴을 그리세요</string>
+    <string name="device_credential_helper_001">비밀번호 또는 PIN을 입력하세요</string>
+
+    <!-- DisplayConfigurationFragment -->
+    <string name="display_preference_fragment_000">다크 모드</string>
+    <string name="display_preference_fragment_001">글꼴 크기</string>
+    <string name="display_preference_fragment_002">시간 숨기기</string>
+    <string name="display_preference_fragment_003">시간 포맷</string>
+
+    <!-- LockScreenPreferenceFragment -->
+    <string name="lock_screen_preference_fragment_000">잠금 해제 후 표시</string>
+    <string name="lock_screen_preference_fragment_001">잠금화면</string>
+    <string name="lock_screen_preference_fragment_002">잠금화면에 표시</string>
+    <string name="lock_screen_preference_fragment_003">백 버튼으로 잠금해제</string>
+
+    <!-- MainActivity -->
+    <string name="main_activity_001">캘린더</string>
+    <string name="main_activity_000">앱 바로가기</string>
+    <string name="main_activity_003">메모</string>
+    <string name="main_activity_004">알림</string>
+    <string name="main_activity_002">카메라를 찾을 수 없습니다.</string>
+
+    <!-- ManageOverlayPermissionNotificationBuilder -->
+    <string name="manage_overlay_permission_notification_builder_000">다른 앱 위에 표시 권한을 허용하세요.</string>
+    <string name="manage_overlay_permission_notification_builder_001">앱 권한 요청</string>
+
+    <!-- NoteDetailDialogFragment -->
+    <string name="note_detail_dialog_fragment_000">애플리케이션을 찾을 수 없습니다.</string>
+    <string name="note_detail_dialog_fragment_001">취소</string>
+    <string name="note_detail_dialog_fragment_002">닫기</string>
+    <string name="note_detail_dialog_fragment_003">삭제</string>
+    <string name="note_detail_dialog_fragment_004">메모 삭제</string>
+    <string name="note_detail_dialog_fragment_005">메모를 삭제합니다.</string>
+    <string name="note_detail_dialog_fragment_006">완료</string>
+
+    <!-- NoteEditingDialogFragment -->
+    <string name="note_editing_dialog_fragment_000">취소</string>
+    <string name="note_editing_dialog_fragment_001">체크리스트를 입력하세요.</string>
+    <string name="note_editing_dialog_fragment_002">메모를 입력하세요.</string>
+    <string name="note_editing_dialog_fragment_003">저장</string>
+
+    <string-array name="note_detail_dialog_fragment_007">
+        <item>캘린더</item>
+        <item>공유</item>
+    </string-array>
+
+    <!-- NoteFragment -->
+    <string name="note_fragment_000">당신은 지체할 수도 있지만 시간은 그러하지 않을 것이다. (벤자민 프랭클린)</string>
+
+    <!-- NotificationBuilder -->
+    <string name="notification_builder_000">캘린더</string>
+    <string name="notification_builder_001">잠금화면 서비스가 실행 중입니다.</string>
+    <string name="notification_builder_002">메모</string>
+
+    <!-- PermissionChecker -->
+    <string name="permission_checker_000">설정</string>
+    <string name="permission_checker_001">캘린더를 표시하려면 캘린더 권한을 허용해야 합니다.</string>
+
+    <!-- PermissionRationaleDialogFragment -->
+    <string name="permission_rationale_dialog_fragment_000">다른 앱 위에 표시</string>
+    <string name="permission_rationale_dialog_fragment_001">캘린더</string>
+    <string name="permission_rationale_dialog_fragment_002">저장공간</string>
+
+    <!-- PreferenceActivity -->
+    <string name="preference_activity_000">캘린더</string>
+    <string name="preference_activity_001">표시할 캘린더</string>
+    <string name="preference_activity_002">다크 모드, 글꼴 크기</string>
+    <string name="preference_activity_003">디스플레이</string>
+    <string name="preference_activity_004">잠금화면</string>
+    <string name="preference_activity_005">잠금 설정, 잠금 방식</string>
+    <string name="preference_activity_006">설정</string>
+    <string name="preference_activity_007">앱 공유하기</string>
+    <string name="preference_activity_008">버전</string>
+    <string name="preference_activity_009">리뷰 쓰기</string>
+
+    <!-- Review -->
+    <string name="review_000">소중한 리뷰 감사합니다.</string>
+
+    <!-- Util -->
+    <string name="util_000">공유하기</string>
+    <string name="util_001">앱 공유하기</string>
+
+    <!-- app_shortcut -->
+    <string name="app_shortcut_000">화면에서 삭제</string>
 
     <!-- bline_screen -->
     <string name="blind_screen_000">보안정책에 따라 홈 버튼으로 잠금 해제 할 수 없습니다.</string>
@@ -19,116 +109,11 @@
     <string name="fragment_date_picker_dialog_001">Save</string>
 
     <!-- fragment_permission_rationale_dialog -->
-    <string name="fragment_permission_rationale_dialog_000">앱 권한 요청</string>
-    <string name="fragment_permission_rationale_dialog_001">앱을 정상적으로 사용하기 위해서는 다음 권한을 허용해야 합니다.</string>
-    <string name="fragment_permission_rationale_dialog_002">거부</string>
-    <string name="fragment_permission_rationale_dialog_003">허용</string>
+    <string name="fragment_permission_rationale_dialog_000">허용</string>
+    <string name="fragment_permission_rationale_dialog_001">거부</string>
+    <string name="fragment_permission_rationale_dialog_002">앱 권한 요청</string>
+    <string name="fragment_permission_rationale_dialog_003">앱을 정상적으로 사용하기 위해서는 다음 권한을 허용해야 합니다.</string>
 
     <!-- no_calendar_permission_message -->
     <string name="no_calendar_permission_message_000">캘린더를 표시하려면 캘린더 권한을 허용해야 합니다.\n(여기를 클릭하여 캘린더 권한을 허용하세요.)</string>
-
-    <!-- settings -->
-    <string name="settings_000">캘린더</string>
-    <string name="settings_001">표시할 캘린더</string>
-    <string name="settings_002">디스플레이</string>
-    <string name="settings_003">다크 모드, 글꼴 크기</string>
-    <string name="settings_004">잠금화면</string>
-    <string name="settings_005">잠금 설정, 잠금 방식</string>
-
-    <!-- popup_window -->
-    <string name="popup_window_000">화면에서 삭제</string>
-
-    <!-- CalendarFragment -->
-    <string name="calendar_fragment_000">오늘</string>
-
-    <!-- ConfigurationActivity -->
-    <string name="configuration_activity_000">잠금 설정, 잠금 방식</string>
-    <string name="configuration_activity_001">디스플레이</string>
-    <string name="configuration_activity_002">다크 모드, 글꼴 크기</string>
-    <string name="configuration_activity_003">잠금화면</string>
-    <string name="configuration_activity_004">설정</string>
-    <string name="configuration_activity_005">캘린더</string>
-    <string name="configuration_activity_006">표시할 캘린더</string>
-    <string name="configuration_activity_007">앱 공유하기</string>
-    <string name="configuration_activity_008">리뷰 쓰기</string>
-    <string name="configuration_activity_009">버전</string>
-
-    <!-- DeviceCredentialHelper -->
-    <string name="device_credential_helper_000">잠금 해제 패턴을 그리세요</string>
-    <string name="device_credential_helper_001">비밀번호 또는 PIN을 입력하세요</string>
-
-    <!-- DisplayConfigurationFragment -->
-    <string name="display_preference_fragment_000">시간 숨기기</string>
-    <string name="display_preference_fragment_001">다크 모드</string>
-    <string name="display_preference_fragment_002">글꼴 크기</string>
-    <string name="display_preference_fragment_003">시간 포맷</string>
-
-    <!-- LockScreenConfigurationFragment -->
-    <string name="lock_screen_configuration_fragment_000">잠금 설정</string>
-    <string name="lock_screen_configuration_fragment_001">잠금 방식</string>
-
-    <!-- NotificationBuilder -->
-    <string name="notification_builder_000">캘린더</string>
-    <string name="notification_builder_001">메모</string>
-
-    <!-- PermissionChecker -->
-    <string name="permission_checker_000">캘린더를 표시하려면 캘린더 권한을 허용해야 합니다.</string>
-    <string name="permission_checker_001">설정</string>
-
-    <!-- Settings -->
-    <string name="calendar">캘린더</string>
-    <string name="lock_screen">잠금화면</string>
-
-    <!-- LockScreenPreferenceFragment -->
-    <string name="lock_screen_preference_fragment_000">잠금화면</string>
-    <string name="lock_screen_preference_fragment_001">잠금화면에 표시</string>
-    <string name="lock_screen_preference_fragment_002">잠금 해제 후 표시</string>
-    <string name="lock_screen_preference_fragment_003">백 버튼으로 잠금해제</string>
-
-    <!-- MainActivity -->
-    <string name="main_activity_000">캘린더</string>
-    <string name="main_activity_001">앱 바로가기</string>
-    <string name="main_activity_002">메모</string>
-    <string name="main_activity_003">알림</string>
-
-    <!-- ManageOverlayPermissionNotificationBuilder -->
-    <string name="manage_overlay_permission_notification_builder_000">앱 권한 요청</string>
-    <string name="manage_overlay_permission_notification_builder_001">다른 앱 위에 표시 권한을 허용하세요.</string>
-
-    <!-- MemoDetailDialogFragment -->
-    <string name="memo_detail_dialog_fragment_000">닫기</string>
-    <string name="memo_detail_dialog_fragment_001">완료</string>
-    <string name="memo_detail_dialog_fragment_002">메모를 삭제합니다.</string>
-    <string name="memo_detail_dialog_fragment_003">취소</string>
-    <string name="memo_detail_dialog_fragment_004">삭제</string>
-    <string name="memo_detail_dialog_fragment_005">메모 삭제</string>
-
-    <string-array name="memo_detail_dialog_fragment_005">
-        <item>캘린더</item>
-        <item>공유</item>
-    </string-array>
-
-    <!-- MemoEditingDialogFragment -->
-    <string name="memo_editing_dialog_fragment_000">취소</string>
-    <string name="memo_editing_dialog_fragment_001">저장</string>
-    <string name="memo_editing_dialog_fragment_002">메모를 입력하세요.</string>
-    <string name="memo_editing_dialog_fragment_003">체크리스트를 입력하세요.</string>
-
-    <!-- MemoFragment -->
-    <string name="memo_fragment_000">당신은 지체할 수도 있지만 시간은 그러하지 않을 것이다. (벤자민 프랭클린)</string>
-
-    <!-- PermissionRationaleDialogFragment -->
-    <string name="permission_rationale_dialog_fragment_000">캘린더</string>
-    <string name="permission_rationale_dialog_fragment_001"></string>
-    <string name="permission_rationale_dialog_fragment_002">저장공간</string>
-    <string name="permission_rationale_dialog_fragment_003"></string>
-    <string name="permission_rationale_dialog_fragment_004">다른 앱 위에 표시</string>
-    <string name="permission_rationale_dialog_fragment_005"></string>
-
-    <!-- Review -->
-    <string name="review_000">소중한 리뷰 감사합니다.</string>
-
-    <!-- Util -->
-    <string name="util_000">공유하기</string>
-    <string name="util_001">앱 공유하기</string>
 </resources>

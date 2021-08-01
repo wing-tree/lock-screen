@@ -3,7 +3,7 @@ package com.flow.android.kotlin.lockscreen.repository
 import android.content.Context
 import androidx.annotation.MainThread
 import com.flow.android.kotlin.lockscreen.persistence.database.AppDatabase
-import com.flow.android.kotlin.lockscreen.persistence.entity.Shortcut
+import com.flow.android.kotlin.lockscreen.persistence.entity.AppShortcut
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -12,31 +12,31 @@ import timber.log.Timber
 class ShortcutRepository(context: Context) {
     private val appDatabase = AppDatabase.getInstance(context)
     private val compositeDisposable = CompositeDisposable()
-    private val dao = appDatabase.shortcutDao()
+    private val dao = appDatabase.appShortcutDao()
 
-    fun delete(shortcut: Shortcut, @MainThread onDeleted: (shortcut: Shortcut) -> Unit) {
-        compositeDisposable.add(dao.delete(shortcut)
+    fun delete(appShortcut: AppShortcut, @MainThread onDeleted: (appShortcut: AppShortcut) -> Unit) {
+        compositeDisposable.add(dao.delete(appShortcut)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ onDeleted(shortcut) }, { Timber.e(it) })
+                .subscribe({ onDeleted(appShortcut) }, { Timber.e(it) })
         )
     }
 
-    fun insert(shortcut: Shortcut, @MainThread onInserted: (shortcut: Shortcut) -> Unit) {
-        compositeDisposable.add(dao.insert(shortcut)
+    fun insert(appShortcut: AppShortcut, @MainThread onInserted: (appShortcut: AppShortcut) -> Unit) {
+        compositeDisposable.add(dao.insert(appShortcut)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ onInserted(shortcut) }, { Timber.e(it) })
+                .subscribe({ onInserted(appShortcut) }, { Timber.e(it) })
         )
     }
 
-    suspend fun updateAll(shortcuts: List<Shortcut>) {
-        dao.updateAll(shortcuts)
+    suspend fun updateAll(appShortcuts: List<AppShortcut>) {
+        dao.updateAll(appShortcuts)
     }
 
     suspend fun getAll() = dao.getAll()
 
-    fun clearCompositeDisposable() {
-        compositeDisposable.clear()
+    fun disposeComposeDisposable() {
+        compositeDisposable.dispose()
     }
 }

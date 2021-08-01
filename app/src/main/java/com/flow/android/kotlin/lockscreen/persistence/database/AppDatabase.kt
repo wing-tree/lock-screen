@@ -5,34 +5,34 @@ import androidx.room.*
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.flow.android.kotlin.lockscreen.persistence.converter.Converters
-import com.flow.android.kotlin.lockscreen.persistence.dao.MemoDao
-import com.flow.android.kotlin.lockscreen.persistence.dao.ShortcutDao
-import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
-import com.flow.android.kotlin.lockscreen.persistence.entity.Shortcut
+import com.flow.android.kotlin.lockscreen.persistence.dao.NoteDao
+import com.flow.android.kotlin.lockscreen.persistence.dao.AppShortcutDao
+import com.flow.android.kotlin.lockscreen.persistence.entity.Note
+import com.flow.android.kotlin.lockscreen.persistence.entity.AppShortcut
 
-@Database(entities = [Memo::class, Shortcut::class], version = 5, exportSchema = false)
+@Database(entities = [Note::class, AppShortcut::class], version = 5, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun memoDao(): MemoDao
-    abstract fun shortcutDao(): ShortcutDao
+    abstract fun appShortcutDao(): AppShortcutDao
+    abstract fun noteDao(): NoteDao
 
     companion object {
         const val name = "com.flow.android.kotlin.lockscreen.persistence.database" +
-                ".AppDatabase.name:1.0.1"
+                ".AppDatabase.name:1.0.3"
 
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
         private val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("ALTER TABLE memo ADD COLUMN priority INTEGER NOT NULL DEFAULT 0")
+                database.execSQL("ALTER TABLE note ADD COLUMN priority INTEGER NOT NULL DEFAULT 0")
             }
         }
 
         private val MIGRATION_2_3 = object : Migration(2, 3) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("ALTER TABLE memo ADD COLUMN color INTEGER NOT NULL DEFAULT 0")
-                database.execSQL("ALTER TABLE memo ADD COLUMN detail TEXT NOT NULL DEFAULT \"\"")
+                database.execSQL("ALTER TABLE note ADD COLUMN color INTEGER NOT NULL DEFAULT 0")
+                database.execSQL("ALTER TABLE note ADD COLUMN detail TEXT NOT NULL DEFAULT \"\"")
             }
         }
 
@@ -50,7 +50,7 @@ abstract class AppDatabase : RoomDatabase() {
 
         private val MIGRATION_4_5 = object : Migration(4, 5) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("ALTER TABLE memo ADD COLUMN checklist TEXT NOT NULL DEFAULT '[]'")
+                database.execSQL("ALTER TABLE note ADD COLUMN checklist TEXT NOT NULL DEFAULT '[]'")
             }
         }
 

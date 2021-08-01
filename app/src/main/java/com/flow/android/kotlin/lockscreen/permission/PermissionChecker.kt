@@ -100,8 +100,8 @@ internal object PermissionChecker {
 
         snackbar?.dismiss()
 
-        snackbar = Snackbar.make(view, context.getString(R.string.permission_checker_000), Snackbar.LENGTH_INDEFINITE)
-                .setAction(context.getString(R.string.permission_checker_001)) {
+        snackbar = Snackbar.make(view, context.getString(R.string.permission_checker_001), Snackbar.LENGTH_INDEFINITE)
+                .setAction(context.getString(R.string.permission_checker_000)) {
                     val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                     val uri: Uri = Uri.fromParts("package", it.context.packageName, null)
 

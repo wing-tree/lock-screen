@@ -28,7 +28,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:title="@string/configuration_activity_004"
+        app:title="@string/preference_activity_006"
         app:titleTextColor="@color/title" />
 
     <androidx.recyclerview.widget.RecyclerView

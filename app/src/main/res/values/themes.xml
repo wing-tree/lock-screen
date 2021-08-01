@@ -67,9 +67,13 @@
         <item name="android:windowExitAnimation">@anim/fade_out_blind_screen</item>
     </style>
 
+    <style name="DialogFragment" parent="@android:style/Theme.Dialog">
+        <item name="android:windowAnimationStyle">@style/WindowAnimation.DialogFragment</item>
+    </style>
+
     <style name="WindowAnimation.DialogFragment">
-        <item name="android:windowEnterAnimation">@anim/fade_in_short</item>
-        <item name="android:windowExitAnimation">@anim/fade_out_short</item>
+        <item name="android:windowEnterAnimation">@anim/fade_in_dialog</item>
+        <item name="android:windowExitAnimation">@anim/fade_out_dialog</item>
     </style>
 
     <style name="WindowAnimation.PreferenceActivity">
@@ -137,5 +141,18 @@
 
     <style name="Snackbar.TextView" parent="@style/Widget.MaterialComponents.Snackbar.TextView">
         <item name="android:textColor">@color/text</item>
+    </style>
+
+    <style name="NativeAdView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">left</item>
+        <item name="android:paddingEnd">2dp</item>
+        <item name="android:paddingStart">2dp</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:text">@string/native_ad_view_000</item>
+        <item name="android:background">@drawable/rounded_corners_top_left</item>
+        <item name="android:backgroundTint">#FFCC66</item>
     </style>
 </resources>

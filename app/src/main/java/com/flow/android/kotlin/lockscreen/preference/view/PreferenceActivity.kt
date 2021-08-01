@@ -31,11 +31,13 @@ class PreferenceActivity: BaseActivity() {
     private val activity = this
     private val checkBoxAdapter = CheckBoxAdapter(arrayListOf())
 
+    private val calendarPermissionAllowed = PermissionChecker.hasCalendarPermission()
+
     private val adapter: PreferenceAdapter by lazy {
         PreferenceAdapter(arrayListOf(
                 AdapterItem.Preference(
-                        drawable = ContextCompat.getDrawable(this, R.drawable.ic_round_calendar_today_24),
-                        summary = getString(R.string.configuration_activity_006),
+                        drawable = ContextCompat.getDrawable(this, R.drawable.ic_round_calendar_24),
+                        summary = getString(R.string.preference_activity_001),
                         onClick = { _, _ ->
                             PermissionChecker.checkPermissions(this, listOf(
                                     Manifest.permission.READ_CALENDAR,
@@ -49,23 +51,23 @@ class PreferenceActivity: BaseActivity() {
                                 )
                             })
                         },
-                        title = getString(R.string.calendar)
+                        title = getString(R.string.preference_activity_000)
                 ),
                 AdapterItem.Preference(
-                        drawable = ContextCompat.getDrawable(this, R.drawable.ic_mobile_48px),
-                        summary = getString(R.string.configuration_activity_002),
+                        drawable = ContextCompat.getDrawable(this, R.drawable.ic_round_stay_primary_portrait_24),
+                        summary = getString(R.string.preference_activity_002),
                         onClick = { _, _ ->
                             addFragment(DisplayPreferenceFragment())
                         },
-                        title = getString(R.string.configuration_activity_001)
+                        title = getString(R.string.preference_activity_003)
                 ),
                 AdapterItem.Preference(
                         drawable = ContextCompat.getDrawable(this, R.drawable.ic_round_screen_lock_portrait_24),
-                        summary = getString(R.string.configuration_activity_000),
+                        summary = getString(R.string.preference_activity_005),
                         onClick = { _, _ ->
                             addFragment(LockScreenPreferenceFragment())
                         },
-                        title = getString(R.string.configuration_activity_003)
+                        title = getString(R.string.preference_activity_004)
                 ),
                 AdapterItem.Space(),
                 AdapterItem.Content(
@@ -73,28 +75,29 @@ class PreferenceActivity: BaseActivity() {
                         onClick = { _, _ ->
                             shareApplication(this)
                         },
-                        title = getString(R.string.configuration_activity_007)
+                        title = getString(R.string.preference_activity_007)
                 ),
                 AdapterItem.Content(
                         drawable = ContextCompat.getDrawable(this, R.drawable.ic_round_rate_review_24),
                         onClick = { _, _ ->
                             Review.launchReviewFlow(this)
                         },
-                        title = getString(R.string.configuration_activity_008)
+                        title = getString(R.string.preference_activity_009)
                 ),
                 AdapterItem.Content(
                         drawable = ContextCompat.getDrawable(this, R.drawable.ic_round_info_24),
                         isClickable = false,
                         summary = versionName(this),
-                        title = getString(R.string.configuration_activity_009)
+                        title = getString(R.string.preference_activity_008)
                 ),
         ))
     }
 
-    object Name {
+    object Extra {
         private const val Prefix = "com.flow.android.kotlin.lockscreen.preference.view" +
-                ".PreferenceActivity.Name"
+                ".PreferenceActivity.Extra"
         const val PreferenceChanged = "$Prefix.PreferenceChange"
+        const val CalendarPermissionChangedToAllowed = "$Prefix.CalendarPermissionChangedToAllowed"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -128,8 +131,9 @@ class PreferenceActivity: BaseActivity() {
         putActivityResultLauncher(
             PermissionChecker.Calendar.KEY,
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                if (PermissionChecker.hasCalendarPermission())
+                if (PermissionChecker.hasCalendarPermission()) {
                     addFragment(CalendarPreferenceFragment())
+                }
             }
         )
     }
@@ -137,16 +141,19 @@ class PreferenceActivity: BaseActivity() {
     override fun onBackPressed() {
         if (supportFragmentManager.fragments.isNotEmpty()) {
             super.onBackPressed()
-            supportActionBar?.setTitle(R.string.configuration_activity_004)
+            supportActionBar?.setTitle(R.string.preference_activity_006)
             return
         }
 
         if (PermissionChecker.dismissSnackbar())
             return
 
+        val calendarPermissionChangedToAllowed = calendarPermissionAllowed != PermissionChecker.hasCalendarPermission()
         val preferenceChanged = Preference.getPreferenceChanged(this)
+
         val intent = Intent().apply {
-            putExtra(Name.PreferenceChanged, preferenceChanged)
+            putExtra(Extra.CalendarPermissionChangedToAllowed, calendarPermissionChangedToAllowed)
+            putExtra(Extra.PreferenceChanged, preferenceChanged)
         }
 
         setResult(RESULT_OK, intent)

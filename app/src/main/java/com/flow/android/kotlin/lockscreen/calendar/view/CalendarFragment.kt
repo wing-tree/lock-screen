@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.flow.android.kotlin.lockscreen.R
@@ -14,14 +15,19 @@ import com.flow.android.kotlin.lockscreen.databinding.FragmentCalendarBinding
 import com.flow.android.kotlin.lockscreen.calendar.adapter.EventsAdapter
 import com.flow.android.kotlin.lockscreen.calendar.contract.CalendarContract
 import com.flow.android.kotlin.lockscreen.calendar.model.Model
+import com.flow.android.kotlin.lockscreen.calendar.viewmodel.CalendarViewModel
+import com.flow.android.kotlin.lockscreen.eventbus.EventBus
+import com.flow.android.kotlin.lockscreen.main.viewmodel.Refresh
 import com.flow.android.kotlin.lockscreen.permission.PermissionChecker
 import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
 import com.flow.android.kotlin.lockscreen.util.hide
 import com.flow.android.kotlin.lockscreen.util.show
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -30,8 +36,8 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
         return FragmentCalendarBinding.inflate(inflater, container, false)
     }
 
-    private val viewModel by lazy { mainViewModel.calendarViewModel }
-
+    private val viewModel by activityViewModels<CalendarViewModel>()
+    private val compositeDisposable = CompositeDisposable()
     private val duration = 150L
 
     private val activityResultLauncher = registerForActivityResult(CalendarContract()) { result ->
@@ -39,8 +45,8 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
             delay(duration)
 
             when (result) {
-                CalendarLoader.RequestCode.EditEvent -> viewModel.callRefresh()
-                CalendarLoader.RequestCode.InsertEvent -> viewModel.callRefresh()
+                CalendarLoader.RequestCode.EditEvent -> refresh()
+                CalendarLoader.RequestCode.InsertEvent -> refresh()
             }
         }
     }
@@ -76,12 +82,14 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
 
         initializeViews()
         registerLifecycleObservers()
+        subscribeObservables()
         setTextColor()
 
         return view
     }
 
     override fun onDestroyView() {
+        compositeDisposable.dispose()
         viewBinding.viewPager2.unregisterOnPageChangeCallback(onPageChangeCallback)
         super.onDestroyView()
     }
@@ -108,30 +116,6 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
                         withContext(Dispatchers.Main) {
                             events.let { currentList.add(it) }
                         }
-                    }
-                }
-
-                withContext(Dispatchers.Main) {
-                    adapter.submitList(currentList)
-                }
-            }
-        })
-
-        viewModel.refresh.observe(viewLifecycleOwner, {
-            adapter.submitList(emptyList())
-
-            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-                val currentList = arrayListOf<List<Model.Event>>()
-                val uncheckedCalendarIds = Preference.Calendar.getUncheckedCalendarIds(requireContext())
-
-                for (i in 0..itemCount) {
-                    CalendarLoader.events(
-                            mainViewModel.contentResolver,
-                            viewModel.calendars.value?.filter {
-                                uncheckedCalendarIds.contains(it.id.toString()).not()
-                            } ?: emptyList(), i
-                    ).also { events ->
-                        events.let { currentList.add(it) }
                     }
                 }
 
@@ -194,6 +178,41 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
                 viewModel.callDisableCalendarControlViews()
                 mainViewModel.callShowRequestCalendarPermissionSnackbar()
             })
+        }
+    }
+
+    private fun subscribeObservables() {
+        compositeDisposable.add(
+            EventBus.getInstance().subscribe({
+                if (it == Refresh.Calendar)
+                    refresh()
+            }) {
+                Timber.e(it)
+            }
+        )
+    }
+
+    private fun refresh() {
+        adapter.submitList(emptyList())
+
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            val currentList = arrayListOf<List<Model.Event>>()
+            val uncheckedCalendarIds = Preference.Calendar.getUncheckedCalendarIds(requireContext())
+
+            for (i in 0..itemCount) {
+                CalendarLoader.events(
+                    mainViewModel.contentResolver,
+                    viewModel.calendars.value?.filter {
+                        uncheckedCalendarIds.contains(it.id.toString()).not()
+                    } ?: emptyList(), i
+                ).also { events ->
+                    events.let { currentList.add(it) }
+                }
+            }
+
+            withContext(Dispatchers.Main) {
+                adapter.submitList(currentList)
+            }
         }
     }
 

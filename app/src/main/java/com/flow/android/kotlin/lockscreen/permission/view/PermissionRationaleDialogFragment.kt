@@ -48,16 +48,16 @@ class PermissionRationaleDialogFragment: BaseDialogFragment<FragmentPermissionRa
                         icon = R.drawable.ic_mobile_48px,
                         isRequired = true,
                         permissions = listOf(Settings.ACTION_MANAGE_OVERLAY_PERMISSION),
-                        permissionName = getString(R.string.permission_rationale_dialog_fragment_004),
+                        permissionName = getString(R.string.permission_rationale_dialog_fragment_000),
                 ),
                 Permission(
-                        icon = R.drawable.ic_round_calendar_today_24,
+                        icon = R.drawable.ic_round_calendar_24,
                         isRequired = false,
                         permissions = listOf(
                                 Manifest.permission.READ_CALENDAR,
                                 Manifest.permission.WRITE_CALENDAR
                         ),
-                        permissionName = getString(R.string.permission_rationale_dialog_fragment_000)
+                        permissionName = getString(R.string.permission_rationale_dialog_fragment_001)
                 )
         )
 

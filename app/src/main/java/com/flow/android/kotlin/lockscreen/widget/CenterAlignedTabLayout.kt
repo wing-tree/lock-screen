@@ -7,7 +7,6 @@ import androidx.core.view.ViewCompat
 import com.flow.android.kotlin.lockscreen.util.scale
 import com.google.android.material.tabs.TabLayout
 
-
 class CenterAlignedTabLayout : TabLayout {
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)

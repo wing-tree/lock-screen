@@ -33,7 +33,7 @@
             android:layout_marginEnd="@dimen/margin_16dp"
             android:layout_marginStart="@dimen/margin_16dp"
             android:gravity="center_vertical"
-            android:text="@string/popup_window_000"
+            android:text="@string/app_shortcut_000"
             android:textSize="@dimen/text_size_16dp"/>
     </LinearLayout>
 </RelativeLayout>

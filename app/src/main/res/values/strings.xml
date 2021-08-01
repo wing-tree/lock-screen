@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">LockScreen</string>
+    <string name="app_name" translatable="false">Lock screen</string>
 
     <string name="format_date_000">EEE, MMMM d</string>
     <string name="format_date_001">MMMM d</string>
@@ -8,129 +8,118 @@
     <string name="format_time_001" translatable="false">h:mm</string>
     <string name="format_time_002" translatable="false">h:mm a</string>
 
-    <string name="notification_content_text">This is a notification for stable execution.</string>
-
-    <!-- blind_screen -->
-    <string name="blind_screen_000">Unlocking with the home button is not allowed as per security policy.</string>
-    <string name="blind_screen_001">Drag to unlock</string>
-
-    <!-- fragment_all_shortcut_bottom_sheet_dialog -->
-    <string name="fragment_all_shortcut_bottom_sheet_dialog_000">Shortcuts</string>
-
-    <!-- fragment_date_picker_dialog -->
-    <string name="fragment_date_picker_dialog_000">Cancel</string>
-    <string name="fragment_date_picker_dialog_001">Save</string>
-
-    <!-- fragment_permission_rationale_dialog -->
-    <string name="fragment_permission_rationale_dialog_000">Request app permissions</string>
-    <string name="fragment_permission_rationale_dialog_001">To use the app normally, you must allow the following permissions.</string>
-    <string name="fragment_permission_rationale_dialog_002">Deny</string>
-    <string name="fragment_permission_rationale_dialog_003">Allow</string>
-
-    <!-- no_calendar_permission_message -->
-    <string name="no_calendar_permission_message_000">You must allow calendar permissions to display the calendar.\n(Click here to allow calendar permissions.)</string>
-
-    <!-- shortcut -->
-    <string name="popup_window_000">Remove from screen</string>
-
     <!-- CalendarFragment -->
     <string name="calendar_fragment_000">Today</string>
 
-    <!-- ConfigurationActivity -->
-    <string name="configuration_activity_000">Lock setting, Lock type</string>
-    <string name="configuration_activity_001">Display</string>
-    <string name="configuration_activity_002">Dark mode, Font size</string>
-    <string name="configuration_activity_003">Lock screen</string>
-    <string name="configuration_activity_004">Settings</string>
-    <string name="configuration_activity_005">Calendar</string>
-    <string name="configuration_activity_006">Calendar to display</string>
-    <string name="configuration_activity_007">Share the app</string>
-    <string name="configuration_activity_008">Write review</string>
-    <string name="configuration_activity_009">Version</string>
+    <!-- CalendarPreferenceFragment -->
+    <string name="calendar_preference_fragment_000">Calendar</string>
 
     <!-- DeviceCredentialHelper -->
     <string name="device_credential_helper_000">Draw unlock pattern</string>
     <string name="device_credential_helper_001">Enter password or PIN</string>
 
     <!-- DisplayPreferenceFragment -->
-    <string name="display_preference_fragment_000">Hide time</string>
-    <string name="display_preference_fragment_001">Dark mode</string>
-    <string name="display_preference_fragment_002">Font size</string>
+    <string name="display_preference_fragment_000">Dark mode</string>
+    <string name="display_preference_fragment_001">Font size</string>
+    <string name="display_preference_fragment_002">Hide time</string>
     <string name="display_preference_fragment_003">Time format</string>
 
-    <!-- LockScreenConfigurationFragment todo 바꿔야할듯.-->
-    <string name="lock_screen_configuration_fragment_000">Lock setting</string>
-    <string name="lock_screen_configuration_fragment_001">Lock type</string>
-
-    <!-- NotificationBuilder -->
-    <string name="notification_builder_000">Calendar</string>
-    <string name="notification_builder_001">Memo</string>
-
-    <!-- Settings -->
-    <string name="calendar">Calendar</string>
-    <string name="lock_screen">Lock Screen</string>
-
     <!-- LockScreenPreferenceFragment -->
-    <string name="lock_screen_preference_fragment_000">Lock screen</string>
-    <string name="lock_screen_preference_fragment_001">Show on lock screen</string>
-    <string name="lock_screen_preference_fragment_002">Display after unlocking</string>
+    <string name="lock_screen_preference_fragment_000">Display after unlocking</string>
+    <string name="lock_screen_preference_fragment_001">Lock screen</string>
+    <string name="lock_screen_preference_fragment_002">Show on lock screen</string>
     <string name="lock_screen_preference_fragment_003">Unlock with back button</string>
 
     <!-- MainActivity -->
-    <string name="main_activity_000">Calendar</string>
-    <string name="main_activity_001">Shortcuts</string>
-    <string name="main_activity_002">Memo</string>
-    <string name="main_activity_003">Notifications</string>
+    <string name="main_activity_000">App Shortcuts</string>
+    <string name="main_activity_001">Calendar</string>
+    <string name="main_activity_002">Camera not found</string>
+    <string name="main_activity_003">Notes</string>
+    <string name="main_activity_004">Notifications</string>
 
-    <string name="manage_overlay_permission_notification_builder_000">Request app permissions</string>
-    <string name="manage_overlay_permission_notification_builder_001">Please allow appear on top permission.</string>
+    <!-- ManageOverlayPermissionNotificationBuilder -->
+    <string name="manage_overlay_permission_notification_builder_000">Please allow appear on top permission.</string>
+    <string name="manage_overlay_permission_notification_builder_001">Request app permissions</string>
 
-    <!-- MemoDetailDialogFragment -->
-    <string name="memo_detail_dialog_fragment_000">Close</string>
-    <string name="memo_detail_dialog_fragment_001">Done</string>
-    <string name="memo_detail_dialog_fragment_002">Delete the memo.</string>
-    <string name="memo_detail_dialog_fragment_003">Cancel</string>
-    <string name="memo_detail_dialog_fragment_004">Delete</string>
-    <string name="memo_detail_dialog_fragment_005">Delete memo</string>
+    <!-- NativeAdView -->
+    <string name="native_ad_view_000" translatable="false">Ad</string>
 
-    <string-array name="memo_detail_dialog_fragment_005">
+    <!-- NoteDetailDialogFragment -->
+    <string name="note_detail_dialog_fragment_000">Application not found</string>
+    <string name="note_detail_dialog_fragment_001">Cancel</string>
+    <string name="note_detail_dialog_fragment_002">Close</string>
+    <string name="note_detail_dialog_fragment_003">Delete</string>
+    <string name="note_detail_dialog_fragment_004">Delete note</string>
+    <string name="note_detail_dialog_fragment_005">Delete the note.</string>
+    <string name="note_detail_dialog_fragment_006">Done</string>
+
+    <string-array name="note_detail_dialog_fragment_007">
         <item>Calendar</item>
         <item>Share</item>
     </string-array>
 
-    <!-- MemoEditingDialogFragment -->
-    <string name="memo_editing_dialog_fragment_000">Cancel</string>
-    <string name="memo_editing_dialog_fragment_001">Save</string>
-    <string name="memo_editing_dialog_fragment_002">Enter a memo.</string>
-    <string name="memo_editing_dialog_fragment_003">Enter a checklist.</string>
+    <!-- NoteEditingDialogFragment -->
+    <string name="note_editing_dialog_fragment_000">Cancel</string>
+    <string name="note_editing_dialog_fragment_001">Enter a checklist.</string>
+    <string name="note_editing_dialog_fragment_002">Enter a note.</string>
+    <string name="note_editing_dialog_fragment_003">Save</string>
 
-    <!-- MemoFragment -->
-    <string name="memo_fragment_000">You may delay, but time will not. (Benjamin Franklin)</string>
+    <!-- NoteFragment -->
+    <string name="note_fragment_000">You may delay, but time will not. (Benjamin Franklin)</string>
+
+    <!-- NotificationBuilder -->
+    <string name="notification_builder_000">Calendar</string>
+    <string name="notification_builder_001">Lock screen service is running.</string>
+    <string name="notification_builder_002">Note</string>
 
     <!-- PermissionChecker -->
-    <string name="permission_checker_000">You must allow calendar permissions to display the calendar.</string>
-    <string name="permission_checker_001">Settings</string>
+    <string name="permission_checker_000">Settings</string>
+    <string name="permission_checker_001">You must allow calendar permissions to display the calendar.</string>
 
     <!-- PermissionRationaleDialogFragment -->
-    <string name="permission_rationale_dialog_fragment_000">Calendar</string>
-    <string name="permission_rationale_dialog_fragment_001"></string>
+    <string name="permission_rationale_dialog_fragment_000">Appear on top</string>
+    <string name="permission_rationale_dialog_fragment_001">Calendar</string>
     <string name="permission_rationale_dialog_fragment_002">Storage</string>
-    <string name="permission_rationale_dialog_fragment_003"></string>
-    <string name="permission_rationale_dialog_fragment_004">Appear on top</string>
-    <string name="permission_rationale_dialog_fragment_005"></string>
+
+    <!-- PreferenceActivity -->
+    <string name="preference_activity_000">Calendar</string>
+    <string name="preference_activity_001">Calendar to display</string>
+    <string name="preference_activity_002">Dark mode, Font size</string>
+    <string name="preference_activity_003">Display</string>
+    <string name="preference_activity_004">Lock screen</string>
+    <string name="preference_activity_005">Lock setting, Lock type</string>
+    <string name="preference_activity_006">Settings</string>
+    <string name="preference_activity_007">Share the app</string>
+    <string name="preference_activity_008">Version</string>
+    <string name="preference_activity_009">Write review</string>
 
     <!-- Review -->
     <string name="review_000">Thank you for your valuable review.</string>
 
-    <!-- settings -->
-    <string name="settings_000">Calendar</string>
-    <string name="settings_001">Calendar to display</string>
-    <string name="settings_002">Display</string>
-    <string name="settings_003">Dark mode, Font size</string>
-    <string name="settings_004">Lock screen</string>
-    <string name="settings_005">Lock setting, Lock type</string>
-
-    <!-- Util todo 000 은 메모의 공유, 바꾸는게 나을듯.-->
+    <!-- Util -->
     <string name="util_000">Share</string>
     <string name="util_001">Share the app</string>
+
+    <!-- app_shortcut -->
+    <string name="app_shortcut_000">Remove from screen</string>
+
+    <!-- blind_screen -->
+    <string name="blind_screen_000">Unlocking with the home button is not allowed as per security policy.</string>
+    <string name="blind_screen_001">Drag to unlock</string>
+
+    <!-- fragment_all_shortcut_bottom_sheet_dialog -->
+    <string name="fragment_all_shortcut_bottom_sheet_dialog_000">App shortcuts</string>
+
+    <!-- fragment_date_picker_dialog -->
+    <string name="fragment_date_picker_dialog_000">Cancel</string>
+    <string name="fragment_date_picker_dialog_001">Save</string>
+
+    <!-- fragment_permission_rationale_dialog -->
+    <string name="fragment_permission_rationale_dialog_000">Allow</string>
+    <string name="fragment_permission_rationale_dialog_001">Deny</string>
+    <string name="fragment_permission_rationale_dialog_002">Request app permissions</string>
+    <string name="fragment_permission_rationale_dialog_003">To use the app normally, you must allow the following permissions.</string>
+
+    <!-- no_calendar_permission_message -->
+    <string name="no_calendar_permission_message_000">You must allow calendar permissions to display the calendar.\n(Click here to allow calendar permissions.)</string>
 </resources>

@@ -15,7 +15,7 @@ class CalendarPreferenceFragment: PreferenceFragment() {
     private val contentResolver by lazy { requireActivity().contentResolver }
     private val uncheckedCalendarIds = arrayListOf<String>()
 
-    override val toolbarTitleResId: Int = R.string.configuration_activity_005
+    override val toolbarTitleResId: Int = R.string.calendar_preference_fragment_000
 
     override fun createPreferenceAdapter(): PreferenceAdapter {
         val context = requireContext()
@@ -38,8 +38,8 @@ class CalendarPreferenceFragment: PreferenceFragment() {
         return PreferenceAdapter(arrayListOf(
                 AdapterItem.MultiSelectListPreference(
                         adapter = checkBoxAdapter,
-                        drawable = ContextCompat.getDrawable(context, R.drawable.ic_round_calendar_today_24),
-                        title = getString(R.string.calendar),
+                        drawable = ContextCompat.getDrawable(context, R.drawable.ic_round_calendar_24),
+                        title = getString(R.string.calendar_preference_fragment_000),
                 )
         ))
     }

@@ -17,14 +17,15 @@ import android.view.View.GONE
 import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.core.content.ContextCompat
 import com.flow.android.kotlin.lockscreen.R
+import com.flow.android.kotlin.lockscreen.ads.AdsBinder
 import com.flow.android.kotlin.lockscreen.application.ApplicationUtil
 import com.flow.android.kotlin.lockscreen.base.BaseActivity
-import com.flow.android.kotlin.lockscreen.preference.view.PreferenceActivity
+import com.flow.android.kotlin.lockscreen.calendar.viewmodel.CalendarViewModel
 import com.flow.android.kotlin.lockscreen.databinding.ActivityMainBinding
 import com.flow.android.kotlin.lockscreen.devicecredential.DeviceCredential
 import com.flow.android.kotlin.lockscreen.devicecredential.RequireDeviceCredential
+import com.flow.android.kotlin.lockscreen.fluidcontentresize.FluidContentResize
 import com.flow.android.kotlin.lockscreen.lockscreen.service.LockScreenService
 import com.flow.android.kotlin.lockscreen.main.adapter.FragmentStateAdapter
 import com.flow.android.kotlin.lockscreen.main.notification.ManageOverlayPermissionNotificationBuilder
@@ -35,8 +36,8 @@ import com.flow.android.kotlin.lockscreen.main.viewmodel.MainViewModel
 import com.flow.android.kotlin.lockscreen.permission.PermissionChecker
 import com.flow.android.kotlin.lockscreen.permission._interface.OnPermissionAllowClickListener
 import com.flow.android.kotlin.lockscreen.permission.view.PermissionRationaleDialogFragment
-import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
 import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
+import com.flow.android.kotlin.lockscreen.preference.view.PreferenceActivity
 import com.flow.android.kotlin.lockscreen.util.*
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.PermissionToken
@@ -52,16 +53,18 @@ import kotlin.math.sqrt
 
 class MainActivity : BaseActivity(),
         OnPermissionAllowClickListener, RequireDeviceCredential<Unit> {
+    private val adsBinder = AdsBinder()
     private val duration = 300L
 
     private val viewBinding by lazy { ActivityMainBinding.inflate(layoutInflater) }
-    private val viewModel: MainViewModel by viewModels()
+    private val viewModel by viewModels<MainViewModel>()
+    private val calendarViewModel by viewModels<CalendarViewModel>()
 
     private val torch: Torch by lazy {
         Torch(viewBinding)
     }
 
-    private val delayMillis = 800L
+    private val delayMillis = 600L
     private val notificationManager by lazy { getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager }
     private var handler: Handler? = null
 
@@ -76,8 +79,6 @@ class MainActivity : BaseActivity(),
         super.onCreate(savedInstanceState)
         setContentView(viewBinding.root)
 
-        viewModel.isInitialized = true
-
         if (Preference.LockScreen.getShowOnLockScreen(this)) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
                 setShowWhenLocked(true)
@@ -88,7 +89,7 @@ class MainActivity : BaseActivity(),
             } else {
                 @Suppress("DEPRECATION")
                 window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD or
-                                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                        WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
                 )
             }
         }
@@ -107,14 +108,21 @@ class MainActivity : BaseActivity(),
                     it.show(supportFragmentManager, it.tag)
                 }
             } else
-                viewModel.calendarViewModel.postValue()
+                calendarViewModel.postValue()
         } else
-            viewModel.calendarViewModel.postValue()
+            calendarViewModel.postValue()
 
         initializeViews()
         registerLifecycleObservers()
         initializeActivityResultLaunchers()
-        firstRun()
+
+        val runCount = Preference.Ads.getRunCount(this)
+
+        if (runCount > 3) {
+            adsBinder.loadAds(viewBinding.frameLayoutAds)
+            Preference.Ads.putRunCount(this, 0)
+        } else
+            Preference.Ads.putRunCount(this, runCount.inc())
     }
 
     override fun onStart() {
@@ -140,6 +148,7 @@ class MainActivity : BaseActivity(),
     }
 
     override fun onDestroy() {
+        adsBinder.clear()
         sendBroadcast(Intent(LockScreenService.Action.MainActivityDestroyed))
         super.onDestroy()
     }
@@ -228,13 +237,13 @@ class MainActivity : BaseActivity(),
                                     intent = packageManager.getLaunchIntentForPackage(it)
                                 } catch (ignored: Exception) {
                                     Timber.e(ignored)
-                                    // 카메라 없으니 꺼지렴.
+                                    showToast(getString(R.string.main_activity_002))
                                 }
 
                                 intent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
                                 startActivity(intent)
                             } ?: run {
-                                // 꺼지라고 하셈. 못찾앗으니 꺼지렴.
+                                showToast(getString(R.string.main_activity_002))
                             }
                         }
                     }
@@ -254,7 +263,7 @@ class MainActivity : BaseActivity(),
             Intent(this, PreferenceActivity::class.java).also {
                 it.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT)
 
-                getActivityResultLauncher(PreferenceActivity.Name.PreferenceChanged)?.launch(it)
+                getActivityResultLauncher(PreferenceActivity.Extra.PreferenceChanged)?.launch(it)
                 overridePendingTransition(R.anim.slide_in_left, R.anim.fade_out)
             }
         }
@@ -279,18 +288,24 @@ class MainActivity : BaseActivity(),
     private fun initializeActivityResultLaunchers() {
         putActivityResultLauncher(
                 DeviceCredential.Key.ConfirmDeviceCredential,
-                registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
+                registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                     finish()
                 }
         )
 
         putActivityResultLauncher(
-                PreferenceActivity.Name.PreferenceChanged,
+                PreferenceActivity.Extra.PreferenceChanged,
                 registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                     if (result.resultCode == RESULT_OK) {
+                        val calendarPermissionChangedToAllowed = result.data?.getBooleanExtra(
+                                PreferenceActivity.Extra.CalendarPermissionChangedToAllowed, false
+                        ) ?: false
                         val preferenceChanged = result.data?.getParcelableExtra<Preference.PreferenceChanged>(
-                                PreferenceActivity.Name.PreferenceChanged
+                                PreferenceActivity.Extra.PreferenceChanged
                         ) ?: return@registerForActivityResult
+
+                        if (calendarPermissionChangedToAllowed)
+                            calendarViewModel.postValue()
 
                         viewModel.refresh(preferenceChanged)
                     }
@@ -300,7 +315,7 @@ class MainActivity : BaseActivity(),
         putActivityResultLauncher(
                 PermissionChecker.Calendar.KEY,
                 registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                    viewModel.calendarViewModel.postValue()
+                    calendarViewModel.postValue()
                 }
         )
     }
@@ -357,30 +372,14 @@ class MainActivity : BaseActivity(),
             startService(intent)
     }
 
-    private fun firstRun() {
-        if (Preference.getFirstRun(this)) {
-            viewModel.memoViewModel.insert(
-                    Memo(
-                            content = getString(R.string.memo_fragment_000),
-                            color = ContextCompat.getColor(this, R.color.white),
-                            id = -20210513L,
-                            modifiedTime = System.currentTimeMillis(),
-                            priority = System.currentTimeMillis()
-                    )
-            )
-
-            Preference.putFirstRun(this, false)
-        }
-    }
-
     override fun onPermissionAllowClick() {
         PermissionChecker.checkPermissions(this, listOf(
                 Manifest.permission.READ_CALENDAR,
                 Manifest.permission.WRITE_CALENDAR
         ), {
-            viewModel.calendarViewModel.postValue()
+            calendarViewModel.postValue()
         }, {
-            viewModel.calendarViewModel.callDisableCalendarControlViews()
+            calendarViewModel.callDisableCalendarControlViews()
             viewModel.callShowRequestCalendarPermissionSnackbar()
         }) {
             checkManageOverlayPermission()
@@ -395,7 +394,7 @@ class MainActivity : BaseActivity(),
 
         if (PermissionChecker.hasCalendarPermission().not()) {
             if (isFinishing.not()) {
-                viewModel.calendarViewModel.callDisableCalendarControlViews()
+                calendarViewModel.callDisableCalendarControlViews()
                 viewModel.callShowRequestCalendarPermissionSnackbar()
             }
         }

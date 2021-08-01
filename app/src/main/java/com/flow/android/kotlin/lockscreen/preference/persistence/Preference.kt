@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Parcelable
 import androidx.appcompat.app.AppCompatDelegate
-import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.util.DEFAULT_FONT_SIZE
 import com.flow.android.kotlin.lockscreen.util.DEFAULT_TIME_FORMAT
 import kotlinx.android.parcel.Parcelize
@@ -63,13 +62,34 @@ object Preference {
                 .getBoolean(Key.FirstRun, true)
     }
 
+    object Ads {
+        private object Name {
+            const val Preference = "$Prefix.Ads.Name.Preference"
+        }
+
+        private object Key {
+            const val RunCount = "$Prefix.Ads.Key.RunCount"
+        }
+
+        fun getRunCount(context: Context): Int {
+            return context.getSharedPreferences(Name.Preference, Context.MODE_PRIVATE)
+                .getInt(Key.RunCount, 0)
+        }
+
+        fun putRunCount(context: Context, value: Int) {
+            context.getSharedPreferences(Name.Preference, Context.MODE_PRIVATE).apply {
+                edit().putInt(Key.RunCount, value).apply()
+            }
+        }
+    }
+
     object Calendar {
         private object Name {
             const val Preference = "$Prefix.Calendar.Name.Preference"
         }
 
         private object Key {
-            const val UncheckedCalendarIds = "$Prefix.Key.UncheckedCalendarIDs"
+            const val UncheckedCalendarIds = "$Prefix.Calendar.Key.UncheckedCalendarIDs"
         }
 
         fun getUncheckedCalendarIds(context: Context): Set<String> {

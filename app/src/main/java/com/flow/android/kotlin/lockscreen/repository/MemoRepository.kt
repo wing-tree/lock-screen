@@ -3,7 +3,7 @@ package com.flow.android.kotlin.lockscreen.repository
 import android.content.Context
 import androidx.annotation.MainThread
 import com.flow.android.kotlin.lockscreen.persistence.database.AppDatabase
-import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
+import com.flow.android.kotlin.lockscreen.persistence.entity.Note
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -13,33 +13,33 @@ import java.util.*
 class MemoRepository(context: Context) {
     private val appDatabase = AppDatabase.getInstance(context)
     private val compositeDisposable = CompositeDisposable()
-    private val dao = appDatabase.memoDao()
+    private val dao = appDatabase.noteDao()
 
-    fun delete(memo: Memo, @MainThread onComplete: (() -> Unit)? = null) {
-        compositeDisposable.add(dao.delete(memo)
+    fun delete(note: Note, @MainThread onComplete: (() -> Unit)? = null) {
+        compositeDisposable.add(dao.delete(note)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ onComplete?.invoke() }, { Timber.e(it) })
         )
     }
 
-    fun insert(memo: Memo, @MainThread onComplete: (() -> Unit)? = null) {
-        compositeDisposable.add(dao.insert(memo)
+    fun insert(note: Note, @MainThread onComplete: (() -> Unit)? = null) {
+        compositeDisposable.add(dao.insert(note)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ onComplete?.invoke() }, { Timber.e(it) })
         )
     }
 
-    fun update(memo: Memo, @MainThread onComplete: (() -> Unit)? = null) {
-        compositeDisposable.add(dao.update(memo)
+    fun update(note: Note, @MainThread onComplete: (() -> Unit)? = null) {
+        compositeDisposable.add(dao.update(note)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ onComplete?.invoke() }, { Timber.e(it) })
         )
     }
 
-    fun updateAll(list: List<Memo>, @MainThread onComplete: (() -> Unit)? = null) {
+    fun updateAll(list: List<Note>, @MainThread onComplete: (() -> Unit)? = null) {
         compositeDisposable.add(dao.updateAll(list)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -53,7 +53,7 @@ class MemoRepository(context: Context) {
 
     suspend fun getAll() = dao.getAll()
 
-    fun getTodayMemos(): List<Memo> {
+    fun getTodayMemos(): List<Note> {
         val start = Calendar.getInstance()
         val end = Calendar.getInstance()
 

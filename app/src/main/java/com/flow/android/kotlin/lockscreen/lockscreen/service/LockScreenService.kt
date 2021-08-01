@@ -8,6 +8,7 @@ import android.content.IntentFilter
 import android.os.Build
 import android.os.IBinder
 import android.provider.Settings
+import androidx.annotation.RequiresApi
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.flow.android.kotlin.lockscreen.lockscreen.blindscreen.BlindScreenPresenter
 import com.flow.android.kotlin.lockscreen.main.notification.ManageOverlayPermissionNotificationBuilder
@@ -123,8 +124,10 @@ class LockScreenService : Service() {
         disposable = NotificationBuilder.single(this, notificationManager)
                 .observeOn(Schedulers.io())
                 .subscribeOn(AndroidSchedulers.mainThread())
-                .subscribe { it ->
+                .subscribe ({
                     startForeground(NotificationBuilder.ID, it.build())
+                }) {
+                    Timber.e(it)
                 }
 
         return START_STICKY

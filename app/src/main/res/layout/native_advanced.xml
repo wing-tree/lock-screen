@@ -1,0 +1,165 @@
+<com.google.android.gms.ads.nativead.NativeAdView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/rounded_corners"
+        android:backgroundTint="@color/surface"
+        android:minHeight="50dp"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
+
+            <TextView style="@style/NativeAdView" />
+
+            <ImageView
+                android:id="@+id/close_window"
+                android:layout_width="@dimen/width_20dp"
+                android:layout_height="@dimen/height_20dp"
+                android:layout_alignParentEnd="true"
+                android:scaleType="fitXY"
+                app:srcCompat="@drawable/ic_round_clear_24"
+                app:tint="@color/light_blue_500"
+                tools:ignore="ContentDescription" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingTop="3dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/icon"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:adjustViewBounds="true"
+                    android:paddingBottom="5dp"
+                    android:paddingEnd="5dp"
+                    tools:ignore="ContentDescription,RtlSymmetry" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/headline"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/light_blue_500"
+                        android:textSize="@dimen/text_size_16dp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/advertiser"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="bottom"
+                            android:textSize="@dimen/text_size_14dp"
+                            android:textStyle="bold"/>
+
+                        <RatingBar
+                            android:id="@+id/star_rating"
+                            style="?android:attr/ratingBarStyleSmall"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:isIndicator="true"
+                            android:numStars="5"
+                            android:stepSize="0.5" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/body"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="20dp"
+                    android:textSize="@dimen/text_size_12dp" />
+
+                <com.google.android.gms.ads.formats.MediaView
+                    android:id="@+id/media_content"
+                    android:layout_width="256dp"
+                    android:layout_height="144dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="5dp"/>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:orientation="horizontal"
+                    android:paddingBottom="10dp"
+                    android:paddingTop="10dp">
+
+                    <TextView
+                        android:id="@+id/price"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/margin_8dp"
+                        android:fontFamily="sans-serif-light"
+                        android:paddingLeft="5dp"
+                        android:paddingStart="5dp"
+                        android:paddingRight="5dp"
+                        android:paddingEnd="5dp"
+                        android:textSize="@dimen/text_size_14dp"
+                        android:textStyle="bold"
+                        tools:text="무료"/>
+
+                    <TextView
+                        android:id="@+id/store"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/margin_8dp"
+                        android:fontFamily="sans-serif-light"
+                        android:paddingLeft="5dp"
+                        android:paddingStart="5dp"
+                        android:paddingRight="5dp"
+                        android:paddingEnd="5dp"
+                        android:textSize="@dimen/text_size_14dp"
+                        android:textStyle="bold"
+                        tools:text="Google Play"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/call_to_action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/light_blue_500"
+                        android:fontFamily="sans-serif-light"
+                        android:gravity="center"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_14dp"
+                        android:textStyle="bold"
+                        tools:text="설치"/>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.gms.ads.nativead.NativeAdView>

@@ -59,7 +59,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/margin_16dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:text="@string/memo_editing_dialog_fragment_001"
+            android:text="@string/note_editing_dialog_fragment_003"
             app:layout_constraintBottom_toBottomOf="@+id/text_view_cancel"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/text_view_cancel"

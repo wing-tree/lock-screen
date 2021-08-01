@@ -11,7 +11,7 @@ import androidx.core.os.bundleOf
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.flow.android.kotlin.lockscreen.base.BaseDialogFragment
 import com.flow.android.kotlin.lockscreen.databinding.FragmentDatePickerDialogBinding
-import com.flow.android.kotlin.lockscreen.memo.view.MemoEditingDialogFragment
+import com.flow.android.kotlin.lockscreen.note.view.NoteEditingDialogFragment
 import java.util.*
 
 class DatePickerDialogFragment: BaseDialogFragment<FragmentDatePickerDialogBinding>() {
@@ -48,8 +48,8 @@ class DatePickerDialogFragment: BaseDialogFragment<FragmentDatePickerDialogBindi
         }
 
         viewBinding.textViewConfirm.setOnClickListener {
-            val intent = Intent(MemoEditingDialogFragment.Action.Date).apply {
-                putExtra(MemoEditingDialogFragment.Name.Date, date)
+            val intent = Intent(NoteEditingDialogFragment.Action.Date).apply {
+                putExtra(NoteEditingDialogFragment.Name.Date, date)
             }
 
             LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)

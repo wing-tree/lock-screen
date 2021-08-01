@@ -11,7 +11,7 @@ import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.calendar.CalendarLoader
 import com.flow.android.kotlin.lockscreen.calendar.model.Model
 import com.flow.android.kotlin.lockscreen.main.view.MainActivity
-import com.flow.android.kotlin.lockscreen.persistence.entity.Memo
+import com.flow.android.kotlin.lockscreen.persistence.entity.Note
 import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
 import com.flow.android.kotlin.lockscreen.repository.MemoRepository
 import com.flow.android.kotlin.lockscreen.util.BLANK
@@ -30,18 +30,15 @@ object NotificationBuilder {
 
     private const val PREFIX = "com.flow.android.kotlin.lockscreen.lockscreen.service.NotificationBuilder"
     private const val CHANNEL_ID = "$PREFIX.CHANNEL_ID"
-    private const val CHANNEL_NAME = "$PREFIX.CHANNEL_NAME"
-    private const val CHANNEL_DESCRIPTION = "com.flow.android.kotlin.lockscreen.lock_screen.channel_description" // todo change real des.
 
     fun single(context: Context, notificationManager: NotificationManager): Single<NotificationCompat.Builder> {
         return Single.create {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val name = context.getString(R.string.app_name)
                 val importance = NotificationManager.IMPORTANCE_MIN
-                val notificationChannel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, importance)
+                val notificationChannel = NotificationChannel(CHANNEL_ID, name, importance)
 
-                notificationChannel.description = CHANNEL_DESCRIPTION
                 notificationChannel.setShowBadge(false)
-
                 notificationManager.createNotificationChannel(notificationChannel)
             }
 
@@ -54,13 +51,13 @@ object NotificationBuilder {
 
             GlobalScope.launch(Dispatchers.IO) {
                 val calendarEventForNotification = calendarEventForNotification(context)
-                val smallIcon = R.drawable.ic_round_lock_24
+                val smallIcon = R.drawable.ic_unlock_48px
 
                 val memos = todayMemos(context)
                 val memoForNotification = memoForNotification(memos)
 
                 var contentTitle = context.getString(R.string.app_name)
-                var contentText = context.getString(R.string.notification_content_text)
+                var contentText = context.getString(R.string.notification_builder_001)
                 var subText = BLANK
 
                 val simpleDateFormat = SimpleDateFormat(context.getString(R.string.format_time_002), Locale.getDefault())
@@ -70,12 +67,12 @@ object NotificationBuilder {
                     contentText = context.getString(R.string.notification_builder_000)
                     subText = it.begin.toDateString(simpleDateFormat)
                 } ?: memoForNotification?.let { memo ->
-                    contentTitle = context.getString(R.string.notification_builder_001)
+                    contentTitle = context.getString(R.string.notification_builder_002)
                     contentText = memo.content.take(160)
                     subText = memo.alarmTime.toDateString(simpleDateFormat)
                 } ?: run {
                     if (memos.isNotEmpty()) {
-                        contentTitle = context.getString(R.string.notification_builder_001)
+                        contentTitle = context.getString(R.string.notification_builder_002)
                         contentText = memos[0].content.take(160)
                     }
                 }
@@ -128,25 +125,25 @@ object NotificationBuilder {
         return event
     }
 
-    private fun todayMemos(context: Context): List<Memo> {
+    private fun todayMemos(context: Context): List<Note> {
         return MemoRepository(context).getTodayMemos()
     }
 
-    private fun memoForNotification(memos: List<Memo>): Memo? {
+    private fun memoForNotification(notes: List<Note>): Note? {
         val gregorianCalendar = GregorianCalendar().apply {
             timeInMillis = System.currentTimeMillis()
         }
 
         val currentTimeHourOfDay = gregorianCalendar.get(GregorianCalendar.HOUR_OF_DAY)
 
-        memos.sortedWith(Comparator { o1, o2 ->
+        notes.sortedWith(Comparator { o1, o2 ->
             return@Comparator when {
                 o1.alarmTime - o2.alarmTime < 0 -> 1
                 else -> -1
             }
         })
 
-        for (memo in memos) {
+        for (memo in notes) {
             gregorianCalendar.timeInMillis = memo.alarmTime
 
             val alarmTimeHourOfDay = gregorianCalendar.get(GregorianCalendar.HOUR_OF_DAY)

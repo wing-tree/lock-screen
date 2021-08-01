@@ -25,13 +25,13 @@ class DisplayPreferenceFragment : PreferenceFragment() {
     private val fontSizes = arrayOf(12F, 14F, 16F, 20F, 24F, 32F)
     private val timeFormats by lazy {
         arrayOf(
-                getString(R.string.display_preference_fragment_000),
+                getString(R.string.display_preference_fragment_002),
                 format(getString(R.string.format_date_001), date),
                 format(getString(R.string.format_date_002), date)
         )
     }
 
-    override val toolbarTitleResId: Int = R.string.configuration_activity_001
+    override val toolbarTitleResId: Int = R.string.preference_activity_003
 
     private fun format(pattern: String, date: Date) =
         SimpleDateFormat(pattern, Locale.getDefault()).format(date)
@@ -41,7 +41,7 @@ class DisplayPreferenceFragment : PreferenceFragment() {
         var timeFormat = Preference.Display.getTimeFormat(requireContext())
 
         if (timeFormat.isBlank())
-            timeFormat = getString(R.string.display_preference_fragment_000)
+            timeFormat = getString(R.string.display_preference_fragment_002)
 
         return PreferenceAdapter(arrayListOf(
                 AdapterItem.SwitchPreference(
@@ -62,7 +62,7 @@ class DisplayPreferenceFragment : PreferenceFragment() {
                                 AppCompatDelegate.setDefaultNightMode(darkMode)
                             }
                         },
-                        title = getString(R.string.display_preference_fragment_001)
+                        title = getString(R.string.display_preference_fragment_000)
                 ),
                 AdapterItem.Preference(
                         drawable = ContextCompat.getDrawable(context, R.drawable.ic_round_format_size_24),
@@ -78,14 +78,14 @@ class DisplayPreferenceFragment : PreferenceFragment() {
                                 dialogFragment.dismiss()
                             }.also { it.show(childFragmentManager, it.tag) }
                         },
-                        title = getString(R.string.display_preference_fragment_002)
+                        title = getString(R.string.display_preference_fragment_001)
                 ),
                 AdapterItem.Preference(
                         drawable = ContextCompat.getDrawable(context, R.drawable.ic_round_access_time_24),
                         summary = format(timeFormat, date),
                         onClick = { viewBinding: PreferenceBinding, _ ->
                             SingleStringChoiceDialogFragment(timeFormats) { dialogFragment, timeFormat ->
-                                if (timeFormat == getString(R.string.display_preference_fragment_000))
+                                if (timeFormat == getString(R.string.display_preference_fragment_002))
                                     Preference.Display.putTimeFormat(requireContext(), BLANK)
                                 else
                                     Preference.Display.putTimeFormat(requireContext(), timeFormat)

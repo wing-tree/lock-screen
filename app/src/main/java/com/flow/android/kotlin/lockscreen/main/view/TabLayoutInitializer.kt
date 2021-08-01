@@ -3,7 +3,6 @@ package com.flow.android.kotlin.lockscreen.main.view
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
-import android.view.ViewGroup
 import android.widget.TextView
 import androidx.viewpager2.widget.ViewPager2
 import com.flow.android.kotlin.lockscreen.R
@@ -21,10 +20,10 @@ object TabLayoutInitializer {
         val context = tabLayout.context
 
         val tabTexts = arrayOf(
-                context.getString(R.string.main_activity_002),
-                context.getString(R.string.main_activity_000),
+                context.getString(R.string.main_activity_003),
                 context.getString(R.string.main_activity_001),
-                context.getString(R.string.main_activity_003)
+                context.getString(R.string.main_activity_000),
+                context.getString(R.string.main_activity_004)
         )
 
         viewPager2.offscreenPageLimit = 2

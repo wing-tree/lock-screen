@@ -132,6 +132,8 @@
             android:layout_height="@dimen/height_48dp"
             android:layout_marginTop="@dimen/margin_8dp"
             android:background="@android:color/transparent"
+            android:clipChildren="true"
+            android:clipToPadding="true"
             android:visibility="invisible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -139,8 +141,8 @@
             app:tabGravity="center"
             app:tabIndicator="@null"
             app:tabMode="scrollable"
-            app:tabPaddingEnd="@dimen/padding_16dp"
-            app:tabPaddingStart="@dimen/padding_16dp"
+            app:tabPaddingEnd="@dimen/padding_28dp"
+            app:tabPaddingStart="@dimen/padding_28dp"
             app:tabRippleColor="@null"
             app:tabTextAppearance="@style/TextAppearance.Tab"
             app:tabUnboundedRipple="true"/>
@@ -152,6 +154,17 @@
             android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/center_aligned_tab_layout" />
+
+        <FrameLayout
+            android:id="@+id/frame_layout_ads"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/margin_32dp"
+            android:layout_marginStart="@dimen/margin_32dp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@+id/view_pager2"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/center_aligned_tab_layout" />
     </androidx.constraintlayout.widget.ConstraintLayout>

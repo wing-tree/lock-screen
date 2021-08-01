@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.widget.Toast
 import androidx.annotation.CallSuper
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
@@ -31,15 +32,19 @@ abstract class BaseDialogFragment<VB : ViewBinding> : DialogFragment() {
     ): View? {
         _viewBinding = inflate(inflater, container)
 
-        dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog?.window?.requestFeature(Window.FEATURE_NO_TITLE)
+        dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog?.window?.setWindowAnimations(R.style.WindowAnimation_DialogFragment)
 
         return viewBinding.root
     }
 
     override fun onDestroyView() {
-        dialog?.window?.setWindowAnimations(R.style.WindowAnimation_DialogFragment)
         _viewBinding = null
         super.onDestroyView()
+    }
+
+    protected fun showToast(text: String, duration: Int = Toast.LENGTH_SHORT) {
+        Toast.makeText(requireContext(), text, duration).show()
     }
 }

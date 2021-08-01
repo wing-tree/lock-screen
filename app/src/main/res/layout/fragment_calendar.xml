@@ -33,6 +33,7 @@
             android:id="@+id/text_view_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-light"
             android:paddingBottom="@dimen/padding_4dp"
             android:shadowColor="@color/shadow"
             android:shadowDx="@dimen/shadow_dx"

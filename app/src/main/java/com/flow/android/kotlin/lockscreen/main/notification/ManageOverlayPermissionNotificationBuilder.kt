@@ -16,21 +16,19 @@ import com.flow.android.kotlin.lockscreen.main.view.MainActivity
 object ManageOverlayPermissionNotificationBuilder {
     const val ID = 2328519
 
-    private const val PREFIX = "com.flow.android.kotlin.lockscreen.main.notification.NotificationBuilder"
+    private const val PREFIX = "com.flow.android.kotlin.lockscreen.main.notification" +
+            ".ManageOverlayPermissionNotificationBuilder"
     private const val CHANNEL_ID = "$PREFIX.CHANNEL_ID"
-    private const val CHANNEL_NAME = "$PREFIX.CHANNEL_NAME"
-    private const val CHANNEL_DESCRIPTION = "com.flow.android.kotlin.lockscreen.lock_screen.channel_description" // todo change real des.
 
     fun create(context: Context): NotificationCompat.Builder {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val importance = NotificationManager.IMPORTANCE_HIGH
-            val notificationChannel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, importance)
+            val name = context.getString(R.string.app_name)
+            val notificationChannel = NotificationChannel(CHANNEL_ID, name, importance)
 
-            notificationChannel.description = CHANNEL_DESCRIPTION
             notificationChannel.setShowBadge(true)
-
             notificationManager.createNotificationChannel(notificationChannel)
         }
 
@@ -48,8 +46,8 @@ object ManageOverlayPermissionNotificationBuilder {
                 PendingIntent.FLAG_UPDATE_CURRENT
         )
 
-        val contentTitle = context.getString(R.string.manage_overlay_permission_notification_builder_000)
-        val contentText = context.getString(R.string.manage_overlay_permission_notification_builder_001)
+        val contentTitle = context.getString(R.string.manage_overlay_permission_notification_builder_001)
+        val contentText = context.getString(R.string.manage_overlay_permission_notification_builder_000)
         val color = ContextCompat.getColor(context, R.color.deep_orange_400)
 
         return NotificationCompat.Builder(context, CHANNEL_ID)
