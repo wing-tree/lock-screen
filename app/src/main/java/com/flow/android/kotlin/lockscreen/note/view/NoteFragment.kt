@@ -13,8 +13,6 @@ import com.flow.android.kotlin.lockscreen.base.BaseMainFragment
 import com.flow.android.kotlin.lockscreen.base.DataChanged
 import com.flow.android.kotlin.lockscreen.base.DataChangedState
 import com.flow.android.kotlin.lockscreen.databinding.FragmentNoteBinding
-import com.flow.android.kotlin.lockscreen.eventbus.EventBus
-import com.flow.android.kotlin.lockscreen.main.viewmodel.Refresh
 import com.flow.android.kotlin.lockscreen.note.adapter.ItemTouchCallback
 import com.flow.android.kotlin.lockscreen.note.adapter.NoteAdapter
 import com.flow.android.kotlin.lockscreen.note.listener.ItemChangedListener
@@ -69,6 +67,7 @@ class NoteFragment: BaseMainFragment<FragmentNoteBinding>(), ItemChangedListener
 
         initializeViews()
         initializeData()
+        registerLifecycleObservers()
         subscribeObservables()
         firstRun()
 
@@ -107,6 +106,13 @@ class NoteFragment: BaseMainFragment<FragmentNoteBinding>(), ItemChangedListener
         }
     }
 
+    private fun registerLifecycleObservers() {
+        mainViewModel.refresh.observe(viewLifecycleOwner, {
+            if (Preference.isChanged(it.fondSize, it.timeFormat))
+                adapter.refresh()
+        })
+    }
+
     private fun subscribeObservables() {
         compositeDisposable.add(publishSubject
                 .subscribeOn(Schedulers.io())
@@ -123,15 +129,6 @@ class NoteFragment: BaseMainFragment<FragmentNoteBinding>(), ItemChangedListener
                 }) {
                     Timber.e(it)
                 }
-        )
-
-        compositeDisposable.add(
-            EventBus.getInstance().subscribe({
-                if (it == Refresh.Note)
-                    adapter.refresh()
-            }) {
-                Timber.e(it)
-            }
         )
     }
 

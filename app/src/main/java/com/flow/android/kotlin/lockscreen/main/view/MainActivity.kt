@@ -21,11 +21,9 @@ import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.ads.AdsBinder
 import com.flow.android.kotlin.lockscreen.application.ApplicationUtil
 import com.flow.android.kotlin.lockscreen.base.BaseActivity
-import com.flow.android.kotlin.lockscreen.calendar.viewmodel.CalendarViewModel
 import com.flow.android.kotlin.lockscreen.databinding.ActivityMainBinding
 import com.flow.android.kotlin.lockscreen.devicecredential.DeviceCredential
 import com.flow.android.kotlin.lockscreen.devicecredential.RequireDeviceCredential
-import com.flow.android.kotlin.lockscreen.fluidcontentresize.FluidContentResize
 import com.flow.android.kotlin.lockscreen.lockscreen.service.LockScreenService
 import com.flow.android.kotlin.lockscreen.main.adapter.FragmentStateAdapter
 import com.flow.android.kotlin.lockscreen.main.notification.ManageOverlayPermissionNotificationBuilder
@@ -58,7 +56,6 @@ class MainActivity : BaseActivity(),
 
     private val viewBinding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<MainViewModel>()
-    private val calendarViewModel by viewModels<CalendarViewModel>()
 
     private val torch: Torch by lazy {
         Torch(viewBinding)
@@ -107,10 +104,8 @@ class MainActivity : BaseActivity(),
                 PermissionRationaleDialogFragment().also {
                     it.show(supportFragmentManager, it.tag)
                 }
-            } else
-                calendarViewModel.postValue()
-        } else
-            calendarViewModel.postValue()
+            }
+        }
 
         initializeViews()
         registerLifecycleObservers()
@@ -305,7 +300,7 @@ class MainActivity : BaseActivity(),
                         ) ?: return@registerForActivityResult
 
                         if (calendarPermissionChangedToAllowed)
-                            calendarViewModel.postValue()
+                            viewModel.callPostCalendars()
 
                         viewModel.refresh(preferenceChanged)
                     }
@@ -315,7 +310,7 @@ class MainActivity : BaseActivity(),
         putActivityResultLauncher(
                 PermissionChecker.Calendar.KEY,
                 registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                    calendarViewModel.postValue()
+                    viewModel.callPostCalendars()
                 }
         )
     }
@@ -377,9 +372,8 @@ class MainActivity : BaseActivity(),
                 Manifest.permission.READ_CALENDAR,
                 Manifest.permission.WRITE_CALENDAR
         ), {
-            calendarViewModel.postValue()
+            viewModel.callPostCalendars()
         }, {
-            calendarViewModel.callDisableCalendarControlViews()
             viewModel.callShowRequestCalendarPermissionSnackbar()
         }) {
             checkManageOverlayPermission()
@@ -393,10 +387,8 @@ class MainActivity : BaseActivity(),
             finish()
 
         if (PermissionChecker.hasCalendarPermission().not()) {
-            if (isFinishing.not()) {
-                calendarViewModel.callDisableCalendarControlViews()
+            if (isFinishing.not())
                 viewModel.callShowRequestCalendarPermissionSnackbar()
-            }
         }
     }
 

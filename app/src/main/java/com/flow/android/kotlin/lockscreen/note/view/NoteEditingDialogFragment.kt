@@ -14,7 +14,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.lifecycle.MutableLiveData
@@ -39,7 +38,10 @@ class NoteEditingDialogFragment : BaseDialogFragment<FragmentNoteEditingDialogBi
         return FragmentNoteEditingDialogBinding.inflate(inflater, container, false)
     }
 
-    private val duration = 150L
+    private object Duration {
+        const val Short = 100L
+        const val Medium = 150L
+    }
 
     private var itemChangedListener: ItemChangedListener? = null
 
@@ -288,10 +290,10 @@ class NoteEditingDialogFragment : BaseDialogFragment<FragmentNoteEditingDialogBi
                 viewBinding.recyclerViewChecklist.show()
 
                 if (viewBinding.viewDividerBottom.isVisible.not())
-                    viewBinding.viewDividerBottom.fadeIn(duration)
+                    viewBinding.viewDividerBottom.fadeIn(Duration.Short)
 
                 if (viewBinding.viewDividerTop.isVisible.not())
-                    viewBinding.viewDividerTop.fadeIn(duration)
+                    viewBinding.viewDividerTop.fadeIn(Duration.Short)
             }
 
             checklistAdapter.submitList(it.toList())
@@ -304,23 +306,23 @@ class NoteEditingDialogFragment : BaseDialogFragment<FragmentNoteEditingDialogBi
                 it.layoutTransition = LayoutTransition()
 
                 it.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
-                it.layoutTransition.setDuration(LayoutTransition.CHANGING, duration)
-                it.layoutTransition.setStartDelay(LayoutTransition.CHANGING, duration)
+                it.layoutTransition.setDuration(LayoutTransition.CHANGING, Duration.Medium)
+                it.layoutTransition.setStartDelay(LayoutTransition.CHANGING, Duration.Medium)
             }
         }
 
         viewBinding.constraintLayout.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
         viewBinding.constraintLayout.layoutTransition.setDuration(
             LayoutTransition.CHANGING,
-            duration
+            Duration.Medium
         )
         viewBinding.constraintLayout.layoutTransition.setStartDelay(
             LayoutTransition.CHANGING,
-            duration
+            Duration.Medium
         )
         viewBinding.root.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
-        viewBinding.root.layoutTransition.setDuration(LayoutTransition.CHANGING, duration)
-        viewBinding.root.layoutTransition.setStartDelay(LayoutTransition.CHANGING, duration)
+        viewBinding.root.layoutTransition.setDuration(LayoutTransition.CHANGING, Duration.Medium)
+        viewBinding.root.layoutTransition.setStartDelay(LayoutTransition.CHANGING, Duration.Medium)
     }
 
     private fun enableSaveButton() {

@@ -1,7 +1,9 @@
 package com.flow.android.kotlin.lockscreen.widget
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import com.flow.android.kotlin.lockscreen.util.scale
@@ -33,6 +35,15 @@ class CenterAlignedTabLayout : TabLayout {
         val last = (getChildAt(0) as ViewGroup).getChildAt((getChildAt(0) as ViewGroup).childCount - 1)
 
         ViewCompat.setPaddingRelative(getChildAt(0), width / 2 - first.width / 2, 0, width / 2 - last.width / 2, 0)
+    }
+
+    override fun onInterceptTouchEvent(event: MotionEvent?): Boolean {
+        return false
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        return false
     }
 }
 

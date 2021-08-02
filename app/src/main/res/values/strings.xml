@@ -52,6 +52,8 @@
     <string name="note_detail_dialog_fragment_004">Delete note</string>
     <string name="note_detail_dialog_fragment_005">Delete the note.</string>
     <string name="note_detail_dialog_fragment_006">Done</string>
+    <string name="note_detail_dialog_fragment_007">Note not found.</string>
+    <string name="note_detail_dialog_fragment_008">Progress</string>
 
     <string-array name="note_detail_dialog_fragment_007">
         <item>Calendar</item>

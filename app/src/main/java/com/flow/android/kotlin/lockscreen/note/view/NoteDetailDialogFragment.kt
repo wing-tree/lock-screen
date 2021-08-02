@@ -10,9 +10,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.base.BaseDialogFragment
+import com.flow.android.kotlin.lockscreen.base.SingleStringChoiceDialogFragment
 import com.flow.android.kotlin.lockscreen.databinding.FragmentNoteDetailDialogBinding
 import com.flow.android.kotlin.lockscreen.note.checklist.adapter.ChecklistAdapter
 import com.flow.android.kotlin.lockscreen.note.listener.ItemChangedListener
@@ -23,11 +25,12 @@ import com.flow.android.kotlin.lockscreen.util.LinearLayoutManagerWrapper
 import com.flow.android.kotlin.lockscreen.util.show
 import com.flow.android.kotlin.lockscreen.util.toDateString
 import com.flow.android.kotlin.lockscreen.util.view.ConfirmationDialogFragment
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
-class NoteDetailDialogFragment : BaseDialogFragment<FragmentNoteDetailDialogBinding>() {
+class NoteDetailDialogFragment : BaseDialogFragment<FragmentNoteDetailDialogBinding>(), ItemChangedListener {
     override fun inflate(inflater: LayoutInflater, container: ViewGroup?): FragmentNoteDetailDialogBinding {
         return FragmentNoteDetailDialogBinding.inflate(inflater, container, false)
     }
@@ -52,6 +55,8 @@ class NoteDetailDialogFragment : BaseDialogFragment<FragmentNoteDetailDialogBind
             } }
         }
     }, isEditable = false)
+
+    private val timeMillis = 233L
 
     private val simpleDateFormat by lazy {
         SimpleDateFormat(getString(R.string.format_date_001), Locale.getDefault())
@@ -97,7 +102,12 @@ class NoteDetailDialogFragment : BaseDialogFragment<FragmentNoteDetailDialogBind
             initializeViews(it)
             registerLifecycleObservers()
         } ?: run {
-            // show error.
+            showToast(getString(R.string.note_detail_dialog_fragment_007))
+
+            lifecycleScope.launch {
+                delay(timeMillis)
+                dismiss()
+            }
         }
 
         localBroadcastManager.registerReceiver(localBroadcastReceiver, IntentFilter(Action.Note))
@@ -149,31 +159,49 @@ class NoteDetailDialogFragment : BaseDialogFragment<FragmentNoteDetailDialogBind
 
         viewBinding.imageViewEdit.setOnClickListener {
             NoteEditingDialogFragment.getInstance(note).also {
-                it.show(requireActivity().supportFragmentManager, it.tag)
+                it.show(childFragmentManager, it.tag)
             }
         }
 
         viewBinding.imageViewMoreVert.setOnClickListener {
             val items = resources.getStringArray(R.array.note_detail_dialog_fragment_007)
 
-            MaterialAlertDialogBuilder(requireContext()).setItems(items) { _: DialogInterface, i: Int ->
-                when(i) {
-                    0 -> insertToCalendar(note)
-                    1 -> share(requireContext(), note)
+            SingleStringChoiceDialogFragment(items) { dialogFragment, item ->
+                when(item) {
+                    items[0] -> insertToCalendar(note)
+                    items[1] -> share(requireContext(), note)
                 }
-            }.show()
+
+                lifecycleScope.launch {
+                    delay(timeMillis)
+                    dialogFragment.dismiss()
+                }
+            }.also { it.show(childFragmentManager, it.tag) }
         }
 
         viewBinding.textViewClose.setOnClickListener {
-            dismiss()
+            lifecycleScope.launch {
+                delay(timeMillis)
+                dismiss()
+            }
         }
+
+        viewBinding.textViewDone.setText(
+                if (note.isDone)
+                    R.string.note_detail_dialog_fragment_008
+                else
+                    R.string.note_detail_dialog_fragment_006
+        )
 
         viewBinding.textViewDone.setOnClickListener {
             itemChangedListener?.onUpdate(note.apply {
                 isDone = isDone.not()
             })
 
-            dismiss()
+            lifecycleScope.launch {
+                delay(timeMillis)
+                dismiss()
+            }
         }
     }
 
@@ -233,5 +261,17 @@ class NoteDetailDialogFragment : BaseDialogFragment<FragmentNoteDetailDialogBind
 
             return instance
         }
+    }
+
+    override fun onDelete(note: Note) {
+        itemChangedListener?.onDelete(note)
+    }
+
+    override fun onInsert(note: Note) {
+        itemChangedListener?.onInsert(note)
+    }
+
+    override fun onUpdate(note: Note, onComplete: (() -> Unit)?) {
+        itemChangedListener?.onUpdate(note, onComplete)
     }
 }

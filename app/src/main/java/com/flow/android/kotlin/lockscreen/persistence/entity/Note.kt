@@ -61,7 +61,7 @@ data class Note (
     fun checkListToString() = if (checklist.isEmpty())
         BLANK
     else
-        checklist.joinToString("$NEWLINE$NEWLINE")
+        checklist.joinToString("$NEWLINE$NEWLINE") { it.content }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

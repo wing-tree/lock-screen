@@ -20,14 +20,6 @@ class CalendarViewModel(application: Application) : AndroidViewModel(application
     val calendars: LiveData<List<Model.Calendar>>
         get() = _calendars
 
-    private val _disableCalendarControlViews = SingleLiveEvent<Unit>()
-    val disableCalendarControlViews: LiveData<Unit>
-        get() = _disableCalendarControlViews
-
-    fun callDisableCalendarControlViews() {
-        _disableCalendarControlViews.call()
-    }
-
     fun postValue() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {

@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.flow.android.kotlin.lockscreen.R
@@ -16,8 +16,6 @@ import com.flow.android.kotlin.lockscreen.calendar.adapter.EventsAdapter
 import com.flow.android.kotlin.lockscreen.calendar.contract.CalendarContract
 import com.flow.android.kotlin.lockscreen.calendar.model.Model
 import com.flow.android.kotlin.lockscreen.calendar.viewmodel.CalendarViewModel
-import com.flow.android.kotlin.lockscreen.eventbus.EventBus
-import com.flow.android.kotlin.lockscreen.main.viewmodel.Refresh
 import com.flow.android.kotlin.lockscreen.permission.PermissionChecker
 import com.flow.android.kotlin.lockscreen.preference.persistence.Preference
 import com.flow.android.kotlin.lockscreen.util.hide
@@ -27,7 +25,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -36,7 +33,7 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
         return FragmentCalendarBinding.inflate(inflater, container, false)
     }
 
-    private val viewModel by activityViewModels<CalendarViewModel>()
+    private val viewModel by viewModels<CalendarViewModel>()
     private val compositeDisposable = CompositeDisposable()
     private val duration = 150L
 
@@ -45,8 +42,8 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
             delay(duration)
 
             when (result) {
-                CalendarLoader.RequestCode.EditEvent -> refresh()
-                CalendarLoader.RequestCode.InsertEvent -> refresh()
+                CalendarLoader.RequestCode.EditEvent -> refresh(false)
+                CalendarLoader.RequestCode.InsertEvent -> refresh(false)
             }
         }
     }
@@ -102,8 +99,8 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
         val view = super.onCreateView(inflater, container, savedInstanceState)
 
         initializeViews()
+        initializeData()
         registerLifecycleObservers()
-        subscribeObservables()
         setTextColor()
 
         return view
@@ -116,6 +113,10 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
     }
 
     private fun registerLifecycleObservers() {
+        mainViewModel.postCalendars.observe(viewLifecycleOwner, {
+            viewModel.postValue()
+        })
+
         viewModel.calendars.observe(viewLifecycleOwner, { calendars ->
             if (calendars.isEmpty())
                 return@observe
@@ -146,8 +147,9 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
             }
         })
 
-        viewModel.disableCalendarControlViews.observe(viewLifecycleOwner, {
-            disableCalendarControlViews()
+        mainViewModel.refresh.observe(viewLifecycleOwner, {
+            if (Preference.isChanged(it.fondSize, it.uncheckedCalendarIds))
+                refresh()
         })
     }
 
@@ -177,24 +179,20 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
             ), {
                 viewModel.postValue()
             }, {
-                viewModel.callDisableCalendarControlViews()
+                disableCalendarControlViews()
                 mainViewModel.callShowRequestCalendarPermissionSnackbar()
             })
         }
     }
 
-    private fun subscribeObservables() {
-        compositeDisposable.add(
-            EventBus.getInstance().subscribe({
-                if (it == Refresh.Calendar)
-                    refresh()
-            }) {
-                Timber.e(it)
-            }
-        )
+    private fun initializeData() {
+        if (PermissionChecker.hasCalendarPermission())
+            viewModel.postValue()
+        else
+            disableCalendarControlViews()
     }
 
-    private fun refresh() {
+    private fun refresh(preferenceChanged: Boolean = true) {
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             val currentList = adapter.currentList.toMutableList()
             val uncheckedCalendarIds = Preference.Calendar.getUncheckedCalendarIds(requireContext())
@@ -210,6 +208,9 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
 
             withContext(Dispatchers.Main) {
                 adapter.submitList(currentList)
+
+                if (preferenceChanged)
+                    adapter.notifyDataSetChanged()
 
                 if (adapter.itemCount > currentItem)
                     viewBinding.viewPager2.currentItem = currentItem

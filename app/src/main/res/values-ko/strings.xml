@@ -46,6 +46,8 @@
     <string name="note_detail_dialog_fragment_004">메모 삭제</string>
     <string name="note_detail_dialog_fragment_005">메모를 삭제합니다.</string>
     <string name="note_detail_dialog_fragment_006">완료</string>
+    <string name="note_detail_dialog_fragment_007">메모를 찾을 수 없습니다.</string>
+    <string name="note_detail_dialog_fragment_008">진행</string>
 
     <!-- NoteEditingDialogFragment -->
     <string name="note_editing_dialog_fragment_000">취소</string>
