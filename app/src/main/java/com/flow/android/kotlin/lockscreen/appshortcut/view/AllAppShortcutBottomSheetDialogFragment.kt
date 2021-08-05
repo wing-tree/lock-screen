@@ -7,24 +7,29 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.GridLayoutManager
+import com.flow.android.kotlin.lockscreen.R
 import com.flow.android.kotlin.lockscreen.appshortcut.adapter.AppShortcutAdapter
 import com.flow.android.kotlin.lockscreen.appshortcut.listener.ItemChangedListener
 import com.flow.android.kotlin.lockscreen.appshortcut.model.Model
 import com.flow.android.kotlin.lockscreen.databinding.FragmentAllAppShortcutBottomSheetDialogBinding
-import com.flow.android.kotlin.lockscreen.util.hide
-import com.flow.android.kotlin.lockscreen.util.show
+import com.flow.android.kotlin.lockscreen.util.*
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.wasabeef.recyclerview.animators.FadeInUpAnimator
 import kotlinx.coroutines.*
 import timber.log.Timber
 
 class AllAppShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
-    private var viewBinding: FragmentAllAppShortcutBottomSheetDialogBinding? = null
+    private var _viewBinding: FragmentAllAppShortcutBottomSheetDialogBinding? = null
+    private val viewBinding: FragmentAllAppShortcutBottomSheetDialogBinding
+        get() = _viewBinding!!
     private var itemChangedListener: ItemChangedListener? = null
 
     private val batchSize = 16
+    private val duration = 150L
     private val job = Job()
     private val adapter = AppShortcutAdapter().apply {
         setListener(object : AppShortcutAdapter.Listener {
@@ -40,39 +45,70 @@ class AllAppShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
         })
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(DialogFragment.STYLE_NORMAL, R.style.BottomSheetDialog)
+    }
+
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
+    ): View {
         parentFragment?.let {
             if (it is ItemChangedListener)
                 itemChangedListener = it
         }
 
-        viewBinding = FragmentAllAppShortcutBottomSheetDialogBinding.inflate(
-            inflater,
-            container,
-            false
+        dialog?.window?.let {
+            it.navigationBarColor = ContextCompat.getColor(requireContext(), R.color.surface_dark)
+        }
+
+        _viewBinding = FragmentAllAppShortcutBottomSheetDialogBinding.inflate(
+                inflater,
+                container,
+                false
         )
 
-        viewBinding?.recyclerView?.apply {
+        viewBinding.recyclerView.apply {
             adapter = this@AllAppShortcutBottomSheetDialogFragment.adapter
             itemAnimator = FadeInUpAnimator()
-            layoutManager = GridLayoutManager(requireContext(), 4)
+            layoutManager = GridLayoutManagerWrapper(requireContext(), 4)
             scheduleLayoutAnimation()
+        }
+
+        viewBinding.searchView.maxWidth = Integer.MAX_VALUE
+
+        viewBinding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                adapter.filter().filter(newText)
+                return true
+            }
+        })
+
+        viewBinding.searchView.setOnQueryTextFocusChangeListener { _, boolean ->
+            if (boolean)
+                viewBinding.textView.fadeOut(duration)
+            else {
+                viewBinding.textView.fadeIn(duration)
+                viewBinding.searchView.isIconified = true
+            }
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
             addAll()
         }
 
-        return viewBinding?.root
+        return viewBinding.root
     }
 
     override fun onDestroyView() {
         job.cancel()
-        viewBinding = null
+        _viewBinding = null
         super.onDestroyView()
     }
 
@@ -83,7 +119,7 @@ class AllAppShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
             var count = 0
 
             withContext(Dispatchers.Main) {
-                viewBinding?.progressBar?.show()
+                viewBinding.progressBar.show()
             }
 
             try {
@@ -93,8 +129,8 @@ class AllAppShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
                 }
 
                 val resolveInfoList: List<ResolveInfo> = packageManager.queryIntentActivities(
-                    intent,
-                    0
+                        intent,
+                        0
                 )
                 for (resolveInfo in resolveInfoList) {
                     val icon = resolveInfo.activityInfo.loadIcon(packageManager)
@@ -110,17 +146,17 @@ class AllAppShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
                         continue
 
                     shortcuts.add(
-                        Model.AppShortcut(
-                            icon = icon,
-                            label = label,
-                            packageName = packageName,
-                            priority = 0L
-                        )
+                            Model.AppShortcut(
+                                    icon = icon,
+                                    label = label,
+                                    packageName = packageName,
+                                    priority = 0L
+                            )
                     )
 
                     if (count >= batchSize.dec()) {
                         withContext(Dispatchers.Main) {
-                            viewBinding?.progressBar?.hide()
+                            viewBinding.progressBar.hide()
                             adapter.addAll(shortcuts.toList())
                             shortcuts.clear()
                         }
@@ -139,6 +175,8 @@ class AllAppShortcutBottomSheetDialogFragment: BottomSheetDialogFragment() {
 
             withContext(Dispatchers.Main) {
                 adapter.addAll(shortcuts)
+                adapter.saveCurrentList()
+                viewBinding.searchView.fadeIn(duration)
             }
         }
     }

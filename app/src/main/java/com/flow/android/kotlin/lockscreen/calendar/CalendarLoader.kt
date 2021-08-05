@@ -174,7 +174,7 @@ object CalendarLoader {
         return events
     }
 
-    fun events(contentResolver: ContentResolver, calendarModels: List<Model.Calendar>, amount: Int): ArrayList<Model.Event> {
+    fun events(contentResolver: ContentResolver, calendars: List<Model.Calendar>, amount: Int): ArrayList<Model.Event> {
         val events = arrayListOf<Model.Event>()
 
         @Suppress("LocalVariableName", "SpellCheckingInspection")
@@ -195,7 +195,7 @@ object CalendarLoader {
         DTEND.set(Calendar.SECOND, 0)
         DTEND.add(Calendar.DATE, 1)
 
-        val string = calendarModels.map { it.id }.joinToString(separator = ", ") { "\"$it\"" }
+        val string = calendars.map { it.id }.joinToString(separator = ", ") { "\"$it\"" }
         val selection = "(${CalendarContract.Instances.CALENDAR_ID} IN ($string))"
 
         events(contentResolver, selection, DTSTART, DTEND)?.let { instances ->

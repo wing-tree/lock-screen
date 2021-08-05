@@ -33,9 +33,12 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
         return FragmentCalendarBinding.inflate(inflater, container, false)
     }
 
-    private val viewModel by viewModels<CalendarViewModel>()
     private val compositeDisposable = CompositeDisposable()
+    private val viewModel by viewModels<CalendarViewModel>()
     private val duration = 150L
+    private val itemCount = 7
+
+    private var currentItem = 0
 
     private val activityResultLauncher = registerForActivityResult(CalendarContract()) { result ->
         lifecycleScope.launch {
@@ -52,7 +55,10 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
         currentItem = viewBinding.viewPager2.currentItem
         CalendarLoader.edit(activityResultLauncher, it)
     }
-    private val itemCount = 7
+
+    private val simpleDateFormat: SimpleDateFormat by lazy {
+        SimpleDateFormat(getString(R.string.format_date_001), Locale.getDefault())
+    }
 
     private val onPageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
@@ -84,12 +90,6 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
             }
         }
     }
-
-    private val simpleDateFormat: SimpleDateFormat by lazy {
-        SimpleDateFormat(getString(R.string.format_date_001), Locale.getDefault())
-    }
-
-    private var currentItem = 0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -196,14 +196,14 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             val currentList = adapter.currentList.toMutableList()
             val uncheckedCalendarIds = Preference.Calendar.getUncheckedCalendarIds(requireContext())
+            val calendars = viewModel.calendars.value?.filter {
+                uncheckedCalendarIds.contains(it.id.toString()).not()
+            } ?: emptyList()
 
             for (i in 0..itemCount) {
-                CalendarLoader.events(
-                    mainViewModel.contentResolver,
-                    viewModel.calendars.value?.filter {
-                        uncheckedCalendarIds.contains(it.id.toString()).not()
-                    } ?: emptyList(), i
-                ).also { currentList[i] = it }
+                CalendarLoader.events(mainViewModel.contentResolver, calendars, i).also {
+                    currentList[i] = it
+                }
             }
 
             withContext(Dispatchers.Main) {
@@ -211,9 +211,6 @@ class CalendarFragment: BaseMainFragment<FragmentCalendarBinding>() {
 
                 if (preferenceChanged)
                     adapter.notifyDataSetChanged()
-
-                if (adapter.itemCount > currentItem)
-                    viewBinding.viewPager2.currentItem = currentItem
             }
         }
     }

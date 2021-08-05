@@ -6,25 +6,47 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="#2E2E2E"
+    android:background="@color/surface_dark"
     android:gravity="center_horizontal">
 
-    <TextView
-        android:id="@+id/text_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-light"
-        android:paddingBottom="@dimen/padding_16dp"
-        android:paddingEnd="@dimen/padding_24dp"
-        android:paddingStart="@dimen/padding_24dp"
-        android:paddingTop="@dimen/padding_16dp"
-        android:text="@string/fragment_all_shortcut_bottom_sheet_dialog_000"
-        android:textColor="@color/high_emphasis_light"
-        android:textSize="@dimen/text_size_20dp"
-        android:textStyle="bold"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/linear_layout"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/height_56dp"
+        android:layout_marginStart="@dimen/margin_8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/text_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-light"
+            android:paddingStart="@dimen/padding_16dp"
+            android:paddingEnd="@dimen/padding_16dp"
+            android:text="@string/fragment_all_shortcut_bottom_sheet_dialog_000"
+            android:textColor="@color/high_emphasis_light"
+            android:textSize="@dimen/text_size_20dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/search_view"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/search_view"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:queryHint="@string/fragment_all_shortcut_bottom_sheet_dialog_001"
+            app:searchHintIcon="@null"
+            app:theme="@style/SearchView"
+            tools:visibility="visible"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View
         android:id="@+id/view_divider"
@@ -33,7 +55,7 @@
         android:background="@color/divider"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_view"/>
+        app:layout_constraintTop_toBottomOf="@id/linear_layout"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"

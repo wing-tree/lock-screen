@@ -12,7 +12,6 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
@@ -31,7 +30,6 @@ import com.flow.android.kotlin.lockscreen.util.*
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
-
 
 class NoteEditingDialogFragment : BaseDialogFragment<FragmentNoteEditingDialogBinding>() {
     override fun inflate(inflater: LayoutInflater, container: ViewGroup?): FragmentNoteEditingDialogBinding {
@@ -155,16 +153,11 @@ class NoteEditingDialogFragment : BaseDialogFragment<FragmentNoteEditingDialogBi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewBinding.editText.requestFocus()
-        with(requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager) {
-            toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
-        }
+        showSoftKeyboard()
     }
 
     override fun onDestroyView() {
-        with(requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager) {
-            toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
-        }
-
+        hideSoftKeyboard()
         localBroadcastManager.unregisterReceiver(localBroadcastReceiver)
         super.onDestroyView()
     }

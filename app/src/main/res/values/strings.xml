@@ -111,6 +111,7 @@
 
     <!-- fragment_all_shortcut_bottom_sheet_dialog -->
     <string name="fragment_all_shortcut_bottom_sheet_dialog_000">App shortcuts</string>
+    <string name="fragment_all_shortcut_bottom_sheet_dialog_001">Search</string>
 
     <!-- fragment_date_picker_dialog -->
     <string name="fragment_date_picker_dialog_000">Cancel</string>

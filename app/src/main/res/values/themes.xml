@@ -155,4 +155,17 @@
         <item name="android:background">@drawable/rounded_corners_top_left</item>
         <item name="android:backgroundTint">#FFCC66</item>
     </style>
+
+    <style name="BottomSheetDialog" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowSoftInputMode">adjustResize|stateHidden</item>
+    </style>
+
+    <style name="SearchView" parent="Widget.AppCompat.SearchView" >
+        <item name="android:textColorHint">@color/medium_emphasis_light</item>
+        <item name="android:textColorPrimary">@color/high_emphasis_light</item>
+        <item name="android:tint">@color/high_emphasis_light</item>
+        <item name="colorAccent">@color/high_emphasis_light</item>
+        <item name="searchHintIcon">@null</item>
+    </style>
 </resources>

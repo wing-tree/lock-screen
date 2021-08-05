@@ -9,8 +9,10 @@ import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.RippleDrawable
 import android.net.Uri
+import android.view.inputmethod.InputMethodManager
 import androidx.annotation.ColorInt
 import com.flow.android.kotlin.lockscreen.R
+import com.flow.android.kotlin.lockscreen.application.MainApplication
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -75,5 +77,17 @@ fun goToPlayStore(context: Context) {
                 Uri.parse("https://play.google.com/store/apps/details?id=${context.packageName}")
             )
         )
+    }
+}
+
+fun hideSoftKeyboard() {
+    with(MainApplication.instance.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager) {
+        toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
+    }
+}
+
+fun showSoftKeyboard() {
+    with(MainApplication.instance.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager) {
+        toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
     }
 }
